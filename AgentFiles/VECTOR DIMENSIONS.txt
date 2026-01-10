@@ -1,0 +1,92 @@
+IGB AI - Feature Dimensions Breakdown
+=====================================
+
+Total: ~190-200 dimensions
+
+Category Breakdown:
+- Textual structure: ~25
+- Temporal patterns: ~20
+- Linguistic style: ~30
+- Topic modeling: ~20
+- Sentiment/emotions: ~20
+- Social behavior: ~25
+- Personality traits: ~15
+- Conversational archetypes: ~10
+- Graph metrics: ~10
+- Synthetic composite signals: ~15
+
+=====================================
+1. MESSAGE STRUCTURE + TEXTUAL METRICS
+=====================================
+- Message length metrics (avg, std dev, min/max, proportions)
+- Frequency + burstiness (avg messages/day, variance, bursts, circadian distribution)
+- Temporal dynamics (response times, latency, consistency)
+- Message type distribution (questions, statements, emojis, punctuation, fillers)
+
+=====================================
+2. LINGUISTIC STYLE + GRAMMATICAL FEATURES
+=====================================
+- Linguistic complexity (sentence length, vocabulary diversity, readability, grammar complexity)
+- Morphological + syntactic features (POS distribution, pronouns, adverbs, intensifiers)
+- Rhetorical markers (past/future references, modal verbs, hedging vs assertiveness)
+
+=====================================
+3. SEMANTIC CONTENT + TOPIC MODELING
+=====================================
+- Topic distribution (BERTopic/LDA: dominant topics, proportions, entropy)
+- Keyword + phrase features (frequency, named entities, domain-specific lexicon)
+- Content diversity (conversation domains, topic switching, stability)
+
+=====================================
+4. SENTIMENT + EMOTION DYNAMICS
+=====================================
+- Sentiment metrics (avg, variance, min/max, slope, volatility)
+- Emotion category distribution (joy, sadness, anger, fear, neutral, confusion, anticipation)
+- Emotional dynamics (stability, inertia, rapid shifts, amplitude)
+
+=====================================
+5. CONVERSATIONAL BEHAVIOR + SOCIAL SIGNALS
+=====================================
+- Responsiveness traits (reply speed, consistency, reciprocity)
+- Engagement level (messages per turn, questions, affirmations, elaboration)
+- Politeness + formality (politeness score, formal/informal ratio, honorifics, profanity)
+- Humor + sarcasm (humor density, sarcasm probability, irony, meme references)
+- Persuasion/dominance signals (directives, interruptions, topic changes, sentiment asymmetry)
+
+=====================================
+6. COMMUNICATION STYLE CLUSTERS
+=====================================
+- Personality traits (Big Five, HEXACO, directness, confidence, empathy, assertiveness)
+- Conversational profile labels (storyteller, question-asker, responder, analyst, encourager, short-messenger, rambler, emotional-expressive, blunt-direct)
+
+=====================================
+7. GRAPH-BASED SOCIAL SIGNATURE
+=====================================
+- Graph metrics (node degree, weighted degree, reciprocity, betweenness, closeness, clustering)
+- Graph shape (dominance score, social balance, dyadic symmetry, dependency)
+
+=====================================
+8. META-DATA + CONTEXTUAL SIGNALS
+=====================================
+- Device/platform indicators (daytime/nighttime usage, weekday/weekend, session length)
+- Interaction rhythm (conversation frequency, schedule consistency, missing-message patterns)
+
+=====================================
+9. SYNTHETIC DERIVED FEATURES
+=====================================
+- Composite behaviors:
+  * Social energy index (message length × frequency × sentiment)
+  * Emotional volatility index (sentiment variance × reply latency variance)
+  * Attentiveness index (question frequency × response speed)
+  * Confidence index (assertive statements / hedges)
+  * Expressiveness index (emoji density × sentiment amplitude)
+  * Topic coherence score (topic stability / entropy)
+
+- Behavior archetypes (K-Means/UMAP clustering):
+  * The Analyst
+  * The Optimist
+  * The Minimalist Texter
+  * The Emotional Storyteller
+  * The Rapid-Fire Conversationalist
+  * The Dry Humorist
+

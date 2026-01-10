@@ -18,20 +18,32 @@ const api = axios.create({
  * @returns {Promise} Upload response
  */
 export const uploadFile = async (file) => {
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'api.js:20',message:'uploadFile entry',data:{file_name:file?.name,file_type:file?.type,has_uri:!!file?.uri},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+  // #endregion
   const formData = new FormData();
   formData.append('file', {
     uri: file.uri,
     type: file.type || 'text/plain',
     name: file.name,
   });
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'api.js:27',message:'FormData created, before request',data:{formData_keys:Array.from(formData.keys())},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+  // #endregion
 
-  const response = await api.post('/api/upload', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-
-  return response.data;
+  // Use axios directly for FormData - axios will automatically set Content-Type with boundary
+  try {
+    const response = await axios.post(`${API_BASE_URL}/api/upload`, formData);
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'api.js:32',message:'uploadFile success',data:{status:response.status},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+    // #endregion
+    return response.data;
+  } catch (error) {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'api.js:36',message:'uploadFile error',data:{error:error.message,status:error.response?.status},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+    // #endregion
+    throw error;
+  }
 };
 
 /**
@@ -56,6 +68,9 @@ export const analyzeText = async (text, analysisType = 'general') => {
  * @returns {Promise} Analysis result
  */
 export const analyzeFile = async (file, analysisType = 'general') => {
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'api.js:55',message:'analyzeFile entry',data:{file_name:file?.name,analysis_type:analysisType},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+  // #endregion
   const formData = new FormData();
   formData.append('file', {
     uri: file.uri,
@@ -63,14 +78,23 @@ export const analyzeFile = async (file, analysisType = 'general') => {
     name: file.name,
   });
   formData.append('analysis_type', analysisType);
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'api.js:63',message:'FormData created for analyze, before request',data:{formData_keys:Array.from(formData.keys())},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+  // #endregion
 
-  const response = await api.post('/api/analyze-file', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-
-  return response.data;
+  // Use axios directly for FormData - axios will automatically set Content-Type with boundary
+  try {
+    const response = await axios.post(`${API_BASE_URL}/api/analyze-file`, formData);
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'api.js:67',message:'analyzeFile success',data:{status:response.status},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+    // #endregion
+    return response.data;
+  } catch (error) {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'api.js:71',message:'analyzeFile error',data:{error:error.message,status:error.response?.status},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+    // #endregion
+    throw error;
+  }
 };
 
 /**

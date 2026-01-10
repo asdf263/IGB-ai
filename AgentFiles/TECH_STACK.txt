@@ -1,0 +1,23 @@
+IGB AI - Technology Stack
+==========================
+
+FRONTEND
+--------
+- React Native 0.73.0
+- React 18.2.0
+- Expo ~50.0.0
+- React Native Paper (UI components)
+- React Navigation (navigation)
+- Axios (HTTP client)
+
+BACKEND
+-------
+- Python
+- Flask 3.0.0
+- MongoDB (database)
+- Google Gemini AI (LLM)
+
+TESTING
+-------
+- Jest (frontend)
+- unittest (backend)

@@ -1,0 +1,101 @@
+IGB AI - Processing Pipeline
+=============================
+
+CLIENT / FRONTEND
+-----------------
+Upload chat logs (JSON / TXT)
+
+API GATEWAY
+-----------
+Minimal validation & routing
+
+DATA INGESTION & PREPROCESSING
+------------------------------
+- Remove PII
+- Normalize whitespace/emojis
+- Segment into messages
+- Tokenization
+- Compute message lengths, timestamps, intervals
+- Calculate response-time variance
+- Structural statistics
+
+FEATURE EXTRACTION
+------------------
+(A) Linguistic + Structural Features
+    - POS tagging
+    - Readability metrics
+    - Stylistic metrics
+
+(B) Topic Modeling (BERTopic / LDA)
+    - Embed sentences
+    - Cluster topics
+    - Compute topic proportions
+
+(C) Sentiment + Emotion Analysis
+    - Per-message sentiment
+    - Emotion category distribution
+
+(D) Conversation Dynamics
+    - Response delay statistics
+    - Burstiness
+    - Reciprocity index
+
+EMBEDDING + PERSONALITY INFERENCE
+---------------------------------
+(E) Text Embeddings
+    - Chunk into 500-1000 token segments
+    - Embed each segment
+    - Average-pool to user vector
+
+(F) LLM Personality Trait Extraction
+    - Big Five traits
+    - Conversational style labels
+    - Empathy/directness/confidence
+
+SYNTHETIC FEATURE GENERATION
+-----------------------------
+Combine raw signals into derived metrics:
+- Emotional volatility index
+- Social energy index
+- Attentiveness index
+- Expressiveness index
+
+Normalize and assemble into mega-vector
+
+VECTOR STORAGE + INDEXING
+-------------------------
+Save to vector DB (Pinecone / Weaviate / Milvus / FAISS):
+- High-dimensional vector
+- Metadata
+- Personality traits
+- Topic profile
+
+MATCHING + COMPATIBILITY ENGINE
+--------------------------------
+Compute compatibility:
+- Cosine similarity between embeddings
+- Trait similarity
+- Behavioral-pattern similarity
+
+Weighted combination:
+  compat = 0.4 * embed_sim
+        + 0.3 * trait_sim
+        + 0.2 * behavior_sim
+        + 0.1 * sentiment_dynamics_sim
+
+REPORT GENERATION
+-----------------
+LLM generates:
+- Natural language compatibility summary
+- Strengths / tensions analysis
+- Conversation starter suggestions
+
+FRONTEND RENDERING
+------------------
+Display:
+- Multi-dimensional radar plot
+- Communication DNA strip
+- Graph model visualization
+- Sentiment timeline
+- Topic clusters
+

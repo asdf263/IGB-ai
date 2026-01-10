@@ -5,10 +5,6 @@ import DocumentPicker from 'react-native-document-picker';
 import { StatusBar } from 'expo-status-bar';
 import { analyzeText, analyzeFile, uploadFile, chat } from './services/api';
 
-const API_BASE_URL = __DEV__ 
-  ? 'http://localhost:5000'  // Development
-  : 'https://your-production-api.com';  // Production
-
 export default function App() {
   const [text, setText] = useState('');
   const [analysisResult, setAnalysisResult] = useState('');
@@ -250,7 +246,6 @@ const styles = StyleSheet.create({
   chipContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
   },
   chip: {
     margin: 4,
