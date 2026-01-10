@@ -17,3 +17,4 @@ class BaseTestCase(unittest.TestCase):
         self.app = app.test_client()
         self.app.testing = True
 
+
