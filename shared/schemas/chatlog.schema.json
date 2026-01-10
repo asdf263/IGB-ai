@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ChatLog",
+  "description": "Schema for chat log input",
+  "type": "object",
+  "properties": {
+    "messages": {
+      "type": "array",
+      "items": {
+        "$ref": "message.schema.json"
+      },
+      "minItems": 1,
+      "description": "Array of chat messages"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "source": { "type": "string" },
+        "exported_at": { "type": "string", "format": "date-time" },
+        "platform": { "type": "string" }
+      },
+      "description": "Optional metadata about the chat log"
+    }
+  },
+  "required": ["messages"]
+}

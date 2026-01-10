@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BehaviorVector",
+  "description": "Schema for behavior vector output",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique vector identifier"
+    },
+    "vector": {
+      "type": "array",
+      "items": { "type": "number" },
+      "description": "Feature vector values (~200 dimensions)"
+    },
+    "feature_labels": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Labels for each feature dimension"
+    },
+    "categories": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": { "type": "number" }
+      },
+      "description": "Features grouped by category"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "message_count": { "type": "integer" },
+        "extracted_at": { "type": "string", "format": "date-time" },
+        "synthetic": { "type": "boolean" },
+        "method": { "type": "string" }
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["vector"]
+}

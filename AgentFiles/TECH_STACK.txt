@@ -9,13 +9,39 @@ FRONTEND
 - React Native Paper (UI components)
 - React Navigation (navigation)
 - Axios (HTTP client)
+Frontend
+React + Plotly + Cytoscape
+TailwindCSS
+
+
+
 
 BACKEND
 -------
-- Python
-- Flask 3.0.0
-- MongoDB (database)
-- Google Gemini AI (LLM)
+FastAPI
+
+
+spaCy
+
+
+HuggingFace Transformers
+
+
+OpenAI + Gemini embeddings
+
+
+scikit-learn + XGBoost
+
+
+Ray for parallelism
+
+
+Storage
+ChromaDB (local) + Mongodb
+
+
+Redis for caching
+
 
 TESTING
 -------
