@@ -1,6 +1,49 @@
-Flask==3.0.0
-flask-cors==4.0.0
-google-generativeai==0.3.2
-python-dotenv==1.0.0
-werkzeug==3.0.1
+# FastAPI Backend
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.5.0
+python-dotenv>=1.0.0
+python-multipart>=0.0.6
+
+# Data Processing
+numpy>=1.24.0
+pandas>=2.0.0
+orjson>=3.9.0
+
+# NLP - spaCy
+spacy>=3.7.0
+
+# ML - HuggingFace & Embeddings
+transformers>=4.36.0
+sentence-transformers>=2.2.0
+torch>=2.1.0
+
+# ML - scikit-learn & XGBoost
+scikit-learn>=1.3.0
+xgboost>=2.0.0
+
+# Dimensionality Reduction & Clustering
+umap-learn>=0.5.0
+hdbscan>=0.8.0
+
+# Vector Storage
+chromadb>=0.4.0
+
+# Caching
+redis>=5.0.0
+
+# Parallelism
+ray>=2.9.0
+
+# Database
+pymongo>=4.6.0
+
+# LLM APIs
+google-generativeai>=0.3.2
+openai>=1.6.0
+
+# Legacy Flask (optional)
+Flask>=3.0.0
+flask-cors>=4.0.0
+werkzeug>=3.0.1
 
