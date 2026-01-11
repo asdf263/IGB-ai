@@ -238,17 +238,36 @@ class EmotionTransformerExtractor:
             for cat in self.EMOTION_CATEGORIES:
                 emotion_arrays[cat].append(emotions.get(cat, 0.0))
         
-        # Primary emotion scores (mean across messages)
-        features['joy_score'] = float(np.mean(emotion_arrays['joy']))
-        features['sadness_score'] = float(np.mean(emotion_arrays['sadness']))
-        features['anger_score'] = float(np.mean(emotion_arrays['anger']))
-        features['fear_score'] = float(np.mean(emotion_arrays['fear']))
-        features['surprise_score'] = float(np.mean(emotion_arrays['surprise']))
-        features['disgust_score'] = float(np.mean(emotion_arrays['disgust']))
-        features['love_score'] = float(np.mean(emotion_arrays['love']))
-        features['optimism_score'] = float(np.mean(emotion_arrays['optimism']))
-        features['trust_score'] = float(np.mean(emotion_arrays['trust']))
-        features['anticipation_score'] = float(np.mean(emotion_arrays['anticipation']))
+        # Primary emotion scores (mean across messages) with boosting
+        # Apply boosting: multiply by 8, then apply special rules for >0.2 and >0.5, cap at 1.0
+        # Exclude optimism_score from boosting
+        
+        def boost_emotion(score: float) -> float:
+            """Apply emotion boosting logic."""
+            # Only multiply by 8 for values under 0.2
+            if score < 0.2:
+                boosted = score * 8.0
+            else:
+                boosted = score
+            
+            # Apply additional multipliers based on the boosted value
+            if boosted > 0.5:
+                boosted *= 1.5
+            elif boosted > 0.2:
+                boosted *= 2.0
+            
+            return min(1.0, boosted)
+        
+        features['joy_score'] = boost_emotion(float(np.mean(emotion_arrays['joy'])))
+        features['sadness_score'] = boost_emotion(float(np.mean(emotion_arrays['sadness'])))
+        features['anger_score'] = boost_emotion(float(np.mean(emotion_arrays['anger'])))
+        features['fear_score'] = boost_emotion(float(np.mean(emotion_arrays['fear'])))
+        features['surprise_score'] = boost_emotion(float(np.mean(emotion_arrays['surprise'])))
+        features['disgust_score'] = boost_emotion(float(np.mean(emotion_arrays['disgust'])))
+        features['love_score'] = boost_emotion(float(np.mean(emotion_arrays['love'])))
+        features['optimism_score'] = float(np.mean(emotion_arrays['optimism']))  # No boosting for optimism
+        features['trust_score'] = boost_emotion(float(np.mean(emotion_arrays['trust'])))
+        features['anticipation_score'] = boost_emotion(float(np.mean(emotion_arrays['anticipation'])))
         
         # Emotion dynamics
         features['dominant_consistency'] = self._compute_dominant_consistency(all_emotions)

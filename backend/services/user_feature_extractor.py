@@ -16,6 +16,7 @@ from .features.reaction_features import ReactionFeatureExtractor
 from .features.llm_synthetic_features import LLMSyntheticFeatureExtractor
 from .features.emotion_transformer import EmotionTransformerExtractor
 from .features.conversation_context_features import ConversationContextExtractor
+from .calibrated_normalizer import CalibratedNormalizer
 
 
 class UserFeatureExtractor:
@@ -32,6 +33,7 @@ class UserFeatureExtractor:
         self.llm_synthetic_extractor = LLMSyntheticFeatureExtractor()
         self.emotion_extractor = EmotionTransformerExtractor()
         self.context_extractor = ConversationContextExtractor()
+        self.calibrated_normalizer = CalibratedNormalizer()
         
         self._feature_names = None
     
@@ -158,55 +160,53 @@ class UserFeatureExtractor:
     
     def _normalize_features(self, features: Dict[str, float]) -> Dict[str, float]:
         """
-        Normalize features appropriately:
-        - Ratios/scores: clip to [0, 1]
-        - Raw metrics (counts, lengths): keep as-is for interpretability
-        - Handle NaN/Inf values
+        Normalize features using calibrated piecewise functions where available,
+        falling back to heuristic normalization for other features.
         """
-        normalized = {}
+        # First, apply calibrated normalization
+        normalized = self.calibrated_normalizer.normalize(features)
         
-        # Features that are naturally bounded [0, 1] - just clip them
+        # For features not in calibration set, apply fallback normalization
         bounded_keywords = {
             'ratio', 'density', 'richness', 'consistency', 'matching', 
             'alignment', 'balance', 'tendency'
         }
         
-        # Features that should be clipped to [0, 1] but might slightly exceed
         soft_bounded_keywords = {
             'score', 'index', 'level', 'frequency', 'rate'
         }
         
-        # Features to keep as raw values (for interpretability)
         raw_keywords = {
             'mean', 'std', 'min', 'max', 'median', 'count', 'length',
             'entropy', 'depth', 'readability', 'latency', 'session'
         }
         
-        for key, value in features.items():
+        for key, value in normalized.items():
             # Handle invalid values
             if value is None or (isinstance(value, float) and (np.isnan(value) or np.isinf(value))):
                 normalized[key] = 0.0
                 continue
             
+            # If value was already normalized by calibration (changed from original), keep it
+            if key in features and value != features[key]:
+                # Calibrated normalization was applied, clip to [0, 1] for safety
+                normalized[key] = float(np.clip(value, 0.0, 1.0))
+                continue
+            
+            # Apply fallback normalization for non-calibrated features
             key_lower = key.lower()
             
-            # Determine normalization strategy
             is_bounded = any(b in key_lower for b in bounded_keywords)
             is_soft_bounded = any(b in key_lower for b in soft_bounded_keywords)
             is_raw = any(r in key_lower for r in raw_keywords)
             
             if is_bounded:
-                # Strict [0, 1] clip for ratios and densities
                 normalized[key] = float(np.clip(value, 0.0, 1.0))
             elif is_soft_bounded:
-                # Soft clip - allow slight overshoot but cap at 1.0
                 normalized[key] = float(np.clip(value, 0.0, 1.0))
             elif is_raw:
-                # Keep raw values - they're interpretable metrics
-                # Just ensure they're not negative (most metrics shouldn't be)
                 normalized[key] = float(max(0.0, value))
             else:
-                # Unknown feature - if in [0,1] keep it, otherwise keep raw
                 if 0.0 <= value <= 1.0:
                     normalized[key] = float(value)
                 else:

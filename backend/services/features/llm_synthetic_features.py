@@ -178,6 +178,7 @@ class LLMSyntheticFeatureExtractor:
         """
         Communication Warmth: Overall friendliness and warmth in communication.
         High = friendly, supportive, positive; Low = cold, distant, neutral
+        Boosted baseline to create more engaging personas.
         """
         sentiment_mean = self._safe_get(sentiment, 'sentiment_mean', 0)
         # Convert from -1,1 to 0,1
@@ -187,17 +188,20 @@ class LLMSyntheticFeatureExtractor:
         empathy = self._safe_get(behavioral, 'empathy_score', 0)
         support = self._safe_get(behavioral, 'support_ratio', 0)
         support_react = self._safe_get(reaction, 'support_reactivity', 0)
-        politeness = self._safe_get(behavioral, 'politeness_score', 0)
         
-        warmth = (
-            sentiment_normalized * 0.2 +
-            positive_ratio * 0.2 +
+        raw_warmth = (
+            sentiment_normalized * 0.25 +
+            positive_ratio * 0.25 +
             empathy * 0.2 +
             support * 0.15 +
-            support_react * 0.15 +
-            politeness * 0.1
+            support_react * 0.15
         )
-        return float(min(1.0, max(0.0, warmth)))
+        
+        # Apply warmth boost - shift distribution upward to avoid cold personas
+        # Maps 0.0-1.0 to 0.2-1.0 range (minimum 20% warmth)
+        boosted_warmth = 0.2 + (raw_warmth * 0.8)
+        
+        return float(min(1.0, max(0.0, boosted_warmth)))
     
     def _compute_intellectual_engagement(self, text: Dict, linguistic: Dict, behavioral: Dict) -> float:
         """
@@ -205,19 +209,18 @@ class LLMSyntheticFeatureExtractor:
         High = thoughtful, analytical, detailed; Low = surface-level, brief
         """
         lexical_richness = self._safe_get(text, 'lexical_richness', 0.5)
-        question_freq = self._safe_get(behavioral, 'question_frequency', 0)
+        question_mark_ratio = self._safe_get(text, 'question_mark_ratio', 0)  # Replaced question_frequency
         elaboration = self._safe_get(behavioral, 'elaboration_score', 0)
         readability = self._safe_get(linguistic, 'readability_score', 50) / 100
         avg_sentence_len = min(1.0, self._safe_get(linguistic, 'avg_sentence_length', 10) / 20)
-        noun_ratio = self._safe_get(linguistic, 'pos_noun_ratio', 0.2)
+        # Removed: pos_noun_ratio (useless - collapsed calibration)
         
         engagement = (
-            lexical_richness * 0.25 +
-            question_freq * 0.2 +
-            elaboration * 0.2 +
+            lexical_richness * 0.3 +
+            question_mark_ratio * 0.2 +
+            elaboration * 0.25 +
             (1 - readability) * 0.15 +  # Lower readability = more complex
-            avg_sentence_len * 0.1 +
-            noun_ratio * 0.1
+            avg_sentence_len * 0.1
         )
         return float(min(1.0, max(0.0, engagement)))
     
@@ -250,15 +253,14 @@ class LLMSyntheticFeatureExtractor:
         exclamation = min(1.0, self._safe_get(linguistic, 'exclamation_ratio', 0))
         sentiment_range = self._safe_get(sentiment, 'sentiment_range', 0) / 2
         intensity = self._safe_get(sentiment, 'emotional_intensity_mean', 0)
-        interjection = self._safe_get(linguistic, 'pos_interjection_ratio', 0) * 10
+        # Removed: pos_interjection_ratio (useless - collapsed calibration)
         uppercase = min(1.0, self._safe_get(text, 'uppercase_ratio', 0) * 5)
         
         expressiveness = (
-            emoji_density * 0.25 +
-            exclamation * 0.2 +
+            emoji_density * 0.3 +
+            exclamation * 0.25 +
             sentiment_range * 0.2 +
             intensity * 0.15 +
-            interjection * 0.1 +
             uppercase * 0.1
         )
         return float(min(1.0, max(0.0, expressiveness)))
@@ -362,13 +364,14 @@ class LLMSyntheticFeatureExtractor:
         High = formal; Low = casual
         """
         formality = self._safe_get(behavioral, 'formality_score', 0.5)
-        politeness = self._safe_get(behavioral, 'politeness_score', 0)
+        # Removed: politeness_score (useless - collapsed calibration)
         # Contractions and emoji reduce formality
         emoji = min(1.0, self._safe_get(text, 'emoji_density', 0) * 10)
+        stopword_ratio = self._safe_get(text, 'stopword_ratio', 0.5)  # More stopwords = more casual
         
         formal_level = (
             formality * 0.5 +
-            politeness * 0.3 +
+            (1 - stopword_ratio) * 0.3 +
             (1 - emoji) * 0.2
         )
         return float(min(1.0, max(0.0, formal_level)))
@@ -416,16 +419,15 @@ class LLMSyntheticFeatureExtractor:
         Curiosity/Openness: Interest in exploring new topics.
         High = curious, open; Low = closed, narrow
         """
-        question_freq = self._safe_get(behavioral, 'question_frequency', 0)
+        # Use question_mark_ratio instead of question_frequency (more reliable)
+        question_mark = min(1.0, self._safe_get(text, 'question_mark_ratio', 0))
         topic_expansion = self._safe_get(reaction, 'topic_expansion_rate', 0)
         interest_signals = self._safe_get(reaction, 'interest_signal_rate', 0)
-        question_mark = min(1.0, self._safe_get(text, 'question_mark_ratio', 0))
         
         curiosity = (
-            question_freq * 0.35 +
-            topic_expansion * 0.25 +
-            interest_signals * 0.25 +
-            question_mark * 0.15
+            question_mark * 0.4 +
+            topic_expansion * 0.3 +
+            interest_signals * 0.3
         )
         return float(min(1.0, max(0.0, curiosity)))
     
@@ -479,20 +481,25 @@ class LLMSyntheticFeatureExtractor:
         """
         Positivity Bias: Overall positive vs negative tendency.
         High = positive; Low = negative
+        Boosted baseline to avoid overly depressed personas.
         """
         sentiment_mean = self._safe_get(sentiment, 'sentiment_mean', 0)
         positive_ratio = self._safe_get(sentiment, 'positive_ratio', 0.33)
-        negative_ratio = self._safe_get(sentiment, 'negative_ratio', 0.33)
         
         # Convert sentiment_mean from -1,1 to 0,1
         sentiment_normalized = (sentiment_mean + 1) / 2
         
-        positivity = (
-            sentiment_normalized * 0.4 +
-            positive_ratio * 0.35 +
-            (1 - negative_ratio) * 0.25
+        # Base positivity calculation
+        raw_positivity = (
+            sentiment_normalized * 0.5 +
+            positive_ratio * 0.5
         )
-        return float(min(1.0, max(0.0, positivity)))
+        
+        # Apply positivity boost - shift distribution upward to avoid depressed personas
+        # Maps 0.0-1.0 to 0.25-1.0 range (minimum 25% positivity)
+        boosted_positivity = 0.25 + (raw_positivity * 0.75)
+        
+        return float(min(1.0, max(0.0, boosted_positivity)))
     
     def _compute_engagement_consistency(self, reaction: Dict, composite: Dict) -> float:
         """
@@ -611,18 +618,17 @@ class LLMSyntheticFeatureExtractor:
         uppercase = self._safe_get(text, 'uppercase_ratio', 0)
         exclamation = self._safe_get(linguistic, 'exclamation_ratio', 0)
         question = self._safe_get(text, 'question_mark_ratio', 0)
-        interjection = self._safe_get(linguistic, 'pos_interjection_ratio', 0)
+        # Removed: pos_interjection_ratio (useless - collapsed calibration)
         
         # Use emotion features if available
         emotion_intensity = self._safe_get(emotion, 'emotion_intensity_mean', 0.3)
         
         expressiveness = (
-            min(1.0, emoji * 8) * 0.25 +
+            min(1.0, emoji * 8) * 0.3 +
             min(1.0, uppercase * 12) * 0.2 +
             min(1.0, exclamation) * 0.2 +
             min(1.0, question) * 0.1 +
-            min(1.0, interjection * 10) * 0.1 +
-            emotion_intensity * 0.15
+            emotion_intensity * 0.2
         )
         return float(min(1.0, max(0.0, expressiveness)))
     

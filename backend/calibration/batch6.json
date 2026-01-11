@@ -176,44 +176,44 @@
     },
     "0.5": {
       "messages": [
-        {"sender": "user", "text": "how does this look", "timestamp": 1718066000},
+        {"sender": "user", "text": "how does this look?", "timestamp": 1718066000},
         {"sender": "assistant", "text": "pretty good", "timestamp": 1718066060},
-        {"sender": "assistant", "text": "did you check the references", "timestamp": 1718066600},
+        {"sender": "assistant", "text": "did you check the references?", "timestamp": 1718066600},
         {"sender": "user", "text": "not yet", "timestamp": 1718067660},
-        {"sender": "user", "text": "should I verify them now", "timestamp": 1718068200},
+        {"sender": "user", "text": "should I verify them now?", "timestamp": 1718068200},
         {"sender": "assistant", "text": "yes please", "timestamp": 1718068260},
-        {"sender": "assistant", "text": "where is the appendix", "timestamp": 1718068800},
+        {"sender": "assistant", "text": "where is the appendix?", "timestamp": 1718068800},
         {"sender": "user", "text": "at the end", "timestamp": 1718069860},
-        {"sender": "user", "text": "is anything missing", "timestamp": 1718070400},
+        {"sender": "user", "text": "is anything missing?", "timestamp": 1718070400},
         {"sender": "assistant", "text": "no that is all", "timestamp": 1718070460}
       ]
     },
     "0.75": {
       "messages": [
-        {"sender": "user", "text": "can you read this", "timestamp": 1718071000},
+        {"sender": "user", "text": "can you read this?", "timestamp": 1718071000},
         {"sender": "assistant", "text": "yes", "timestamp": 1718071060},
-        {"sender": "user", "text": "what do you think", "timestamp": 1718071600},
+        {"sender": "user", "text": "what do you think?", "timestamp": 1718071600},
         {"sender": "assistant", "text": "it is good", "timestamp": 1718071660},
-        {"sender": "assistant", "text": "should we edit section two", "timestamp": 1718072200},
+        {"sender": "assistant", "text": "should we edit section two?", "timestamp": 1718072200},
         {"sender": "user", "text": "maybe", "timestamp": 1718073260},
-        {"sender": "user", "text": "does the graph make sense", "timestamp": 1718073800},
+        {"sender": "user", "text": "does the graph make sense?", "timestamp": 1718073800},
         {"sender": "assistant", "text": "mostly", "timestamp": 1718073860},
-        {"sender": "assistant", "text": "can we simplify the table", "timestamp": 1718074400},
+        {"sender": "assistant", "text": "can we simplify the table?", "timestamp": 1718074400},
         {"sender": "user", "text": "yes we can", "timestamp": 1718074460}
       ]
     },
     "1.0": {
       "messages": [
-        {"sender": "user", "text": "how are you", "timestamp": 1718075000},
-        {"sender": "assistant", "text": "good and you", "timestamp": 1718075060},
-        {"sender": "user", "text": "what are you doing", "timestamp": 1718075600},
-        {"sender": "assistant", "text": "working why", "timestamp": 1718075660},
-        {"sender": "user", "text": "can you help me", "timestamp": 1718076200},
-        {"sender": "assistant", "text": "with what exactly", "timestamp": 1718076260},
-        {"sender": "user", "text": "did you see my email", "timestamp": 1718076800},
-        {"sender": "assistant", "text": "which one", "timestamp": 1718076860},
-        {"sender": "user", "text": "should we meet today", "timestamp": 1718077400},
-        {"sender": "assistant", "text": "what time", "timestamp": 1718077460}
+        {"sender": "user", "text": "how are you?", "timestamp": 1718075000},
+        {"sender": "assistant", "text": "good and you?", "timestamp": 1718075060},
+        {"sender": "user", "text": "what are you doing?", "timestamp": 1718075600},
+        {"sender": "assistant", "text": "working why?", "timestamp": 1718075660},
+        {"sender": "user", "text": "can you help me?", "timestamp": 1718076200},
+        {"sender": "assistant", "text": "with what exactly?", "timestamp": 1718076260},
+        {"sender": "user", "text": "did you see my email?", "timestamp": 1718076800},
+        {"sender": "assistant", "text": "which one?", "timestamp": 1718076860},
+        {"sender": "user", "text": "should we meet today?", "timestamp": 1718077400},
+        {"sender": "assistant", "text": "what time?", "timestamp": 1718077460}
       ]
     }
   },

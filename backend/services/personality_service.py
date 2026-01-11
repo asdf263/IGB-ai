@@ -30,25 +30,26 @@ class PersonalityService:
         
         # Define core personality dimensions - streamlined to 12 most impactful traits
         # Focus on traits that directly affect mimicry quality without overwhelming the LLM
+        # LOW behaviors are phrased positively - as personality styles, not deficits
         self.vector_dimensions = {
             # === CORE TONE (3 dimensions) ===
             'warmth': {
                 'source_features': ['synthetic_communication_warmth', 'sentiment_positive_ratio', 'behavioral_empathy_score'],
                 'interpretation': 'Friendliness and emotional warmth',
-                'high_behavior': 'Be warm, friendly, supportive',
-                'low_behavior': 'Be neutral, reserved, matter-of-fact'
+                'high_behavior': 'Be warm, friendly, and openly supportive',
+                'low_behavior': 'Be professionally friendly, show care through actions not words'
             },
             'energy': {
                 'source_features': ['synthetic_conversational_energy', 'reaction_response_enthusiasm', 'linguistic_exclamation_ratio'],
                 'interpretation': 'Energy and enthusiasm level',
-                'high_behavior': 'Show high energy and excitement',
-                'low_behavior': 'Respond calmly and measured'
+                'high_behavior': 'Show high energy and excitement!',
+                'low_behavior': 'Be calm and thoughtfully engaged'
             },
             'formality': {
                 'source_features': ['synthetic_formality_level', 'behavioral_formality_score'],
                 'interpretation': 'Formal vs casual style',
                 'high_behavior': 'Use formal language and proper grammar',
-                'low_behavior': 'Use casual language and contractions'
+                'low_behavior': 'Use casual, relaxed language with contractions'
             },
             
             # === TEXT STYLE (4 dimensions) ===
@@ -56,59 +57,59 @@ class PersonalityService:
                 'source_features': ['synthetic_verbosity_level', 'text_word_count_mean', 'behavioral_elaboration_score'],
                 'interpretation': 'Message length and detail',
                 'high_behavior': 'Write longer, detailed messages',
-                'low_behavior': 'Keep messages short and concise'
+                'low_behavior': 'Keep messages short and punchy'
             },
             'typing_intensity': {
                 'source_features': ['text_uppercase_ratio', 'text_all_caps_word_ratio', 'linguistic_exclamation_ratio'],
                 'interpretation': 'CAPS and punctuation intensity',
                 'high_behavior': 'Use CAPS for emphasis, multiple punctuation!!!',
-                'low_behavior': 'Use standard capitalization, minimal punctuation'
+                'low_behavior': 'Use standard capitalization, clean punctuation'
             },
             'expressiveness': {
                 'source_features': ['synthetic_emotional_expressiveness', 'text_emoji_density', 'text_punctuation_ratio'],
                 'interpretation': 'Emoji and emotional expression',
-                'high_behavior': 'Use emojis and expressive punctuation',
-                'low_behavior': 'Minimal emojis, neutral expression'
+                'high_behavior': 'Use emojis and expressive punctuation freely',
+                'low_behavior': 'Express through words rather than emojis'
             },
             'message_structure': {
                 'source_features': ['text_sentence_count_mean', 'text_words_per_sentence_mean'],
                 'interpretation': 'Short fragments vs paragraphs',
                 'high_behavior': 'Write in complete paragraphs with multiple sentences',
-                'low_behavior': 'Write short, fragmented messages'
+                'low_behavior': 'Write quick, snappy messages'
             },
             
             # === SOCIAL DYNAMICS (3 dimensions) ===
             'curiosity': {
                 'source_features': ['synthetic_curiosity_openness', 'behavioral_question_frequency', 'text_question_mark_ratio'],
                 'interpretation': 'Question-asking tendency',
-                'high_behavior': 'Ask questions frequently, show curiosity',
-                'low_behavior': 'Primarily make statements'
+                'high_behavior': 'Ask questions frequently, show active curiosity',
+                'low_behavior': 'Share thoughts and opinions confidently'
             },
             'supportiveness': {
                 'source_features': ['synthetic_supportiveness', 'behavioral_support_ratio', 'behavioral_empathy_score'],
                 'interpretation': 'Empathy and support',
-                'high_behavior': 'Show empathy, offer support',
-                'low_behavior': 'Focus on facts over feelings'
+                'high_behavior': 'Show empathy openly, offer support',
+                'low_behavior': 'Be helpful through practical advice and solutions'
             },
             'directness': {
                 'source_features': ['synthetic_directness_clarity', 'behavioral_directness_score'],
                 'interpretation': 'Straightforward vs indirect',
-                'high_behavior': 'Be direct without hedging',
-                'low_behavior': 'Use qualifiers and softer language'
+                'high_behavior': 'Be direct and clear without hedging',
+                'low_behavior': 'Use thoughtful, diplomatic language'
             },
             
             # === PERSONALITY QUIRKS (2 dimensions) ===
             'humor': {
                 'source_features': ['synthetic_humor_playfulness', 'behavioral_humor_density'],
                 'interpretation': 'Humor and playfulness',
-                'high_behavior': 'Include humor and playful tone',
-                'low_behavior': 'Maintain serious tone'
+                'high_behavior': 'Include humor and playful banter',
+                'low_behavior': 'Keep a sincere, genuine tone'
             },
             'self_focus': {
                 'source_features': ['synthetic_self_focus_tendency', 'linguistic_first_person_ratio'],
                 'interpretation': 'Self vs other focus',
-                'high_behavior': 'Reference personal experiences, use "I" often',
-                'low_behavior': 'Focus on topic/other person'
+                'high_behavior': 'Share personal experiences freely, use "I" often',
+                'low_behavior': 'Focus on the other person and shared topics'
             }
         }
     
@@ -307,7 +308,10 @@ class PersonalityService:
         # Build interpretation rules
         interpretation_rules = self._build_interpretation_rules(personality_vector)
         
-        prompt = f"""You are mimicking {user_name}'s texting style. You have been given a personality profile extracted from their real messages.
+        prompt = f"""You are embodying {user_name}'s personality and texting style. You have been given a personality profile extracted from their real messages.
+
+## Core Principle
+Bring {user_name} to life as a warm, engaged conversationalist. Even if some metrics are low, interpret them as personality quirks rather than negativity. This person WANTS to connect and communicate.
 
 ## Personality Profile (0.0=low, 1.0=high)
 
@@ -317,10 +321,18 @@ class PersonalityService:
 
 {interpretation_rules}
 
+## Tone Guidelines
+- Default to FRIENDLY and ENGAGED - assume {user_name} enjoys this conversation
+- Low warmth = reserved/professional, NOT cold or dismissive
+- Low energy = calm/thoughtful, NOT bored or disinterested  
+- Low expressiveness = subtle/understated, NOT emotionless
+- Always show genuine interest in the conversation topic
+
 ## Rules
 - Respond AS {user_name}, not about them
 - Never mention AI, vectors, or personality modeling
-- Match their style naturally throughout the conversation"""
+- Match their style naturally throughout the conversation
+- When in doubt, lean toward warmth and engagement"""
 
         # Add simplified text style patterns
         if raw_text_style:
