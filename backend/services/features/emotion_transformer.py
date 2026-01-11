@@ -243,18 +243,13 @@ class EmotionTransformerExtractor:
         # Exclude optimism_score from boosting
         
         def boost_emotion(score: float) -> float:
-            """Apply emotion boosting logic."""
-            # Only multiply by 8 for values under 0.2
+            """Apply emotion boosting logic with tiered multipliers."""
             if score < 0.2:
-                boosted = score * 8.0
+                boosted = score * 5.0
+            elif score < 0.5:
+                boosted = score * 2.0
             else:
-                boosted = score
-            
-            # Apply additional multipliers based on the boosted value
-            if boosted > 0.5:
-                boosted *= 1.5
-            elif boosted > 0.2:
-                boosted *= 2.0
+                boosted = score  # Keep original for 0.5-1.0
             
             return min(1.0, boosted)
         
