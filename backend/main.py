@@ -1,16 +1,18 @@
 """
-IGB AI - Behavior Vector Extraction API
-FastAPI backend with feature extraction, synthetic generation, clustering, and visualization
+IGB AI - Unified Backend API
+FastAPI backend with authentication, feature extraction, synthetic generation, clustering, and visualization
 """
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Optional
 import os
+import json
 import logging
 from datetime import datetime
 from contextlib import asynccontextmanager
 from pathlib import Path
+import tempfile
 
 # Load environment variables from .env file in backend directory
 try:
@@ -34,10 +36,12 @@ from services.compatibility_service import CompatibilityService
 from services.storage_service import StorageService
 from services.personality_service import PersonalityService
 from services.ecosystem_service import EcosystemService
+from services.user_service import UserService
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Service instances (initialized in lifespan)
 feature_extractor = None
 synthetic_generator = None
 clustering_service = None
@@ -49,6 +53,7 @@ compatibility_service = None
 storage_service = None
 personality_service = None
 ecosystem_service = None
+user_service = None
 
 
 @asynccontextmanager
@@ -56,7 +61,7 @@ async def lifespan(app: FastAPI):
     global feature_extractor, synthetic_generator, clustering_service
     global visualization_service, vector_store, cache_service
     global user_feature_extractor, compatibility_service, storage_service
-    global personality_service, ecosystem_service
+    global personality_service, ecosystem_service, user_service
     
     logger.info("Initializing services...")
     feature_extractor = FeatureExtractor()
@@ -71,6 +76,14 @@ async def lifespan(app: FastAPI):
     personality_service = PersonalityService()
     ecosystem_service = EcosystemService(storage_dir="./data/ecosystem")
     
+    # Initialize user service (MongoDB) - graceful failure if MongoDB not available
+    try:
+        user_service = UserService()
+        logger.info("User service (MongoDB) initialized")
+    except Exception as e:
+        logger.warning(f"User service not available: {e}")
+        user_service = None
+    
     logger.info(f"Services initialized. Feature count: {feature_extractor.get_feature_count()}")
     logger.info(f"User feature count: {user_feature_extractor.get_feature_count()}")
     yield
@@ -79,9 +92,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="IGB AI - Behavior Vector API",
-    description="Extract behavior vectors from chat logs",
-    version="2.0.0",
+    title="IGB AI - Unified Backend API",
+    description="Authentication, behavior vector extraction, and personality ecosystem",
+    version="2.1.0",
     lifespan=lifespan
 )
 
@@ -93,6 +106,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# ============== Pydantic Models ==============
 
 class Message(BaseModel):
     sender: str
@@ -180,23 +195,217 @@ class EcosystemCompatibilityRequest(BaseModel):
     persona_id_2: str
 
 
+# Auth models
+class SignupRequest(BaseModel):
+    email: str
+    password: str
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class ProfileUpdateRequest(BaseModel):
+    name: Optional[str] = None
+    instagram_handle: Optional[str] = None
+    bio: Optional[str] = None
+    interests: Optional[List[str]] = None
+
+
+# ============== Health Check ==============
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
     return {
         "status": "healthy",
-        "service": "IGB-AI Vector API",
-        "version": "2.0.0",
+        "service": "IGB-AI Unified API",
+        "version": "2.1.0",
         "feature_count": feature_extractor.get_feature_count() if feature_extractor else 0,
-        "stored_vectors": vector_store.count() if vector_store else 0
+        "stored_vectors": vector_store.count() if vector_store else 0,
+        "mongodb_available": user_service is not None and user_service.client is not None
     }
 
 
+# ============== Authentication Endpoints ==============
+
+@app.post("/api/users/signup")
+async def signup(request: SignupRequest):
+    """Create a new user account"""
+    if not user_service:
+        raise HTTPException(status_code=503, detail="User service not available (MongoDB not connected)")
+    
+    try:
+        user = user_service.create_user(request.email, request.password)
+        return {
+            "success": True,
+            "uid": user['uid'],
+            "email": user['email'],
+            "message": "Account created successfully"
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Signup error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Signup failed: {str(e)}")
+
+
+@app.post("/api/users/login")
+async def login(request: LoginRequest):
+    """Authenticate user and return profile"""
+    if not user_service:
+        raise HTTPException(status_code=503, detail="User service not available (MongoDB not connected)")
+    
+    try:
+        user = user_service.authenticate_user(request.email, request.password)
+        
+        if not user:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        return {
+            "success": True,
+            "uid": user['uid'],
+            "email": user['email'],
+            "user_profile": {
+                "profile": user.get('profile', {}),
+                "onboarding_complete": user.get('onboarding_complete', False)
+            }
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Login error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Login failed: {str(e)}")
+
+
+@app.get("/api/users/{uid}")
+async def get_user(uid: str):
+    """Get user data by UID"""
+    if not user_service:
+        raise HTTPException(status_code=503, detail="User service not available")
+    
+    try:
+        user = user_service.get_user_by_uid(uid)
+        
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        return {
+            "success": True,
+            "metadata": {
+                "uid": user['uid'],
+                "email": user['email'],
+                "onboarding_complete": user.get('onboarding_complete', False)
+            },
+            "profile": user.get('profile', {}),
+            "vector_id": user.get('vector_id')
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Get user error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get user: {str(e)}")
+
+
+@app.post("/api/users/{uid}/profile")
+async def update_profile(uid: str, request: ProfileUpdateRequest):
+    """Update user profile"""
+    if not user_service:
+        raise HTTPException(status_code=503, detail="User service not available")
+    
+    try:
+        profile_data = request.model_dump(exclude_none=True)
+        updated_user = user_service.update_user_profile(uid, profile_data)
+        
+        return {
+            "success": True,
+            "profile": updated_user.get('profile', {}),
+            "message": "Profile updated successfully"
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        logger.error(f"Update profile error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to update profile: {str(e)}")
+
+
+@app.post("/api/users/{uid}/upload-chat")
+async def upload_chat(uid: str, file: UploadFile = File(...)):
+    """Upload chat data and extract behavior vector for user"""
+    if not user_service:
+        raise HTTPException(status_code=503, detail="User service not available")
+    
+    try:
+        # Read and parse the uploaded file
+        content = await file.read()
+        
+        try:
+            chat_data = json.loads(content.decode('utf-8'))
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="Invalid JSON file")
+        
+        # Extract messages from chat data
+        messages = chat_data if isinstance(chat_data, list) else chat_data.get('messages', [])
+        
+        if not messages:
+            raise HTTPException(status_code=400, detail="No messages found in chat data")
+        
+        # Extract behavior vector
+        vector, labels = feature_extractor.extract(messages)
+        categories = feature_extractor.extract_by_category(messages)
+        
+        # Store vector
+        metadata = {
+            "uid": uid,
+            "message_count": len(messages),
+            "extracted_at": datetime.now().isoformat(),
+            "filename": file.filename
+        }
+        vector_id = vector_store.add(vector, metadata)
+        
+        # Link vector to user
+        user_service.link_vector_to_user(uid, vector_id)
+        
+        return {
+            "success": True,
+            "vector_id": vector_id,
+            "feature_count": len(vector),
+            "message_count": len(messages),
+            "categories": {k: dict(v) for k, v in categories.items()},
+            "category_summary": feature_extractor.get_category_summary(messages)
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Upload chat error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to process chat data: {str(e)}")
+
+
+@app.post("/api/users/{uid}/complete-onboarding")
+async def complete_onboarding(uid: str):
+    """Mark user onboarding as complete"""
+    if not user_service:
+        raise HTTPException(status_code=503, detail="User service not available")
+    
+    try:
+        user_service.mark_onboarding_complete(uid)
+        
+        return {
+            "success": True,
+            "message": "Onboarding completed successfully"
+        }
+    except Exception as e:
+        logger.error(f"Complete onboarding error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to complete onboarding: {str(e)}")
+
+
+# ============== Feature Extraction Endpoints ==============
+
 @app.post("/api/features/extract")
 async def extract_features(request: ExtractRequest):
-    """
-    Extract behavior vector features from chat messages.
-    """
+    """Extract behavior vector features from chat messages."""
     try:
         messages = [msg.model_dump() for msg in request.messages]
         
@@ -221,7 +430,6 @@ async def extract_features(request: ExtractRequest):
             try:
                 vector_id = vector_store.add(vector, metadata)
             except Exception as store_error:
-                # Handle dimension mismatch by resetting collection
                 if "dimension" in str(store_error).lower():
                     logger.warning(f"Vector dimension mismatch, resetting collection: {store_error}")
                     vector_store.reset_collection()
@@ -253,9 +461,7 @@ async def extract_features(request: ExtractRequest):
 
 @app.post("/api/features/synthetic-generate")
 async def generate_synthetic(request: SyntheticRequest):
-    """
-    Generate synthetic behavior vectors.
-    """
+    """Generate synthetic behavior vectors."""
     try:
         vectors = request.vectors
         
@@ -304,6 +510,33 @@ async def generate_synthetic(request: SyntheticRequest):
         logger.error(f"Error generating synthetic vectors: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Synthetic generation failed: {str(e)}")
 
+
+@app.get("/api/features/labels")
+async def get_feature_labels():
+    """Get all feature labels."""
+    try:
+        labels = feature_extractor.get_feature_names()
+        
+        categories = {}
+        for label in labels:
+            category = label.split("_")[0]
+            if category not in categories:
+                categories[category] = []
+            categories[category].append(label)
+        
+        return {
+            "success": True,
+            "labels": labels,
+            "count": len(labels),
+            "categories": categories
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting labels: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get labels: {str(e)}")
+
+
+# ============== Vector Storage Endpoints ==============
 
 @app.get("/api/vectors/list")
 async def list_vectors():
@@ -409,6 +642,29 @@ async def cluster_vectors(request: ClusterRequest):
         raise HTTPException(status_code=500, detail=f"Clustering failed: {str(e)}")
 
 
+@app.post("/api/vectors/search")
+async def search_vectors(request: SearchRequest):
+    """Search for similar vectors."""
+    try:
+        results = vector_store.search_similar(
+            request.query_vector, 
+            request.top_k, 
+            request.threshold
+        )
+        
+        return {
+            "success": True,
+            "results": results,
+            "count": len(results)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error searching vectors: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")
+
+
+# ============== Visualization Endpoints ==============
+
 @app.get("/api/visualization/graph")
 async def get_visualization_graph():
     """Get graph structure for cluster visualization."""
@@ -507,65 +763,17 @@ async def get_radar(request: RadarRequest):
         raise HTTPException(status_code=500, detail=f"Radar generation failed: {str(e)}")
 
 
-@app.post("/api/vectors/search")
-async def search_vectors(request: SearchRequest):
-    """Search for similar vectors."""
-    try:
-        results = vector_store.search_similar(
-            request.query_vector, 
-            request.top_k, 
-            request.threshold
-        )
-        
-        return {
-            "success": True,
-            "results": results,
-            "count": len(results)
-        }
-        
-    except Exception as e:
-        logger.error(f"Error searching vectors: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")
-
-
-@app.get("/api/features/labels")
-async def get_feature_labels():
-    """Get all feature labels."""
-    try:
-        labels = feature_extractor.get_feature_names()
-        
-        categories = {}
-        for label in labels:
-            category = label.split("_")[0]
-            if category not in categories:
-                categories[category] = []
-            categories[category].append(label)
-        
-        return {
-            "success": True,
-            "labels": labels,
-            "count": len(labels),
-            "categories": categories
-        }
-        
-    except Exception as e:
-        logger.error(f"Error getting labels: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to get labels: {str(e)}")
-
+# ============== User Features Endpoints ==============
 
 @app.post("/api/users/features")
 async def extract_user_features(request: UserFeaturesRequest):
-    """
-    Extract behavior features for individual users in a conversation.
-    Analyzes how each user reacts to and interacts with the other person.
-    """
+    """Extract behavior features for individual users in a conversation."""
     try:
         messages = [msg.model_dump() for msg in request.messages]
         
         if len(messages) == 0:
             raise HTTPException(status_code=400, detail="Messages list is empty")
         
-        # Get all participants
         participants = user_feature_extractor.get_participants(messages)
         
         if request.target_user:
@@ -574,7 +782,6 @@ async def extract_user_features(request: UserFeaturesRequest):
                     status_code=400, 
                     detail=f"User '{request.target_user}' not found in conversation. Available: {participants}"
                 )
-            # Extract for specific user
             vector, labels = user_feature_extractor.extract_for_user(messages, request.target_user)
             categories = user_feature_extractor._group_by_category(labels, vector)
             summary = user_feature_extractor.get_user_summary(messages, request.target_user)
@@ -592,7 +799,6 @@ async def extract_user_features(request: UserFeaturesRequest):
                 "message_count": len(user_msgs)
             }
         else:
-            # Extract for all users
             all_users = user_feature_extractor.extract_all_users(messages)
             
             response = {
@@ -613,10 +819,7 @@ async def extract_user_features(request: UserFeaturesRequest):
 
 @app.post("/api/users/compatibility")
 async def calculate_compatibility(request: CompatibilityRequest):
-    """
-    Calculate compatibility score between two users based on their conversation behavior.
-    Uses Gemini LLM for intelligent analysis when available, falls back to algorithmic scoring.
-    """
+    """Calculate compatibility score between two users."""
     try:
         messages = [msg.model_dump() for msg in request.messages]
         
@@ -631,7 +834,6 @@ async def calculate_compatibility(request: CompatibilityRequest):
                 detail="Need at least 2 participants for compatibility analysis"
             )
         
-        # Determine which users to compare
         user1 = request.user1 or participants[0]
         user2 = request.user2 or (participants[1] if len(participants) > 1 else participants[0])
         
@@ -640,7 +842,6 @@ async def calculate_compatibility(request: CompatibilityRequest):
         if user2 not in participants:
             raise HTTPException(status_code=400, detail=f"User '{user2}' not found")
         
-        # Extract features for both users
         vec1, labels1 = user_feature_extractor.extract_for_user(messages, user1)
         vec2, labels2 = user_feature_extractor.extract_for_user(messages, user2)
         
@@ -656,7 +857,6 @@ async def calculate_compatibility(request: CompatibilityRequest):
             'categories': user_feature_extractor._group_by_category(labels2, vec2)
         }
         
-        # Calculate compatibility
         compatibility = await compatibility_service.calculate_compatibility(
             user1_features, user2_features, user1, user2
         )
@@ -700,25 +900,22 @@ async def get_user_feature_labels():
         raise HTTPException(status_code=500, detail=f"Failed to get user labels: {str(e)}")
 
 
+# ============== Analysis Storage Endpoints ==============
+
 @app.post("/api/analyses/save")
 async def save_analysis(request: SaveAnalysisRequest):
-    """
-    Save a complete analysis to local storage.
-    Each upload creates a new analysis file with a unique ID.
-    """
+    """Save a complete analysis to local storage."""
     try:
         messages = [msg.model_dump() for msg in request.messages]
         
         if len(messages) == 0:
             raise HTTPException(status_code=400, detail="Messages list is empty")
         
-        # If user_features not provided, extract them
         user_features = request.user_features
         if not user_features:
             all_users = user_feature_extractor.extract_all_users(messages)
             user_features = all_users.get("users", {})
         
-        # If conversation_features not provided, extract them
         conversation_features = request.conversation_features
         if not conversation_features:
             vector, labels = feature_extractor.extract(messages)
@@ -729,7 +926,6 @@ async def save_analysis(request: SaveAnalysisRequest):
                 "categories": {k: dict(v) for k, v in categories.items()}
             }
         
-        # Save to storage
         result = storage_service.save_analysis(
             messages=messages,
             user_features=user_features,
@@ -834,10 +1030,7 @@ async def get_user_history(username: str):
 
 @app.post("/api/personality/synthesize")
 async def synthesize_personality(request: SynthesizePersonalityRequest):
-    """
-    Synthesize an AI personality from user features.
-    Generates a custom LLM prompt that shapes voice, tone, style, pacing, and quirks.
-    """
+    """Synthesize an AI personality from user features."""
     try:
         personality = personality_service.synthesize_personality(
             user_name=request.user_name,
@@ -857,12 +1050,8 @@ async def synthesize_personality(request: SynthesizePersonalityRequest):
 
 @app.post("/api/personality/chat")
 async def chat_with_persona(request: ChatWithPersonaRequest):
-    """
-    Chat with an AI persona. Users can preview interpersonal dynamics
-    by talking to another person's AI persona before meeting them.
-    """
+    """Chat with an AI persona."""
     try:
-        # Get persona from ecosystem
         persona = ecosystem_service.get_persona(request.persona_id)
         
         if not persona:
@@ -870,14 +1059,12 @@ async def chat_with_persona(request: ChatWithPersonaRequest):
         
         personality = persona.get('personality', {})
         
-        # Generate response
         response = await personality_service.chat_as_persona(
             personality=personality,
             user_message=request.message,
             conversation_history=request.conversation_history
         )
         
-        # Increment interaction count
         ecosystem_service.increment_interaction(request.persona_id)
         
         return {
@@ -983,11 +1170,7 @@ async def remove_ecosystem_persona(persona_id: str):
 
 @app.post("/api/ecosystem/compatibility")
 async def compute_ecosystem_compatibility(request: EcosystemCompatibilityRequest):
-    """
-    Compute detailed compatibility between two personas in the ecosystem.
-    Scores across: emotional alignment, conversation rhythm, topic affinity,
-    social energy match, linguistic similarity, and trait complementarity.
-    """
+    """Compute detailed compatibility between two personas in the ecosystem."""
     try:
         compatibility = ecosystem_service.compute_compatibility(
             request.persona_id_1,
@@ -1043,12 +1226,8 @@ async def get_ecosystem_stats():
 
 @app.post("/api/ecosystem/from-analysis/{analysis_id}")
 async def create_personas_from_analysis(analysis_id: str):
-    """
-    Create personas from a saved analysis and add them to the ecosystem.
-    This allows users to quickly populate the ecosystem from past analyses.
-    """
+    """Create personas from a saved analysis and add them to the ecosystem."""
     try:
-        # Get the analysis
         analysis = storage_service.get_analysis(analysis_id)
         
         if not analysis:
@@ -1056,29 +1235,22 @@ async def create_personas_from_analysis(analysis_id: str):
         
         created_personas = []
         
-        # Create persona for each participant
         for user_name, user_data in analysis.get('user_features', {}).items():
-            # Extract sample messages for this user
             sample_messages = [
                 msg.get('content', '')
                 for msg in analysis.get('messages', [])
                 if msg.get('sender') == user_name
             ][:10]
             
-            # Synthesize personality
             personality = personality_service.synthesize_personality(
                 user_name=user_name,
                 user_features={'categories': user_data.get('categories', {})},
                 sample_messages=sample_messages
             )
             
-            # Generate persona ID
             persona_id = f"{user_name.lower().replace(' ', '_')}_{analysis_id[:8]}"
-            
-            # Get vector
             vector = user_data.get('vector', [0.5] * 100)
             
-            # Add to ecosystem
             persona = ecosystem_service.add_persona(
                 persona_id=persona_id,
                 user_name=user_name,
@@ -1105,9 +1277,11 @@ async def create_personas_from_analysis(analysis_id: str):
         raise HTTPException(status_code=500, detail=f"Failed to create personas: {str(e)}")
 
 
+# ============== Run Server ==============
+
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.getenv("PORT", 8000))
+    port = int(os.getenv("PORT", 5000))  # Changed default to 5000 to match frontend expectations
     uvicorn.run(
         "main:app",
         host="0.0.0.0",

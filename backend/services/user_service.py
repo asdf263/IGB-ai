@@ -2,6 +2,8 @@
 User Service - MongoDB operations for user authentication and profiles
 """
 import os
+import ssl
+import certifi
 from pymongo import MongoClient
 from bson import ObjectId
 from typing import Optional, Dict, Any
@@ -27,7 +29,27 @@ class UserService:
     def _connect(self):
         """Establish MongoDB connection"""
         try:
-            self.client = MongoClient(self.mongodb_uri, serverSelectionTimeoutMS=5000)
+            # Check if using MongoDB Atlas (contains mongodb+srv or .mongodb.net)
+            is_atlas = 'mongodb+srv' in self.mongodb_uri or '.mongodb.net' in self.mongodb_uri
+            
+            if is_atlas:
+                # MongoDB Atlas requires TLS with proper certificate verification
+                # Use ssl context for better compatibility
+                import ssl
+                ssl_context = ssl.create_default_context(cafile=certifi.where())
+                ssl_context.check_hostname = True
+                ssl_context.verify_mode = ssl.CERT_REQUIRED
+                
+                self.client = MongoClient(
+                    self.mongodb_uri,
+                    serverSelectionTimeoutMS=10000,
+                    tls=True,
+                    tlsCAFile=certifi.where(),
+                )
+            else:
+                # Local MongoDB
+                self.client = MongoClient(self.mongodb_uri, serverSelectionTimeoutMS=5000)
+            
             self.db = self.client[self.db_name]
             self.users_collection = self.db['users']
             # Test connection

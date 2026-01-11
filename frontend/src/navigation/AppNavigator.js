@@ -1,3 +1,7 @@
+// #region agent log
+console.log('[NAV] AppNavigator.js module loading');
+// #endregion
+
 import React, { useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -8,8 +12,11 @@ import { AuthContext } from '../context/AuthContext';
 import AuthNavigator from './AuthNavigator';
 import OnboardingNavigator from './OnboardingNavigator';
 
+// #region agent log
+console.log('[NAV] AppNavigator imports complete');
+// #endregion
+
 // Lazy load screens - only import when needed
-// Using factory functions to enable better code splitting
 const createLazyScreen = (importFn) => {
   let Component = null;
   return (props) => {
@@ -117,24 +124,30 @@ const MainAppNavigator = () => {
 
 const AppNavigator = () => {
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppNavigator.js:119',message:'AppNavigator entry, before useContext',data:{AuthContext_defined:typeof AuthContext !== 'undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+  console.log('[NAV] AppNavigator function called');
   // #endregion
+  
   const contextValue = useContext(AuthContext);
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppNavigator.js:121',message:'after useContext',data:{contextValue_defined:typeof contextValue !== 'undefined',contextValue_null:contextValue === null,has_isAuthenticated:contextValue?.isAuthenticated !== undefined},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
   const { isAuthenticated, isLoading, user } = contextValue || {};
+
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppNavigator.js:123',message:'after destructuring',data:{isAuthenticated,isLoading,user_defined:typeof user !== 'undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+  console.log('[NAV] Auth state:', { isAuthenticated, isLoading, hasUser: !!user });
   // #endregion
 
   if (isLoading) {
+    // #region agent log
+    console.log('[NAV] Showing loading indicator because isLoading=true');
+    // #endregion
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#6200ee" />
       </View>
     );
   }
+
+  // #region agent log
+  console.log('[NAV] Rendering NavigationContainer, isAuthenticated:', isAuthenticated);
+  // #endregion
 
   return (
     <NavigationContainer>
