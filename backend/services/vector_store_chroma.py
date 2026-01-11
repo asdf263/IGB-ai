@@ -38,6 +38,22 @@ class ChromaVectorStore:
             print("ChromaDB not installed, using in-memory fallback")
             self._use_fallback()
     
+    def reset_collection(self):
+        """Delete and recreate the collection (use when dimensions change)."""
+        if self.client is not None:
+            try:
+                self.client.delete_collection(self.collection_name)
+                self.collection = self.client.get_or_create_collection(
+                    name=self.collection_name,
+                    metadata={"hnsw:space": "cosine"}
+                )
+                print(f"Collection '{self.collection_name}' reset successfully")
+                return True
+            except Exception as e:
+                print(f"Error resetting collection: {e}")
+                return False
+        return False
+    
     def _use_fallback(self):
         """Use in-memory storage as fallback."""
         self.vectors = {}

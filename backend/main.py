@@ -218,7 +218,16 @@ async def extract_features(request: ExtractRequest):
                 "message_count": len(messages),
                 "extracted_at": datetime.now().isoformat()
             }
-            vector_id = vector_store.add(vector, metadata)
+            try:
+                vector_id = vector_store.add(vector, metadata)
+            except Exception as store_error:
+                # Handle dimension mismatch by resetting collection
+                if "dimension" in str(store_error).lower():
+                    logger.warning(f"Vector dimension mismatch, resetting collection: {store_error}")
+                    vector_store.reset_collection()
+                    vector_id = vector_store.add(vector, metadata)
+                else:
+                    raise store_error
         
         response = {
             "success": True,

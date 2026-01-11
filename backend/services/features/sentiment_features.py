@@ -24,12 +24,6 @@ class SentimentFeatureExtractor:
             'neutral_ratio',
             'sentiment_volatility',
             'sentiment_trend',
-            'emotion_joy_ratio',
-            'emotion_sadness_ratio',
-            'emotion_anger_ratio',
-            'emotion_fear_ratio',
-            'emotion_surprise_ratio',
-            'emotion_disgust_ratio',
             'emotional_intensity_mean',
             'emotional_shift_frequency',
             'sentiment_consistency'
@@ -106,17 +100,6 @@ class SentimentFeatureExtractor:
         features['sentiment_volatility'] = self._compute_volatility(sentiments)
         features['sentiment_trend'] = self._compute_trend(sentiments)
         features['sentiment_consistency'] = self._compute_consistency(sentiments)
-        
-        # Emotion ratios
-        emotion_counts = self._aggregate_emotions(emotions)
-        total_emotions = sum(emotion_counts.values()) or 1
-        
-        features['emotion_joy_ratio'] = emotion_counts.get('joy', 0) / total_emotions
-        features['emotion_sadness_ratio'] = emotion_counts.get('sadness', 0) / total_emotions
-        features['emotion_anger_ratio'] = emotion_counts.get('anger', 0) / total_emotions
-        features['emotion_fear_ratio'] = emotion_counts.get('fear', 0) / total_emotions
-        features['emotion_surprise_ratio'] = emotion_counts.get('surprise', 0) / total_emotions
-        features['emotion_disgust_ratio'] = emotion_counts.get('disgust', 0) / total_emotions
         
         # Emotional intensity and shifts
         intensities = [self._compute_intensity(t) for t in texts]

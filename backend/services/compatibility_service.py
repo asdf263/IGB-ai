@@ -26,15 +26,17 @@ class CompatibilityService:
             return
         
         try:
-            import google.generativeai as genai
-            genai.configure(api_key=self.api_key)
-            self.model = genai.GenerativeModel('gemini-1.5-flash')
-            logger.info("Gemini model initialized successfully")
+            from google import genai
+            self.client = genai.Client(api_key=self.api_key)
+            self.model = 'gemini-3-flash-preview'
+            logger.info(f"Gemini model initialized successfully: {self.model}")
         except ImportError:
-            logger.warning("google-generativeai not installed. Install with: pip install google-generativeai")
+            logger.warning("google-genai not installed. Install with: pip install google-genai")
+            self.client = None
             self.model = None
         except Exception as e:
             logger.error(f"Failed to initialize Gemini model: {e}")
+            self.client = None
             self.model = None
     
     async def calculate_compatibility(
@@ -56,7 +58,7 @@ class CompatibilityService:
         Returns:
             Dictionary with compatibility score and analysis
         """
-        if self.model is None:
+        if self.client is None or self.model is None:
             return self._fallback_compatibility(user1_features, user2_features, user1_name, user2_name)
         
         try:
@@ -107,7 +109,7 @@ Consider factors like:
 Return ONLY the JSON object, no additional text."""
 
         try:
-            response = self.model.generate_content(prompt)
+            response = self.client.models.generate_content(model=self.model, contents=prompt)
             result_text = response.text.strip()
             
             # Clean up response if needed
@@ -127,6 +129,9 @@ Return ONLY the JSON object, no additional text."""
             
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse Gemini response: {e}")
+            return self._fallback_compatibility(user1_features, user2_features, user1_name, user2_name)
+        except Exception as e:
+            logger.error(f"Gemini compatibility calculation failed: {e}")
             return self._fallback_compatibility(user1_features, user2_features, user1_name, user2_name)
     
     def _prepare_feature_summary(self, features: Dict[str, Any], user_name: str) -> str:

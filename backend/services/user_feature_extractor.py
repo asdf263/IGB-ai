@@ -12,9 +12,11 @@ from .features.linguistic_features_spacy import LinguisticFeatureExtractorSpacy
 from .features.semantic_features_hf import SemanticFeatureExtractorHF
 from .features.sentiment_features import SentimentFeatureExtractor
 from .features.behavioral_features import BehavioralFeatureExtractor
-from .features.graph_features import GraphFeatureExtractor
 from .features.composite_features import CompositeFeatureExtractor
 from .features.reaction_features import ReactionFeatureExtractor
+from .features.llm_synthetic_features import LLMSyntheticFeatureExtractor
+from .features.emotion_transformer import EmotionTransformerExtractor
+from .features.conversation_context_features import ConversationContextExtractor
 
 
 class UserFeatureExtractor:
@@ -27,9 +29,11 @@ class UserFeatureExtractor:
         self.semantic_extractor = SemanticFeatureExtractorHF()
         self.sentiment_extractor = SentimentFeatureExtractor()
         self.behavioral_extractor = BehavioralFeatureExtractor()
-        self.graph_extractor = GraphFeatureExtractor()
         self.composite_extractor = CompositeFeatureExtractor()
         self.reaction_extractor = ReactionFeatureExtractor()
+        self.llm_synthetic_extractor = LLMSyntheticFeatureExtractor()
+        self.emotion_extractor = EmotionTransformerExtractor()
+        self.context_extractor = ConversationContextExtractor()
         
         self._feature_names = None
     
@@ -60,8 +64,13 @@ class UserFeatureExtractor:
         linguistic_features = self.linguistic_extractor.extract(user_messages)
         semantic_features = self.semantic_extractor.extract(user_messages)
         sentiment_features = self.sentiment_extractor.extract(user_messages)
-        behavioral_features = self.behavioral_extractor.extract(messages)  # Needs full context
-        graph_features = self.graph_extractor.extract(messages)  # Needs full context
+        behavioral_features = self.behavioral_extractor.extract(messages, target_user)  # Needs full context
+        
+        # Extract transformer-based emotion features (replaces word-list emotions)
+        emotion_features = self.emotion_extractor.extract(user_messages)
+        
+        # Extract conversation context features (flow and topic transitions)
+        context_features = self.context_extractor.extract(messages)  # Needs full context
         
         # Extract reaction features (how user reacts to the other person)
         reaction_features = self.reaction_extractor.extract_for_user(messages, target_user)
@@ -74,7 +83,19 @@ class UserFeatureExtractor:
             semantic_features=semantic_features,
             sentiment_features=sentiment_features,
             behavioral_features=behavioral_features,
-            graph_features=graph_features
+            graph_features={}
+        )
+        
+        # Compute LLM synthetic features (high-level abstractions for personality)
+        llm_synthetic_features = self.llm_synthetic_extractor.extract(
+            text_features=text_features,
+            linguistic_features=linguistic_features,
+            sentiment_features=sentiment_features,
+            behavioral_features=behavioral_features,
+            reaction_features=reaction_features,
+            composite_features=composite_features,
+            emotion_features=emotion_features,
+            context_features=context_features
         )
         
         # Combine all features with proper normalization
@@ -85,9 +106,11 @@ class UserFeatureExtractor:
         all_features.update({f'semantic_{k}': v for k, v in semantic_features.items()})
         all_features.update({f'sentiment_{k}': v for k, v in sentiment_features.items()})
         all_features.update({f'behavioral_{k}': v for k, v in behavioral_features.items()})
-        all_features.update({f'graph_{k}': v for k, v in graph_features.items()})
         all_features.update({f'composite_{k}': v for k, v in composite_features.items()})
         all_features.update({f'reaction_{k}': v for k, v in reaction_features.items()})
+        all_features.update({f'emotion_{k}': v for k, v in emotion_features.items()})
+        all_features.update({f'context_{k}': v for k, v in context_features.items()})
+        all_features.update({f'synthetic_{k}': v for k, v in llm_synthetic_features.items()})
         
         # Apply proper normalization to prevent values maxing at 1
         all_features = self._normalize_features(all_features)
@@ -139,54 +162,61 @@ class UserFeatureExtractor:
     
     def _normalize_features(self, features: Dict[str, float]) -> Dict[str, float]:
         """
-        Apply proper normalization to features to prevent maxing out at 1.
-        Uses sigmoid-based soft normalization for unbounded features.
+        Normalize features appropriately:
+        - Ratios/scores: clip to [0, 1]
+        - Raw metrics (counts, lengths): keep as-is for interpretability
+        - Handle NaN/Inf values
         """
         normalized = {}
         
-        # Define normalization strategies for different feature types
-        # Features that should be in [0, 1] range naturally
-        bounded_features = {
-            'ratio', 'rate', 'frequency', 'score', 'index', 'level',
-            'tendency', 'balance', 'consistency', 'matching', 'alignment'
+        # Features that are naturally bounded [0, 1] - just clip them
+        bounded_keywords = {
+            'ratio', 'density', 'richness', 'consistency', 'matching', 
+            'alignment', 'balance', 'tendency'
         }
         
-        # Features that can have larger ranges and need soft normalization
-        unbounded_features = {
-            'mean', 'std', 'variance', 'count', 'length', 'distance',
-            'entropy', 'depth', 'density'
+        # Features that should be clipped to [0, 1] but might slightly exceed
+        soft_bounded_keywords = {
+            'score', 'index', 'level', 'frequency', 'rate'
+        }
+        
+        # Features to keep as raw values (for interpretability)
+        raw_keywords = {
+            'mean', 'std', 'min', 'max', 'median', 'count', 'length',
+            'entropy', 'depth', 'readability', 'latency', 'session'
         }
         
         for key, value in features.items():
-            if value is None or np.isnan(value) or np.isinf(value):
+            # Handle invalid values
+            if value is None or (isinstance(value, float) and (np.isnan(value) or np.isinf(value))):
                 normalized[key] = 0.0
                 continue
             
-            # Check if feature is naturally bounded
-            is_bounded = any(b in key.lower() for b in bounded_features)
-            is_unbounded = any(u in key.lower() for u in unbounded_features)
+            key_lower = key.lower()
             
-            if is_bounded and not is_unbounded:
-                # Clip to [0, 1] for naturally bounded features
+            # Determine normalization strategy
+            is_bounded = any(b in key_lower for b in bounded_keywords)
+            is_soft_bounded = any(b in key_lower for b in soft_bounded_keywords)
+            is_raw = any(r in key_lower for r in raw_keywords)
+            
+            if is_bounded:
+                # Strict [0, 1] clip for ratios and densities
                 normalized[key] = float(np.clip(value, 0.0, 1.0))
-            elif is_unbounded or abs(value) > 1.0:
-                # Apply soft sigmoid normalization for unbounded features
-                # Maps any value to (0, 1) range smoothly
-                normalized[key] = float(self._soft_normalize(value))
+            elif is_soft_bounded:
+                # Soft clip - allow slight overshoot but cap at 1.0
+                normalized[key] = float(np.clip(value, 0.0, 1.0))
+            elif is_raw:
+                # Keep raw values - they're interpretable metrics
+                # Just ensure they're not negative (most metrics shouldn't be)
+                normalized[key] = float(max(0.0, value))
             else:
-                # Keep value as-is if it's already in reasonable range
-                normalized[key] = float(np.clip(value, -1.0, 1.0))
+                # Unknown feature - if in [0,1] keep it, otherwise keep raw
+                if 0.0 <= value <= 1.0:
+                    normalized[key] = float(value)
+                else:
+                    normalized[key] = float(value)
         
         return normalized
-    
-    def _soft_normalize(self, value: float, scale: float = 1.0) -> float:
-        """
-        Apply soft sigmoid normalization.
-        Maps any real number to (0, 1) range.
-        """
-        # Use tanh-based normalization for smoother distribution
-        # tanh maps to (-1, 1), we shift to (0, 1)
-        return (np.tanh(value / scale) + 1) / 2
     
     def get_feature_names(self) -> List[str]:
         """Get list of all feature names."""
@@ -200,9 +230,11 @@ class UserFeatureExtractor:
         names.extend([f'semantic_{n}' for n in self.semantic_extractor.get_feature_names()])
         names.extend([f'sentiment_{n}' for n in self.sentiment_extractor.get_feature_names()])
         names.extend([f'behavioral_{n}' for n in self.behavioral_extractor.get_feature_names()])
-        names.extend([f'graph_{n}' for n in self.graph_extractor.get_feature_names()])
         names.extend([f'composite_{n}' for n in self.composite_extractor.get_feature_names()])
         names.extend([f'reaction_{n}' for n in self.reaction_extractor.get_feature_names()])
+        names.extend([f'emotion_{n}' for n in self.emotion_extractor.get_feature_names()])
+        names.extend([f'context_{n}' for n in self.context_extractor.get_feature_names()])
+        names.extend([f'synthetic_{n}' for n in self.llm_synthetic_extractor.get_feature_names()])
         
         return names
     

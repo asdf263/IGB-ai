@@ -14,6 +14,9 @@ const categoryColors = {
   graph: '#98D8C8',
   composite: '#F7DC6F',
   reaction: '#FF9F43',
+  emotion: '#E74C3C',
+  context: '#9B59B6',
+  synthetic: '#1ABC9C',
 }
 
 function UserProfilePage() {
@@ -119,6 +122,68 @@ function UserProfilePage() {
 
       {selectedUser && currentUserData && (
         <>
+          {/* Text Style Summary - Key visible features */}
+          <div className="card bg-gradient-to-r from-teal-50 to-cyan-50 border-teal-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              ✍️ {selectedUser}'s Text Style
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {/* CAPS Usage */}
+              <div className="bg-white p-4 rounded-lg border border-teal-200">
+                <div className="text-xs text-gray-500 uppercase tracking-wide">CAPS Usage</div>
+                <div className="text-2xl font-bold text-teal-600">
+                  {((currentUserData.categories?.text?.uppercase_ratio || 0) * 100).toFixed(0)}%
+                </div>
+                <div className="text-xs text-gray-500">
+                  {(currentUserData.categories?.text?.all_caps_word_ratio || 0) > 0.1 
+                    ? 'Uses ALL CAPS words' 
+                    : 'Standard caps'}
+                </div>
+              </div>
+              
+              {/* Punctuation */}
+              <div className="bg-white p-4 rounded-lg border border-teal-200">
+                <div className="text-xs text-gray-500 uppercase tracking-wide">Punctuation</div>
+                <div className="text-2xl font-bold text-teal-600">
+                  {((currentUserData.categories?.text?.punctuation_ratio || 0) * 100).toFixed(0)}%
+                </div>
+                <div className="text-xs text-gray-500">
+                  {(currentUserData.categories?.linguistic?.exclamation_ratio || 0) > 0.2 
+                    ? 'Uses !!! often' 
+                    : 'Standard punctuation'}
+                </div>
+              </div>
+              
+              {/* Emoji */}
+              <div className="bg-white p-4 rounded-lg border border-teal-200">
+                <div className="text-xs text-gray-500 uppercase tracking-wide">Emoji Use</div>
+                <div className="text-2xl font-bold text-teal-600">
+                  {((currentUserData.categories?.text?.emoji_density || 0) * 100).toFixed(1)}%
+                </div>
+                <div className="text-xs text-gray-500">
+                  {(currentUserData.categories?.text?.emoji_density || 0) > 0.1 
+                    ? 'Frequent emoji user' 
+                    : 'Minimal emojis'}
+                </div>
+              </div>
+              
+              {/* Message Length */}
+              <div className="bg-white p-4 rounded-lg border border-teal-200">
+                <div className="text-xs text-gray-500 uppercase tracking-wide">Avg Words/Msg</div>
+                <div className="text-2xl font-bold text-teal-600">
+                  {((currentUserData.categories?.text?.word_count_mean || 0) * 50).toFixed(0)}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {(currentUserData.categories?.text?.word_count_mean || 0) < 0.2 
+                    ? 'Short messages' 
+                    : (currentUserData.categories?.text?.word_count_mean || 0) > 0.5 
+                      ? 'Long messages' 
+                      : 'Medium length'}
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="card">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -231,79 +296,20 @@ function UserProfilePage() {
         </>
       )}
 
-      {compatibility && (
-        <div className="card bg-gradient-to-r from-pink-50 to-purple-50 border-pink-200">
-          <div className="flex items-center mb-4">
-            <Heart className="w-6 h-6 text-pink-500 mr-2" />
-            <h3 className="text-lg font-semibold text-gray-900">Compatibility Score</h3>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="text-5xl font-bold text-pink-600">
-                {compatibility.compatibility?.overall_score || 0}%
-              </div>
-              <div className="text-gray-600 mt-1">Overall Compatibility</div>
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Communication Style</span>
-                <span className="font-medium">{compatibility.compatibility?.communication_style_match || 0}%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Emotional Compatibility</span>
-                <span className="font-medium">{compatibility.compatibility?.emotional_compatibility || 0}%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Engagement Balance</span>
-                <span className="font-medium">{compatibility.compatibility?.engagement_balance || 0}%</span>
-              </div>
-            </div>
-            
-            <div>
-              <p className="text-gray-700 italic">
-                "{compatibility.compatibility?.summary || 'Analysis pending...'}"
-              </p>
-            </div>
-          </div>
-
-          {compatibility.compatibility?.strengths && (
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <h4 className="font-medium text-green-700 mb-2">Strengths</h4>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  {compatibility.compatibility.strengths.map((s, i) => (
-                    <li key={i} className="flex items-start">
-                      <span className="text-green-500 mr-2">✓</span>
-                      {s}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-medium text-amber-700 mb-2">Areas for Growth</h4>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  {compatibility.compatibility.challenges?.map((c, i) => (
-                    <li key={i} className="flex items-start">
-                      <span className="text-amber-500 mr-2">!</span>
-                      {c}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
       <div className="flex gap-4">
         <button
           onClick={() => navigate('/compatibility')}
           className="btn-primary flex items-center"
         >
-          <Users className="w-4 h-4 mr-2" />
+          <Heart className="w-4 h-4 mr-2" />
           View Compatibility Analysis
+        </button>
+        <button
+          onClick={() => navigate('/chat')}
+          className="btn-secondary flex items-center"
+        >
+          <Users className="w-4 h-4 mr-2" />
+          Chat as Persona
         </button>
       </div>
     </div>
