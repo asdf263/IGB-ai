@@ -3,7 +3,7 @@ Visualization Service Module
 Generates graph structures and visualization data for frontend rendering
 """
 import numpy as np
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 import hashlib
 
 
