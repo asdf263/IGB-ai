@@ -1,0 +1,17 @@
+{
+  "name": "igb-ai",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm:dev:frontend\" \"npm:dev:web\"",
+    "dev:frontend": "cd frontend && npm start",
+    "dev:web": "cd web && npm run dev",
+    "install:all": "npm install && cd frontend && npm install && cd ../web && npm install",
+    "frontend": "cd frontend && npm start",
+    "web": "cd web && npm run dev",
+    "backend": "cd backend && python3.12 main.py"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

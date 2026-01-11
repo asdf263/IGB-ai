@@ -23,13 +23,13 @@ const navItems = [
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b border-gray-200">
+    <div className="min-h-screen bg-rose-50">
+      <nav className="bg-white shadow-sm border-b border-rose-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <span className="text-xl font-bold text-primary-600">IGB AI</span>
-              <span className="ml-2 text-sm text-gray-500">Behavior Vectors</span>
+              <span className="text-xl font-bold text-rose-600">IGB AI</span>
+              <span className="ml-2 text-sm text-rose-400">Matchmaking Intelligence</span>
             </div>
             <div className="flex space-x-1">
               {navItems.map(({ path, label, icon: Icon }) => (
@@ -39,8 +39,8 @@ function App() {
                   className={({ isActive }) =>
                     `flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                       isActive
-                        ? 'bg-primary-100 text-primary-700'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'bg-rose-100 text-rose-700'
+                        : 'text-rose-600 hover:bg-rose-50'
                     }`
                   }
                 >
