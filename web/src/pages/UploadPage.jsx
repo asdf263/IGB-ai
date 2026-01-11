@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { useDropzone } from 'react-dropzone'
 import { Upload, FileJson, AlertCircle, CheckCircle, Loader2 } from 'lucide-react'
 import useStore from '../store/useStore'
-import { extractFeatures } from '../services/api'
+import { extractFeatures, extractUserFeatures, saveAnalysis } from '../services/api'
 
 function UploadPage() {
   const navigate = useNavigate()
-  const { setCurrentVector, setFeatureLabels, setCategories, addVector } = useStore()
+  const { setCurrentVector, setFeatureLabels, setCategories, addVector, setUserFeatures, setCurrentMessages } = useStore()
   const [jsonText, setJsonText] = useState('')
   const [inputMode, setInputMode] = useState('file')
   const [validationStatus, setValidationStatus] = useState(null)
@@ -70,7 +70,11 @@ function UploadPage() {
         return
       }
 
+      // Extract standard features
       const result = await extractFeatures(parsed.messages, true)
+
+      // Also extract user-based features
+      const userResult = await extractUserFeatures(parsed.messages)
 
       if (result.success) {
         setCurrentVector(result.vector)
@@ -83,6 +87,30 @@ function UploadPage() {
           categories: result.categories,
           timestamp: new Date().toISOString(),
         })
+
+        // Store user features and messages for user profile and compatibility pages
+        if (userResult.success) {
+          setUserFeatures(userResult)
+          setCurrentMessages(parsed.messages)
+          
+          // Save analysis to local storage (creates new file each time)
+          try {
+            const saveResult = await saveAnalysis(
+              parsed.messages,
+              userResult.users,
+              null,
+              {
+                vector: result.vector,
+                labels: result.feature_labels,
+                categories: result.categories,
+              }
+            )
+            console.log('Analysis saved:', saveResult.analysis_id)
+          } catch (saveErr) {
+            console.warn('Failed to save analysis:', saveErr)
+          }
+        }
+
         navigate('/analysis')
       } else {
         setError(result.error || 'Extraction failed')
@@ -105,15 +133,15 @@ function UploadPage() {
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="card">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Upload Chat Log</h2>
-        <p className="text-gray-600 mb-6">Extract behavior vectors from conversation data</p>
+        <p className="text-gray-600 mb-6">Get started on your optimized matchmaking!</p>
 
         <div className="flex space-x-2 mb-6">
           <button
             onClick={() => setInputMode('file')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               inputMode === 'file'
-                ? 'bg-primary-100 text-primary-700'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-rose-100 text-rose-700'
+                : 'bg-rose-50 text-rose-600 hover:bg-rose-100'
             }`}
           >
             File Upload
@@ -122,8 +150,8 @@ function UploadPage() {
             onClick={() => setInputMode('text')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               inputMode === 'text'
-                ? 'bg-primary-100 text-primary-700'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-rose-100 text-rose-700'
+                : 'bg-rose-50 text-rose-600 hover:bg-rose-100'
             }`}
           >
             Paste JSON
@@ -135,20 +163,20 @@ function UploadPage() {
             {...getRootProps()}
             className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-colors ${
               isDragActive
-                ? 'border-primary-500 bg-primary-50'
-                : 'border-gray-300 hover:border-primary-400'
+                ? 'border-rose-500 bg-rose-50'
+                : 'border-rose-300 hover:border-rose-400'
             }`}
           >
             <input {...getInputProps()} />
-            <Upload className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+            <Upload className="w-12 h-12 mx-auto text-rose-300 mb-4" />
             {isDragActive ? (
-              <p className="text-primary-600 font-medium">Drop the file here...</p>
+              <p className="text-rose-600 font-medium">Drop the file here...</p>
             ) : (
               <>
-                <p className="text-gray-600 font-medium">
+                <p className="text-gray-700 font-medium">
                   Drag & drop a JSON file here, or click to select
                 </p>
-                <p className="text-gray-400 text-sm mt-2">Only .json files are accepted</p>
+                <p className="text-rose-400 text-sm mt-2">Only .json files are accepted</p>
               </>
             )}
           </div>
@@ -206,7 +234,7 @@ function UploadPage() {
 
       <div className="card">
         <h3 className="text-lg font-semibold text-gray-900 mb-3">Expected Format</h3>
-        <pre className="bg-gray-100 p-4 rounded-lg text-sm font-mono overflow-x-auto">
+        <pre className="bg-rose-50 p-4 rounded-lg text-sm font-mono overflow-x-auto border border-rose-100">
           {sampleJson}
         </pre>
       </div>

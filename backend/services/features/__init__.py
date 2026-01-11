@@ -9,6 +9,7 @@ from .sentiment_features import SentimentFeatureExtractor
 from .behavioral_features import BehavioralFeatureExtractor
 from .graph_features import GraphFeatureExtractor
 from .composite_features import CompositeFeatureExtractor
+from .reaction_features import ReactionFeatureExtractor
 
 __all__ = [
     'TemporalFeatureExtractor',
@@ -20,5 +21,6 @@ __all__ = [
     'SentimentFeatureExtractor',
     'BehavioralFeatureExtractor',
     'GraphFeatureExtractor',
-    'CompositeFeatureExtractor'
+    'CompositeFeatureExtractor',
+    'ReactionFeatureExtractor'
 ]

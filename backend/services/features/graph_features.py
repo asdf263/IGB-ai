@@ -24,10 +24,20 @@ class GraphFeatureExtractor:
             'interaction_density'
         ]
     
-    def extract(self, messages: List[Dict[str, Any]]) -> Dict[str, float]:
-        """Extract all graph features from messages."""
+    def extract(self, messages: List[Dict[str, Any]], target_user: str = None) -> Dict[str, float]:
+        """
+        Extract all graph features from messages.
+        
+        Args:
+            messages: All messages in the conversation
+            target_user: The user to extract features for (if None, defaults to 'user' for backward compatibility)
+        """
         if not messages:
             return {name: 0.0 for name in self.feature_names}
+        
+        # Default to 'user' for backward compatibility
+        if target_user is None:
+            target_user = 'user'
         
         graph = self._build_interaction_graph(messages)
         
@@ -39,9 +49,9 @@ class GraphFeatureExtractor:
         features['betweenness_centrality'] = self._compute_betweenness(graph)
         features['closeness_centrality'] = self._compute_closeness(graph)
         features['clustering_coefficient'] = self._compute_clustering(graph)
-        features['dominance_asymmetry'] = self._compute_dominance_asymmetry(messages)
-        features['social_balance'] = self._compute_social_balance(messages)
-        features['dyadic_symmetry'] = self._compute_dyadic_symmetry(messages)
+        features['dominance_asymmetry'] = self._compute_dominance_asymmetry(messages, target_user)
+        features['social_balance'] = self._compute_social_balance(messages, target_user)
+        features['dyadic_symmetry'] = self._compute_dyadic_symmetry(messages, target_user)
         features['interaction_density'] = self._compute_interaction_density(messages)
         
         return features
@@ -191,37 +201,57 @@ class GraphFeatureExtractor:
         
         return triangles / possible_triangles if possible_triangles > 0 else 0.0
     
-    def _compute_dominance_asymmetry(self, messages: List[Dict[str, Any]]) -> float:
-        """Compute dominance asymmetry between user and bot."""
+    def _compute_dominance_asymmetry(self, messages: List[Dict[str, Any]], target_user: str) -> float:
+        """Compute dominance asymmetry between target_user and others."""
+        participants = list(set(m.get('sender') for m in messages if m.get('sender')))
+        if len(participants) != 2:
+            return 0.0
+        
+        other_user = [p for p in participants if p != target_user][0] if len(participants) == 2 else None
+        if not other_user:
+            return 0.0
+        
         user_words = sum(len(m.get('text', '').split()) 
-                        for m in messages if m.get('sender') == 'user')
-        bot_words = sum(len(m.get('text', '').split()) 
-                       for m in messages if m.get('sender') == 'bot')
+                        for m in messages if m.get('sender') == target_user)
+        other_words = sum(len(m.get('text', '').split()) 
+                       for m in messages if m.get('sender') == other_user)
         
-        total = user_words + bot_words
+        total = user_words + other_words
         if total == 0:
             return 0.0
         
-        return abs(user_words - bot_words) / total
+        return abs(user_words - other_words) / total
     
-    def _compute_social_balance(self, messages: List[Dict[str, Any]]) -> float:
+    def _compute_social_balance(self, messages: List[Dict[str, Any]], target_user: str) -> float:
         """Compute social balance (turn-taking equality)."""
-        user_count = sum(1 for m in messages if m.get('sender') == 'user')
-        bot_count = len(messages) - user_count
+        participants = list(set(m.get('sender') for m in messages if m.get('sender')))
+        if len(participants) != 2:
+            return 0.5
         
-        total = user_count + bot_count
+        other_user = [p for p in participants if p != target_user][0]
+        
+        user_count = sum(1 for m in messages if m.get('sender') == target_user)
+        other_count = sum(1 for m in messages if m.get('sender') == other_user)
+        
+        total = user_count + other_count
         if total == 0:
             return 0.0
         
-        return 1.0 - abs(user_count - bot_count) / total
+        return 1.0 - abs(user_count - other_count) / total
     
-    def _compute_dyadic_symmetry(self, messages: List[Dict[str, Any]]) -> float:
+    def _compute_dyadic_symmetry(self, messages: List[Dict[str, Any]], target_user: str) -> float:
         """Compute dyadic symmetry (response pattern similarity)."""
         if len(messages) < 4:
             return 0.5
         
+        participants = list(set(m.get('sender') for m in messages if m.get('sender')))
+        if len(participants) != 2:
+            return 0.5
+        
+        other_user = [p for p in participants if p != target_user][0]
+        
         user_response_lengths = []
-        bot_response_lengths = []
+        other_response_lengths = []
         
         for i in range(1, len(messages)):
             msg = messages[i]
@@ -229,22 +259,22 @@ class GraphFeatureExtractor:
             
             if msg.get('sender') != prev_msg.get('sender'):
                 length = len(msg.get('text', '').split())
-                if msg.get('sender') == 'user':
+                if msg.get('sender') == target_user:
                     user_response_lengths.append(length)
-                else:
-                    bot_response_lengths.append(length)
+                elif msg.get('sender') == other_user:
+                    other_response_lengths.append(length)
         
-        if not user_response_lengths or not bot_response_lengths:
+        if not user_response_lengths or not other_response_lengths:
             return 0.5
         
         user_mean = np.mean(user_response_lengths)
-        bot_mean = np.mean(bot_response_lengths)
+        other_mean = np.mean(other_response_lengths)
         
-        max_mean = max(user_mean, bot_mean)
+        max_mean = max(user_mean, other_mean)
         if max_mean == 0:
             return 1.0
         
-        return 1.0 - abs(user_mean - bot_mean) / max_mean
+        return 1.0 - abs(user_mean - other_mean) / max_mean
     
     def _compute_interaction_density(self, messages: List[Dict[str, Any]]) -> float:
         """Compute interaction density (messages per time unit)."""

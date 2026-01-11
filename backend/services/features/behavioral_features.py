@@ -67,22 +67,41 @@ class BehavioralFeatureExtractor:
         self.self_disclosure = {'i feel', 'i think', 'i believe', 'my opinion', 'personally',
                                'to be honest', 'honestly', 'i\'m', 'my life', 'my experience'}
     
-    def extract(self, messages: List[Dict[str, Any]]) -> Dict[str, float]:
-        """Extract all behavioral features from messages."""
+    def extract(self, messages: List[Dict[str, Any]], target_user: str = None) -> Dict[str, float]:
+        """
+        Extract all behavioral features from messages.
+        
+        Args:
+            messages: All messages in the conversation
+            target_user: The user to extract features for (if None, defaults to 'user' for backward compatibility)
+        """
         if not messages:
             return {name: 0.0 for name in self.feature_names}
         
-        user_messages = [m for m in messages if m.get('sender') == 'user']
-        bot_messages = [m for m in messages if m.get('sender') == 'bot']
+        # Default to 'user' for backward compatibility
+        if target_user is None:
+            target_user = 'user'
+        
+        # Get all participants
+        participants = list(set(m.get('sender') for m in messages if m.get('sender')))
+        
+        # Filter messages for target user and others
+        user_messages = [m for m in messages if m.get('sender') == target_user]
+        other_messages = [m for m in messages if m.get('sender') != target_user]
+        
+        # Get the "other" participant (for 2-person conversations)
+        other_user = None
+        if len(participants) == 2:
+            other_user = [p for p in participants if p != target_user][0]
         
         features = {}
         
         # Response and initiation patterns
-        features['response_rate'] = self._compute_response_rate(messages)
-        features['initiation_rate'] = self._compute_initiation_rate(messages)
+        features['response_rate'] = self._compute_response_rate(messages, target_user, other_user)
+        features['initiation_rate'] = self._compute_initiation_rate(messages, target_user)
         
         # Turn length features
-        turn_features = self._compute_turn_features(messages)
+        turn_features = self._compute_turn_features(messages, target_user)
         features.update(turn_features)
         
         # Question and answer patterns
@@ -98,69 +117,70 @@ class BehavioralFeatureExtractor:
         features.update(social_features)
         
         # Interaction dynamics
-        dynamics_features = self._compute_dynamics_features(messages, user_messages)
+        dynamics_features = self._compute_dynamics_features(messages, user_messages, target_user, other_user)
         features.update(dynamics_features)
         
         return features
     
-    def _compute_response_rate(self, messages: List[Dict[str, Any]]) -> float:
-        """Compute how often user responds to bot messages."""
-        if len(messages) < 2:
+    def _compute_response_rate(self, messages: List[Dict[str, Any]], target_user: str, other_user: str = None) -> float:
+        """Compute how often target_user responds to other person's messages."""
+        if len(messages) < 2 or not other_user:
             return 0.0
         
         responses = 0
         opportunities = 0
         
         for i in range(1, len(messages)):
-            if messages[i-1].get('sender') == 'bot':
+            if messages[i-1].get('sender') == other_user:
                 opportunities += 1
-                if messages[i].get('sender') == 'user':
+                if messages[i].get('sender') == target_user:
                     responses += 1
         
         return responses / opportunities if opportunities > 0 else 0.0
     
-    def _compute_initiation_rate(self, messages: List[Dict[str, Any]]) -> float:
-        """Compute how often user initiates conversation."""
+    def _compute_initiation_rate(self, messages: List[Dict[str, Any]], target_user: str) -> float:
+        """Compute how often target_user initiates conversation."""
         if not messages:
             return 0.0
         
-        user_messages = [m for m in messages if m.get('sender') == 'user']
+        user_messages = [m for m in messages if m.get('sender') == target_user]
         if not user_messages:
             return 0.0
         
         initiations = 0
         for i, msg in enumerate(messages):
-            if msg.get('sender') == 'user':
-                if i == 0 or messages[i-1].get('sender') == 'user':
+            if msg.get('sender') == target_user:
+                if i == 0 or messages[i-1].get('sender') == target_user:
                     initiations += 1
         
         return initiations / len(user_messages)
     
-    def _compute_turn_features(self, messages: List[Dict[str, Any]]) -> Dict[str, float]:
+    def _compute_turn_features(self, messages: List[Dict[str, Any]], target_user: str, other_user: str = None) -> Dict[str, float]:
         """Compute turn-taking features."""
-        turns = []
+        user_turns = []
         current_turn = []
-        current_sender = None
+        prev_sender = None
         
         for msg in messages:
             sender = msg.get('sender')
-            if sender != current_sender:
-                if current_turn:
-                    turns.append(len(current_turn))
+            if sender != prev_sender:
+                if current_turn and prev_sender == target_user:
+                    user_turns.append(current_turn)
                 current_turn = [msg]
-                current_sender = sender
+                prev_sender = sender
             else:
                 current_turn.append(msg)
         
         if current_turn:
-            turns.append(len(current_turn))
+            user_turns.append(current_turn)
         
-        if not turns:
+        if not user_turns:
             return {'avg_turn_length': 0.0, 'turn_length_variance': 0.0}
         
+        turn_lengths = [len(turn) for turn in user_turns]
         return {
-            'avg_turn_length': float(np.mean(turns)),
-            'turn_length_variance': float(np.var(turns))
+            'avg_turn_length': float(np.mean(turn_lengths)),
+            'turn_length_variance': float(np.var(turn_lengths))
         }
     
     def _compute_qa_features(self, user_messages: List[Dict[str, Any]]) -> Dict[str, float]:
@@ -271,7 +291,9 @@ class BehavioralFeatureExtractor:
         }
     
     def _compute_dynamics_features(self, messages: List[Dict[str, Any]], 
-                                   user_messages: List[Dict[str, Any]]) -> Dict[str, float]:
+                                   user_messages: List[Dict[str, Any]],
+                                   target_user: str,
+                                   other_user: str = None) -> Dict[str, float]:
         """Compute interaction dynamics features."""
         if not messages or not user_messages:
             return {
@@ -283,18 +305,18 @@ class BehavioralFeatureExtractor:
             }
         
         user_count = len(user_messages)
-        bot_count = len(messages) - user_count
+        other_count = len(messages) - user_count
         total = len(messages)
         
         user_words = sum(len(m.get('text', '').split()) for m in user_messages)
-        bot_words = sum(len(m.get('text', '').split()) for m in messages if m.get('sender') == 'bot')
+        other_words = sum(len(m.get('text', '').split()) for m in messages if m.get('sender') == other_user) if other_user else 0
         
         engagement = min(1.0, user_count / max(total, 1) * 2)
         
-        reciprocity = 1.0 - abs(user_count - bot_count) / max(total, 1)
+        reciprocity = 1.0 - abs(user_words - other_words) / max(user_words + other_words, 1) if other_user else 0.5
         
-        total_words = user_words + bot_words
-        dominance = user_words / total_words if total_words > 0 else 0.5
+        total_words = user_words + other_words
+        dominance = (user_words - other_words) / max(user_words + other_words, 1) if other_user else 0.0
         
         question_initiations = sum(1 for m in user_messages if '?' in m.get('text', ''))
         topic_control = question_initiations / max(user_count, 1)

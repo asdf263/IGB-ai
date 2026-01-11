@@ -38,7 +38,8 @@ class TextFeatureExtractor:
             'url_density',
             'mention_density',
             'hashtag_density',
-            'question_mark_ratio'
+            'question_mark_ratio',
+            'all_caps_word_ratio'
         ]
         
         self.stopwords = {
@@ -144,30 +145,48 @@ class TextFeatureExtractor:
         # Character-level entropy
         features['char_entropy'] = self._compute_char_entropy(all_text)
         
-        # Character type ratios
-        total_chars = len(all_text) if all_text else 1
-        features['uppercase_ratio'] = sum(1 for c in all_text if c.isupper()) / total_chars
-        features['digit_ratio'] = sum(1 for c in all_text if c.isdigit()) / total_chars
-        features['punctuation_ratio'] = sum(1 for c in all_text if c in '.,!?;:\'"-()[]{}') / total_chars
-        features['whitespace_ratio'] = sum(1 for c in all_text if c.isspace()) / total_chars
+        # Character type ratios - use ORIGINAL text (not lowercased) for uppercase detection
+        all_text_original = ' '.join(texts)  # Keep original case
         
-        # Special pattern densities
+        # Count non-whitespace characters for ratio calculations (excluding whitespace)
+        non_whitespace_chars = [c for c in all_text_original if not c.isspace()]
+        total_non_whitespace = len(non_whitespace_chars) if non_whitespace_chars else 1
+        
+        features['uppercase_ratio'] = sum(1 for c in non_whitespace_chars if c.isupper()) / total_non_whitespace
+        features['digit_ratio'] = sum(1 for c in non_whitespace_chars if c.isdigit()) / total_non_whitespace
+        features['punctuation_ratio'] = sum(1 for c in non_whitespace_chars if c in '.,!?;:\'"-()[]{}') / total_non_whitespace
+        
+        # Whitespace ratio uses total chars (including whitespace) as denominator
+        total_chars_with_whitespace = len(all_text_original) if all_text_original else 1
+        features['whitespace_ratio'] = sum(1 for c in all_text_original if c.isspace()) / total_chars_with_whitespace
+        
+        # Special pattern densities - use original text for patterns that don't need lowercasing
         total_words = len(words) if words else 1
         
-        emoji_count = len(self.emoji_pattern.findall(all_text))
+        # Emojis don't have case, but use original to be safe
+        emoji_count = len(self.emoji_pattern.findall(all_text_original))
         features['emoji_density'] = emoji_count / total_words
         
-        url_count = len(self.url_pattern.findall(all_text))
+        # URLs, mentions, hashtags - use original text
+        url_count = len(self.url_pattern.findall(all_text_original))
         features['url_density'] = url_count / total_words
         
-        mention_count = len(self.mention_pattern.findall(all_text))
+        mention_count = len(self.mention_pattern.findall(all_text_original))
         features['mention_density'] = mention_count / total_words
         
-        hashtag_count = len(self.hashtag_pattern.findall(all_text))
+        hashtag_count = len(self.hashtag_pattern.findall(all_text_original))
         features['hashtag_density'] = hashtag_count / total_words
         
         question_count = all_text.count('?')
         features['question_mark_ratio'] = question_count / len(texts)
+        
+        # All-caps words detection (words with 2+ chars that are entirely uppercase)
+        # Use original text to preserve case
+        original_words = re.findall(r'\b[A-Za-z]+\b', all_text_original)
+        all_caps_words = [w for w in original_words if len(w) >= 2 and w.isupper()]
+        total_alpha_words = len(original_words) if original_words else 1
+        
+        features['all_caps_word_ratio'] = len(all_caps_words) / total_alpha_words
         
         return features
     

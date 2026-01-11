@@ -127,16 +127,34 @@ class FeatureExtractor:
         """Get raw semantic embeddings for messages."""
         return self.semantic_extractor.get_embeddings(messages)
     
-    def normalize_vector(self, vector: List[float]) -> List[float]:
-        """Normalize feature vector to [0, 1] range."""
+    def normalize_vector(self, vector: List[float], method: str = 'soft') -> List[float]:
+        """
+        Normalize feature vector.
+        
+        Args:
+            vector: Feature vector to normalize
+            method: 'soft' for sigmoid-based (prevents maxing at 1), 
+                   'minmax' for traditional [0,1] range
+        """
         arr = np.array(vector)
-        min_val = np.min(arr)
-        max_val = np.max(arr)
         
-        if max_val - min_val == 0:
-            return [0.5] * len(vector)
+        # Handle NaN and Inf values
+        arr = np.nan_to_num(arr, nan=0.0, posinf=1.0, neginf=0.0)
         
-        normalized = (arr - min_val) / (max_val - min_val)
+        if method == 'soft':
+            # Soft sigmoid normalization - maps to (0, 1) without hard clipping
+            # Uses tanh for smoother distribution
+            normalized = (np.tanh(arr) + 1) / 2
+        else:
+            # Traditional min-max normalization
+            min_val = np.min(arr)
+            max_val = np.max(arr)
+            
+            if max_val - min_val == 0:
+                return [0.5] * len(vector)
+            
+            normalized = (arr - min_val) / (max_val - min_val)
+        
         return normalized.tolist()
     
     def get_category_summary(self, messages: List[Dict[str, Any]]) -> Dict[str, float]:
