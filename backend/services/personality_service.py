@@ -28,147 +28,88 @@ class PersonalityService:
         self.gemini_model = None
         self._init_gemini()
         
-        # Define the personality vector dimensions with their meanings and interpretation rules
-        # Uses SYNTHETIC features (from llm_synthetic_features.py) as primary source - these are
-        # pre-computed abstractions that are more robust and interpretable for the LLM.
-        # Falls back to raw features when synthetic not available.
+        # Define core personality dimensions - streamlined to 12 most impactful traits
+        # Focus on traits that directly affect mimicry quality without overwhelming the LLM
+        # LOW behaviors are phrased positively - as personality styles, not deficits
         self.vector_dimensions = {
-            # Core Communication Style (from synthetic features)
+            # === CORE TONE (3 dimensions) ===
             'warmth': {
-                'source_features': ['synthetic_communication_warmth', 'behavioral_empathy_score', 'sentiment_positive_ratio'],
-                'interpretation': 'Overall friendliness and warmth in communication.',
-                'high_behavior': 'Be warm, friendly, supportive, and encouraging',
-                'low_behavior': 'Be more neutral, reserved, and matter-of-fact'
+                'source_features': ['synthetic_communication_warmth', 'sentiment_positive_ratio', 'behavioral_empathy_score'],
+                'interpretation': 'Friendliness and emotional warmth',
+                'high_behavior': 'Be warm, friendly, and openly supportive',
+                'low_behavior': 'Be professionally friendly, show care through actions not words'
             },
             'energy': {
-                'source_features': ['synthetic_conversational_energy', 'reaction_response_enthusiasm', 'behavioral_engagement_level'],
-                'interpretation': 'Overall energy and enthusiasm level.',
-                'high_behavior': 'Show high energy, excitement, enthusiasm in responses',
-                'low_behavior': 'Respond in calm, measured, understated manner'
+                'source_features': ['synthetic_conversational_energy', 'reaction_response_enthusiasm', 'linguistic_exclamation_ratio'],
+                'interpretation': 'Energy and enthusiasm level',
+                'high_behavior': 'Show high energy and excitement!',
+                'low_behavior': 'Be calm and thoughtfully engaged'
             },
             'formality': {
-                'source_features': ['synthetic_formality_level', 'behavioral_formality_score', 'behavioral_politeness_score'],
-                'interpretation': 'Formal vs casual communication style.',
-                'high_behavior': 'Use formal language, proper grammar, professional tone',
-                'low_behavior': 'Use casual language, contractions, relaxed grammar'
-            },
-            'directness': {
-                'source_features': ['synthetic_directness_clarity', 'behavioral_directness_score', 'behavioral_assertiveness_score'],
-                'interpretation': 'How straightforward vs indirect responses are.',
-                'high_behavior': 'Be straightforward, state things directly without hedging',
-                'low_behavior': 'Use indirect phrasing, qualifiers, softer language'
+                'source_features': ['synthetic_formality_level', 'behavioral_formality_score'],
+                'interpretation': 'Formal vs casual style',
+                'high_behavior': 'Use formal language and proper grammar',
+                'low_behavior': 'Use casual, relaxed language with contractions'
             },
             
-            # Emotional Expression
-            'emotional_expressiveness': {
-                'source_features': ['synthetic_emotional_expressiveness', 'text_emoji_density', 'linguistic_exclamation_ratio'],
-                'interpretation': 'How much emotion is displayed in communication.',
-                'high_behavior': 'Express emotions openly, use emphatic language and emojis',
-                'low_behavior': 'Maintain emotional neutrality, measured tone'
+            # === TEXT STYLE (4 dimensions) ===
+            'verbosity': {
+                'source_features': ['synthetic_verbosity_level', 'text_word_count_mean', 'behavioral_elaboration_score'],
+                'interpretation': 'Message length and detail',
+                'high_behavior': 'Write longer, detailed messages',
+                'low_behavior': 'Keep messages short and punchy'
             },
-            'positivity': {
-                'source_features': ['synthetic_positivity_bias', 'sentiment_positive_ratio', 'sentiment_sentiment_mean'],
-                'interpretation': 'Default emotional valence (positive vs negative).',
-                'high_behavior': 'Default to positive, optimistic, encouraging tone',
-                'low_behavior': 'Default to more neutral or slightly skeptical tone'
+            'typing_intensity': {
+                'source_features': ['text_uppercase_ratio', 'text_all_caps_word_ratio', 'linguistic_exclamation_ratio'],
+                'interpretation': 'CAPS and punctuation intensity',
+                'high_behavior': 'Use CAPS for emphasis, multiple punctuation!!!',
+                'low_behavior': 'Use standard capitalization, clean punctuation'
             },
-            'emotional_stability': {
-                'source_features': ['synthetic_emotional_stability', 'sentiment_sentiment_consistency', 'sentiment_sentiment_volatility'],
-                'interpretation': 'Emotional consistency vs variability.',
-                'high_behavior': 'Maintain consistent emotional tone throughout',
-                'low_behavior': 'Show varying emotions, react emotionally to different topics'
+            'expressiveness': {
+                'source_features': ['synthetic_emotional_expressiveness', 'text_emoji_density', 'text_punctuation_ratio'],
+                'interpretation': 'Emoji and emotional expression',
+                'high_behavior': 'Use emojis and expressive punctuation freely',
+                'low_behavior': 'Express through words rather than emojis'
+            },
+            'message_structure': {
+                'source_features': ['text_sentence_count_mean', 'text_words_per_sentence_mean'],
+                'interpretation': 'Short fragments vs paragraphs',
+                'high_behavior': 'Write in complete paragraphs with multiple sentences',
+                'low_behavior': 'Write quick, snappy messages'
             },
             
-            # Social & Engagement
+            # === SOCIAL DYNAMICS (3 dimensions) ===
             'curiosity': {
                 'source_features': ['synthetic_curiosity_openness', 'behavioral_question_frequency', 'text_question_mark_ratio'],
-                'interpretation': 'Interest in exploring topics and asking questions.',
-                'high_behavior': 'Frequently ask questions, show curiosity, explore topics',
-                'low_behavior': 'Primarily make statements, rarely ask questions'
+                'interpretation': 'Question-asking tendency',
+                'high_behavior': 'Ask questions frequently, show active curiosity',
+                'low_behavior': 'Share thoughts and opinions confidently'
             },
             'supportiveness': {
                 'source_features': ['synthetic_supportiveness', 'behavioral_support_ratio', 'behavioral_empathy_score'],
-                'interpretation': 'Tendency to support and encourage others.',
-                'high_behavior': 'Show strong empathy, acknowledge feelings, offer support',
-                'low_behavior': 'Focus on facts/solutions rather than emotional validation'
+                'interpretation': 'Empathy and support',
+                'high_behavior': 'Show empathy openly, offer support',
+                'low_behavior': 'Be helpful through practical advice and solutions'
             },
-            'agreement_orientation': {
-                'source_features': ['synthetic_agreement_orientation', 'reaction_affirmation_tendency', 'behavioral_agreement_ratio'],
-                'interpretation': 'Tendency to agree vs challenge.',
-                'high_behavior': 'Tend to agree, affirm, and validate others\' points',
-                'low_behavior': 'More likely to question, challenge, or offer alternatives'
+            'directness': {
+                'source_features': ['synthetic_directness_clarity', 'behavioral_directness_score'],
+                'interpretation': 'Straightforward vs indirect',
+                'high_behavior': 'Be direct and clear without hedging',
+                'low_behavior': 'Use thoughtful, diplomatic language'
             },
             
-            # Communication Patterns
-            'verbosity': {
-                'source_features': ['synthetic_verbosity_level', 'text_word_count_mean', 'behavioral_elaboration_score'],
-                'interpretation': 'How much detail and length in responses.',
-                'high_behavior': 'Write longer messages with elaboration and detail',
-                'low_behavior': 'Keep messages short and to the point'
-            },
-            'sophistication': {
-                'source_features': ['synthetic_linguistic_sophistication', 'text_lexical_richness', 'linguistic_readability_score'],
-                'interpretation': 'Language complexity and sophistication.',
-                'high_behavior': 'Use varied vocabulary, complex sentence structures',
-                'low_behavior': 'Use simple words, basic sentence structures'
-            },
+            # === PERSONALITY QUIRKS (2 dimensions) ===
             'humor': {
-                'source_features': ['synthetic_humor_playfulness', 'behavioral_humor_density', 'text_emoji_density'],
-                'interpretation': 'Use of humor and playfulness.',
-                'high_behavior': 'Include humor, jokes, witty remarks, playful tone',
-                'low_behavior': 'Maintain serious, straightforward tone'
+                'source_features': ['synthetic_humor_playfulness', 'behavioral_humor_density'],
+                'interpretation': 'Humor and playfulness',
+                'high_behavior': 'Include humor and playful banter',
+                'low_behavior': 'Keep a sincere, genuine tone'
             },
-            
-            # Interpersonal Dynamics
             'self_focus': {
-                'source_features': ['synthetic_self_focus_tendency', 'linguistic_first_person_ratio', 'behavioral_self_disclosure_level'],
-                'interpretation': 'Focus on self vs others.',
-                'high_behavior': 'Frequently reference personal experiences, use "I" often',
-                'low_behavior': 'Focus on the topic/other person, minimize self-references'
-            },
-            'social_dominance': {
-                'source_features': ['synthetic_social_dominance', 'behavioral_dominance_score', 'behavioral_initiation_rate'],
-                'interpretation': 'Tendency to lead vs follow in conversations.',
-                'high_behavior': 'Proactively introduce topics, drive conversation forward',
-                'low_behavior': 'Primarily respond to what others say, follow their lead'
-            },
-            'adaptiveness': {
-                'source_features': ['synthetic_adaptive_communication', 'reaction_style_adaptation', 'reaction_formality_matching'],
-                'interpretation': 'How much style adapts to conversation partner.',
-                'high_behavior': 'Adapt communication style to match the other person',
-                'low_behavior': 'Maintain consistent personal style regardless of partner'
-            },
-            'attunement': {
-                'source_features': ['synthetic_interpersonal_attunement', 'reaction_sentiment_mirroring', 'reaction_emotional_responsiveness'],
-                'interpretation': 'Responsiveness and sensitivity to others.',
-                'high_behavior': 'Be highly responsive to emotional cues, mirror sentiment',
-                'low_behavior': 'Respond based on content rather than emotional cues'
-            },
-            
-            # Text Style & Tempo (NEW - weighted higher for stylistic accuracy)
-            'message_tempo': {
-                'source_features': ['temporal_burstiness_score', 'temporal_avg_response_latency', 'text_msg_length_mean'],
-                'interpretation': 'Speed and rhythm of communication. Fast responders with short messages vs slow, deliberate responses.',
-                'high_behavior': 'Send quick, short bursts of messages. Respond rapidly. Use brief, punchy sentences.',
-                'low_behavior': 'Take time to compose longer, more thoughtful responses. Write in complete paragraphs.'
-            },
-            'typing_intensity': {
-                'source_features': ['text_uppercase_ratio', 'text_punctuation_ratio', 'linguistic_exclamation_ratio'],
-                'interpretation': 'Intensity of typing style - caps, punctuation, emphasis.',
-                'high_behavior': 'Use CAPS for emphasis, multiple punctuation marks!!, expressive typing style',
-                'low_behavior': 'Use standard capitalization, minimal punctuation, calm typing style'
-            },
-            'message_structure': {
-                'source_features': ['text_msg_length_mean', 'text_words_per_sentence_mean', 'text_sentence_count_mean'],
-                'interpretation': 'How messages are structured - short fragments vs long paragraphs.',
-                'high_behavior': 'Write longer messages with multiple sentences and detailed explanations',
-                'low_behavior': 'Write short, fragmented messages. One thought per message. Brief responses.'
-            },
-            'response_speed': {
-                'source_features': ['temporal_avg_response_latency', 'temporal_burstiness_score', 'context_turn_taking_regularity'],
-                'interpretation': 'How quickly responses come and conversation pacing.',
-                'high_behavior': 'Respond quickly, maintain rapid back-and-forth conversation flow',
-                'low_behavior': 'Take time before responding, more deliberate pacing'
+                'source_features': ['synthetic_self_focus_tendency', 'linguistic_first_person_ratio'],
+                'interpretation': 'Self vs other focus',
+                'high_behavior': 'Share personal experiences freely, use "I" often',
+                'low_behavior': 'Focus on the other person and shared topics'
             }
         }
     
@@ -262,108 +203,77 @@ class PersonalityService:
     
     def _extract_raw_text_style(self, categories: Dict[str, Dict[str, float]]) -> Dict[str, Any]:
         """
-        Extract raw, visible text style features that the LLM should directly mimic.
-        These are NOT abstracted - they represent exact observable patterns.
+        Extract only the most critical observable text patterns for LLM mimicry.
+        Focus on 6 key patterns that have the highest impact on perceived authenticity.
         """
         text = categories.get('text', {})
         linguistic = categories.get('linguistic', {})
-        sentiment = categories.get('sentiment', {})
         behavioral = categories.get('behavioral', {})
         
         style = {}
         
-        # Punctuation patterns
-        exclamation_ratio = linguistic.get('exclamation_ratio', 0)
-        style['exclamation_ratio'] = exclamation_ratio
-        if exclamation_ratio > 0.3:
-            style['exclamation_level'] = 'HEAVY - frequently uses exclamation marks!'
-        elif exclamation_ratio > 0.15:
-            style['exclamation_level'] = 'Moderate - uses exclamation marks regularly'
-        elif exclamation_ratio > 0.05:
-            style['exclamation_level'] = 'Light - occasional exclamation marks'
-        else:
-            style['exclamation_level'] = 'Minimal - rarely uses exclamation marks'
-        
-        question_ratio = text.get('question_mark_ratio', 0)
-        style['question_ratio'] = question_ratio
-        if question_ratio > 0.3:
-            style['question_level'] = 'High - asks many questions'
-        elif question_ratio > 0.15:
-            style['question_level'] = 'Moderate - asks questions regularly'
-        else:
-            style['question_level'] = 'Low - mostly makes statements'
-        
-        # Check for multiple punctuation (!!!, ???)
-        punctuation_ratio = text.get('punctuation_ratio', 0)
-        style['uses_multiple_punctuation'] = punctuation_ratio > 0.1 and exclamation_ratio > 0.2
-        
-        # Capitalization patterns
-        uppercase_ratio = text.get('uppercase_ratio', 0)
-        style['uppercase_ratio'] = uppercase_ratio
-        if uppercase_ratio > 0.3:
-            style['caps_level'] = 'HEAVY - frequently uses ALL CAPS for emphasis'
-            style['caps_style'] = 'Uses CAPS LOCK for emphasis and excitement'
-        elif uppercase_ratio > 0.15:
-            style['caps_level'] = 'Moderate - sometimes uses CAPS for emphasis'
-            style['caps_style'] = 'Occasionally capitalizes words for EMPHASIS'
-        elif uppercase_ratio > 0.05:
-            style['caps_level'] = 'Light - minimal caps beyond sentence starts'
-            style['caps_style'] = 'Standard capitalization with rare emphasis'
-        else:
-            style['caps_level'] = 'Minimal - standard capitalization only'
-            style['caps_style'] = 'Standard capitalization'
-        
-        # Emoji patterns
-        emoji_density = text.get('emoji_density', 0)
-        style['emoji_density'] = emoji_density
-        if emoji_density > 0.2:
-            style['emoji_level'] = 'HEAVY - uses emojis very frequently 😊🎉'
-            style['common_emojis'] = 'Uses many emojis throughout messages'
-        elif emoji_density > 0.1:
-            style['emoji_level'] = 'Moderate - uses emojis regularly'
-            style['common_emojis'] = 'Sprinkles emojis in messages'
-        elif emoji_density > 0.02:
-            style['emoji_level'] = 'Light - occasional emoji use'
-            style['common_emojis'] = 'Rare emoji use'
-        else:
-            style['emoji_level'] = 'None - does not use emojis'
-            style['common_emojis'] = 'No emojis'
-        
-        # Message structure
+        # 1. MESSAGE LENGTH - Most visible pattern
         avg_words = text.get('word_count_mean', 10)
-        style['avg_words'] = avg_words
         if avg_words < 5:
-            style['sentence_style'] = 'Very short, fragmented messages'
-        elif avg_words < 10:
-            style['sentence_style'] = 'Brief, concise messages'
-        elif avg_words < 20:
-            style['sentence_style'] = 'Medium-length messages'
+            style['length'] = f'Very short ({int(avg_words)} words avg) - fragments and brief responses'
+        elif avg_words < 15:
+            style['length'] = f'Short ({int(avg_words)} words avg) - concise messages'
+        elif avg_words < 30:
+            style['length'] = f'Medium ({int(avg_words)} words avg) - balanced messages'
         else:
-            style['sentence_style'] = 'Long, detailed messages with multiple sentences'
+            style['length'] = f'Long ({int(avg_words)} words avg) - detailed paragraphs'
         
-        # Formality and diction
+        # 2. CAPS USAGE - Highly distinctive
+        uppercase_ratio = text.get('uppercase_ratio', 0)
+        all_caps_ratio = text.get('all_caps_word_ratio', 0)
+        if uppercase_ratio > 0.2 or all_caps_ratio > 0.1:
+            style['caps'] = f'HEAVY CAPS usage ({uppercase_ratio:.0%}) - uses CAPS for EMPHASIS'
+        elif uppercase_ratio > 0.1 or all_caps_ratio > 0.05:
+            style['caps'] = f'Moderate caps ({uppercase_ratio:.0%}) - occasional EMPHASIS'
+        else:
+            style['caps'] = f'Standard caps ({uppercase_ratio:.0%}) - normal capitalization'
+        
+        # 3. PUNCTUATION INTENSITY - Exclamations and questions
+        exclamation_ratio = linguistic.get('exclamation_ratio', 0)
+        question_ratio = text.get('question_mark_ratio', 0)
+        if exclamation_ratio > 0.2:
+            style['punctuation'] = f'High energy! Uses lots of exclamation marks! ({exclamation_ratio:.0%})'
+        elif exclamation_ratio > 0.1:
+            style['punctuation'] = f'Moderate energy with regular exclamations ({exclamation_ratio:.0%})'
+        else:
+            style['punctuation'] = f'Calm punctuation. Minimal exclamations ({exclamation_ratio:.0%})'
+        
+        if question_ratio > 0.2:
+            style['punctuation'] += f' Asks many questions? ({question_ratio:.0%})'
+        
+        # 4. EMOJI USAGE - Emotional expressiveness
+        emoji_density = text.get('emoji_density', 0)
+        if emoji_density > 0.15:
+            style['emojis'] = f'Heavy emoji user 😊✨ ({emoji_density:.1%} density)'
+        elif emoji_density > 0.05:
+            style['emojis'] = f'Moderate emoji use 😊 ({emoji_density:.1%} density)'
+        elif emoji_density > 0.01:
+            style['emojis'] = f'Rare emojis ({emoji_density:.1%} density)'
+        else:
+            style['emojis'] = 'No emojis'
+        
+        # 5. FORMALITY - Contractions and casual language
         formality = behavioral.get('formality_score', 0.5)
-        if formality > 0.7:
-            style['formality_description'] = 'Formal - proper grammar and vocabulary'
-            style['uses_contractions'] = False
-        elif formality > 0.4:
-            style['formality_description'] = 'Casual - relaxed but clear'
-            style['uses_contractions'] = True
+        if formality > 0.65:
+            style['formality'] = 'Formal - proper grammar, no contractions (do not, cannot)'
+        elif formality > 0.35:
+            style['formality'] = "Casual - uses contractions (don't, can't, won't)"
         else:
-            style['formality_description'] = 'Very casual - informal, conversational'
-            style['uses_contractions'] = True
+            style['formality'] = 'Very casual - relaxed grammar, slang, abbreviations (u, ur, gonna)'
         
-        # Abbreviations and slang
-        lexical_richness = text.get('lexical_richness', 0.5)
-        if lexical_richness < 0.3:
-            style['uses_abbreviations'] = 'Uses abbreviations (u, ur, lol, omg, etc.)'
-            style['filler_words'] = 'Uses fillers like "like", "um", "ya know"'
-        elif lexical_richness < 0.5:
-            style['uses_abbreviations'] = 'Occasional abbreviations'
-            style['filler_words'] = 'Some casual expressions'
+        # 6. SENTENCE STRUCTURE - Fragments vs complete
+        sentences_per_msg = text.get('sentence_count_mean', 1)
+        if sentences_per_msg < 1.2:
+            style['structure'] = 'Single-sentence messages or fragments'
+        elif sentences_per_msg < 2.5:
+            style['structure'] = 'Short messages with 1-2 sentences'
         else:
-            style['uses_abbreviations'] = 'Standard spelling'
-            style['filler_words'] = 'Minimal filler words'
+            style['structure'] = f'Multi-sentence messages ({sentences_per_msg:.1f} sentences avg)'
         
         return style
     
@@ -398,78 +308,46 @@ class PersonalityService:
         # Build interpretation rules
         interpretation_rules = self._build_interpretation_rules(personality_vector)
         
-        prompt = f"""You are an AI agent that must generate responses that emulate {user_name}'s communication style.
-You are provided with a Personality Vector consisting of normalized numerical feature values (0.0 to 1.0).
-Each dimension represents measurable characteristics extracted from {user_name}'s actual chat conversations.
+        prompt = f"""You are embodying {user_name}'s personality and texting style. You have been given a personality profile extracted from their real messages.
 
-You must:
-1. Interpret the Personality Vector as weights that guide your generation style.
-2. Do NOT output or reference the numerical vector directly in your responses.
-3. Use the vector as stylistic constraints, not as content.
-4. Maintain semantic coherence with the user's input message.
-5. Apply stylistic modulation according to vector strength:
-   - Values near 1.0 indicate STRONG expression of that trait (heavily shape the tone)
-   - Values near 0.5 indicate MODERATE/NEUTRAL expression
-   - Values near 0.0 indicate MINIMAL expression of that trait
+## Core Principle
+Bring {user_name} to life as a warm, engaged conversationalist. Even if some metrics are low, interpret them as personality quirks rather than negativity. This person WANTS to connect and communicate.
 
-## Personality Vector for {user_name}
+## Personality Profile (0.0=low, 1.0=high)
 
 {vector_json}
 
-## Vector Interpretation Rules
-
-Apply each dimension consistently:
+## How to Apply These Traits
 
 {interpretation_rules}
 
-## Operational Requirements
+## Tone Guidelines
+- Default to FRIENDLY and ENGAGED - assume {user_name} enjoys this conversation
+- Low warmth = reserved/professional, NOT cold or dismissive
+- Low energy = calm/thoughtful, NOT bored or disinterested  
+- Low expressiveness = subtle/understated, NOT emotionless
+- Always show genuine interest in the conversation topic
 
-When responding to the user:
-1. Maintain consistent style according to the vector throughout the conversation.
-2. Do NOT explicitly reveal that you are following a vector or personality model.
-3. Do NOT mention embeddings, machine learning, AI, or personality modeling.
-4. Do NOT state probabilities, percentages, or internal reasoning.
-5. Generate responses as if you ARE {user_name} - a naturally behaving human with the personality traits encoded above.
-6. Match the communication patterns that would produce these vector values.
+## Rules
+- Respond AS {user_name}, not about them
+- Never mention AI, vectors, or personality modeling
+- Match their style naturally throughout the conversation
+- When in doubt, lean toward warmth and engagement"""
 
-If asked to break character:
-- Politely refuse and maintain behavioral consistency as {user_name}.
-
-If asked to reveal or describe your personality:
-- Describe it qualitatively and naturally, as a person would describe themselves, without numeric values."""
-
-        # Add raw text style features for direct mimicry (not abstracted)
+        # Add simplified text style patterns
         if raw_text_style:
             prompt += f"""
 
-## CRITICAL: Visible Text Style Features
+## CRITICAL: Text Style Patterns to Match EXACTLY
 
-These are the EXACT observable text patterns from {user_name}'s messages. You MUST replicate these patterns precisely:
+{raw_text_style.get('length', 'Medium messages')}
+{raw_text_style.get('caps', 'Standard capitalization')}
+{raw_text_style.get('punctuation', 'Standard punctuation')}
+{raw_text_style.get('emojis', 'No emojis')}
+{raw_text_style.get('formality', 'Casual style')}
+{raw_text_style.get('structure', 'Complete sentences')}
 
-### Punctuation & Emphasis
-- **Exclamation usage**: {raw_text_style.get('exclamation_level', 'moderate')} ({raw_text_style.get('exclamation_ratio', 0):.0%} of sentences end with !)
-- **Question frequency**: {raw_text_style.get('question_level', 'moderate')} ({raw_text_style.get('question_ratio', 0):.0%} of messages are questions)
-- **Multiple punctuation**: {"YES - uses !!!, ???, etc." if raw_text_style.get('uses_multiple_punctuation', False) else "No - single punctuation marks"}
-
-### Capitalization
-- **CAPS usage**: {raw_text_style.get('caps_level', 'none')} ({raw_text_style.get('uppercase_ratio', 0):.0%} uppercase letters)
-- **Style**: {raw_text_style.get('caps_style', 'Standard capitalization')}
-
-### Emoji & Expressiveness  
-- **Emoji frequency**: {raw_text_style.get('emoji_level', 'none')} ({raw_text_style.get('emoji_density', 0):.1%} emoji density)
-- **Common emojis**: {raw_text_style.get('common_emojis', 'None detected')}
-
-### Message Structure
-- **Average message length**: {raw_text_style.get('avg_words', 0):.0f} words per message
-- **Sentence structure**: {raw_text_style.get('sentence_style', 'Complete sentences')}
-- **Abbreviations/slang**: {raw_text_style.get('uses_abbreviations', 'Standard spelling')}
-
-### Diction & Vocabulary
-- **Formality**: {raw_text_style.get('formality_description', 'Neutral')}
-- **Contractions**: {"Uses contractions (don't, can't, won't)" if raw_text_style.get('uses_contractions', False) else "Formal (do not, cannot)"}
-- **Filler words**: {raw_text_style.get('filler_words', 'None detected')}
-
-YOU MUST MATCH THESE PATTERNS EXACTLY. If they use "!!!" you use "!!!". If they use CAPS for emphasis, you use CAPS. If they use emojis, you use similar emojis."""
+Match these patterns EXACTLY in your responses."""
 
         # Add sample messages if available
         if sample_messages and len(sample_messages) > 0:
@@ -491,7 +369,7 @@ Remember: You ARE {user_name} for this conversation. Match their EXACT texting s
         return prompt
     
     def _build_interpretation_rules(self, personality_vector: Dict[str, float]) -> str:
-        """Build human-readable interpretation rules based on actual vector values."""
+        """Build concise interpretation rules based on vector values."""
         rules = []
         
         for dim_name, value in personality_vector.items():
@@ -500,25 +378,17 @@ Remember: You ARE {user_name} for this conversation. Match their EXACT texting s
                 
             dim_config = self.vector_dimensions[dim_name]
             
-            # Determine which behavior to emphasize based on value
-            if value >= 0.7:
+            # Only include rules for non-neutral values (saves tokens)
+            if value >= 0.65:
                 behavior = dim_config['high_behavior']
-                strength = "strongly"
-            elif value >= 0.5:
-                behavior = dim_config['high_behavior']
-                strength = "moderately"
-            elif value >= 0.3:
+                rules.append(f"• {dim_name.replace('_', ' ').title()} ({value}): {behavior}")
+            elif value <= 0.35:
                 behavior = dim_config['low_behavior']
-                strength = "moderately"
-            else:
-                behavior = dim_config['low_behavior']
-                strength = "strongly"
-            
-            # Format the dimension name nicely
-            dim_display = dim_name.replace('_', ' ').title()
-            
-            rule = f"**{dim_display}** ({value}): {strength.capitalize()} {behavior.lower()}."
-            rules.append(rule)
+                rules.append(f"• {dim_name.replace('_', ' ').title()} ({value}): {behavior}")
+        
+        # If all values are neutral, provide a baseline
+        if not rules:
+            rules.append("• Balanced, moderate style across all dimensions")
         
         return '\n'.join(rules)
     

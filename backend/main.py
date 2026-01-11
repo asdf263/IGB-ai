@@ -1053,7 +1053,7 @@ async def calculate_compatibility(request: CompatibilityRequest):
         }
         
         compatibility = await compatibility_service.calculate_compatibility(
-            user1_features, user2_features, user1, user2
+            user1_features, user2_features, user1, user2, messages
         )
         
         return {

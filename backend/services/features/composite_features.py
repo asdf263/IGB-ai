@@ -157,12 +157,9 @@ class CompositeFeatureExtractor:
         return float(min(1.0, max(0.0, expressiveness)))
     
     def _compute_topic_coherence(self, semantic_features: Dict[str, float]) -> float:
-        """Compute topic coherence: topic_stability / entropy."""
-        coherence = self._safe_get(semantic_features, 'semantic_coherence', 0.5)
-        concentration = self._safe_get(semantic_features, 'topic_concentration', 0.5)
-        
-        score = (coherence + concentration) / 2
-        return float(min(1.0, max(0.0, score)))
+        """Compute topic coherence: topic_stability / entropy (semantic features removed, returns default)."""
+        # Semantic features removed - return neutral score
+        return 0.5
     
     def _compute_communication_efficiency(self, text_features: Dict[str, float],
                                          behavioral_features: Dict[str, float]) -> float:
@@ -207,22 +204,22 @@ class CompositeFeatureExtractor:
     
     def _compute_semantic_richness(self, text_features: Dict[str, float],
                                    semantic_features: Dict[str, float]) -> float:
-        """Compute semantic richness score."""
+        """Compute semantic richness score (based on text entropy only, semantic features removed)."""
         entropy = self._safe_get(text_features, 'shannon_entropy', 0) / 10
-        diversity = self._safe_get(semantic_features, 'topic_diversity', 0)
+        lexical_richness = self._safe_get(text_features, 'lexical_richness', 0.5)
         
-        richness = (entropy + diversity) / 2
+        richness = (entropy + lexical_richness) / 2
         return float(min(1.0, max(0.0, richness)))
     
     def _compute_conversational_depth(self, linguistic_features: Dict[str, float],
                                       semantic_features: Dict[str, float],
                                       behavioral_features: Dict[str, float]) -> float:
-        """Compute conversational depth score."""
+        """Compute conversational depth score (semantic features removed, uses linguistic complexity)."""
         clause_depth = self._safe_get(linguistic_features, 'avg_clause_depth', 1) / 3
         elaboration = self._safe_get(behavioral_features, 'elaboration_score', 0.5)
-        abstraction = self._safe_get(semantic_features, 'abstraction_level', 0.5)
+        complexity = self._safe_get(linguistic_features, 'syntactic_complexity', 0.5)
         
-        depth = (clause_depth + elaboration + abstraction) / 3
+        depth = (clause_depth + elaboration + complexity) / 3
         return float(min(1.0, max(0.0, depth)))
     
     def _compute_responsiveness_quality(self, temporal_features: Dict[str, float],

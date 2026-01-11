@@ -44,7 +44,8 @@ class CompatibilityService:
         user1_features: Dict[str, Any],
         user2_features: Dict[str, Any],
         user1_name: str = "User 1",
-        user2_name: str = "User 2"
+        user2_name: str = "User 2",
+        messages: Optional[List[Dict[str, Any]]] = None
     ) -> Dict[str, Any]:
         """
         Calculate compatibility score between two users based on their features.
@@ -54,6 +55,7 @@ class CompatibilityService:
             user2_features: Feature dictionary for user 2
             user1_name: Display name for user 1
             user2_name: Display name for user 2
+            messages: Optional list of conversation messages for context
             
         Returns:
             Dictionary with compatibility score and analysis
@@ -62,7 +64,7 @@ class CompatibilityService:
             return self._fallback_compatibility(user1_features, user2_features, user1_name, user2_name)
         
         try:
-            return await self._gemini_compatibility(user1_features, user2_features, user1_name, user2_name)
+            return await self._gemini_compatibility(user1_features, user2_features, user1_name, user2_name, messages)
         except Exception as e:
             logger.error(f"Gemini compatibility calculation failed: {e}")
             return self._fallback_compatibility(user1_features, user2_features, user1_name, user2_name)
@@ -72,22 +74,38 @@ class CompatibilityService:
         user1_features: Dict[str, Any],
         user2_features: Dict[str, Any],
         user1_name: str,
-        user2_name: str
+        user2_name: str,
+        messages: Optional[List[Dict[str, Any]]] = None
     ) -> Dict[str, Any]:
         """Calculate compatibility using Gemini."""
         # Prepare feature summaries for the prompt
         user1_summary = self._prepare_feature_summary(user1_features, user1_name)
         user2_summary = self._prepare_feature_summary(user2_features, user2_name)
         
-        prompt = f"""Analyze the communication compatibility between two people based on their conversation behavior profiles.
+        # Prepare message snippet (~100 messages)
+        message_snippet = ""
+        if messages and len(messages) > 0:
+            # Take up to 100 messages, prioritizing recent ones
+            snippet_messages = messages[-100:] if len(messages) > 100 else messages
+            message_snippet = "\n\n## Conversation Sample (~100 messages)\n\n"
+            for msg in snippet_messages:
+                sender = msg.get('sender', 'Unknown')
+                text = msg.get('text', '')
+                # Truncate very long messages
+                if len(text) > 200:
+                    text = text[:200] + "..."
+                message_snippet += f"{sender}: {text}\n"
+        
+        prompt = f"""Analyze the communication compatibility between two people based on their conversation behavior profiles and actual conversation examples.
 
 {user1_name}'s Communication Profile:
 {user1_summary}
 
 {user2_name}'s Communication Profile:
 {user2_summary}
+{message_snippet}
 
-Based on these behavioral profiles, provide a compatibility analysis in the following JSON format:
+Based on these behavioral profiles and the conversation examples above, provide a compatibility analysis in the following JSON format:
 {{
     "overall_score": <number between 0-100>,
     "communication_style_match": <number between 0-100>,

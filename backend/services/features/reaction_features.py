@@ -175,10 +175,21 @@ class ReactionFeatureExtractor:
             if trigger_len > 0:
                 length_ratios.append(response_len / trigger_len)
             
-            # Enthusiasm: exclamations, positive words, length
+            # Enthusiasm: exclamations, positive words, length, ALL CAPS words (massive weight)
             exclamations = response_text.count('!')
             positive_count = sum(1 for w in response_text.lower().split() if w in self.positive_words)
-            enthusiasm = min(1.0, (exclamations * 0.2 + positive_count * 0.1 + response_len * 0.01))
+            
+            # Calculate all caps word ratio with massive weight
+            words = response_text.split()
+            all_caps_count = sum(1 for w in words if w.isupper() and len(w) > 1)
+            all_caps_ratio = all_caps_count / len(words) if words else 0.0
+            
+            enthusiasm = min(1.0, (
+                exclamations * 0.2 + 
+                positive_count * 0.1 + 
+                response_len * 0.01 +
+                all_caps_ratio * 2.0  # Massive weight for ALL CAPS
+            ))
             enthusiasm_scores.append(enthusiasm)
             
             # Engagement based on trigger type

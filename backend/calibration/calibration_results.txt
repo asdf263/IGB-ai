@@ -1,0 +1,2889 @@
+================================================================================
+CALIBRATION PIPELINE RESULTS
+Generated: 2026-01-11 01:43:22
+Execution Time: 173.28 seconds
+================================================================================
+
+SUMMARY
+----------------------------------------
+Total Vectors Processed: 46
+Passed: 8
+Failed: 38
+Pass Rate: 17.4%
+
+DETAILED RESULTS BY VECTOR
+----------------------------------------
+
+[PASS] all_caps_word_ratio
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.409091
+  Anchor High (1.0): 1.000000
+  Sample Count: 5
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.000000
+    intensity=0.25: raw=0.095238, normalized=0.095238
+    intensity=0.50: raw=0.409091, normalized=0.409091
+    intensity=0.75: raw=0.535714, normalized=0.535714
+    intensity=1.00: raw=1.000000, normalized=1.000000
+
+[FAIL] answer_frequency
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.000000
+  Anchor High (1.0): 0.600000
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.00 and 0.25 have similar values 0.0000 and 0.0000
+    - Collapsed: intensities 0.25 and 0.50 have similar values 0.0000 and 0.0000
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.000000
+    intensity=0.25: raw=0.000000, normalized=0.000000
+    intensity=0.50: raw=0.000000, normalized=0.000000
+    intensity=0.75: raw=0.400000, normalized=0.666667
+    intensity=1.00: raw=0.600000, normalized=1.000000
+
+[FAIL] circadian_afternoon_ratio
+  Anchor Low (0.0):  0.200000
+  Anchor Mid (0.5):  0.000000
+  Anchor High (1.0): 0.200000
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+  Samples:
+    intensity=0.00: raw=0.200000, normalized=0.500000
+    intensity=0.25: raw=0.000000, normalized=0.500000
+    intensity=0.50: raw=0.000000, normalized=0.500000
+    intensity=0.75: raw=0.200000, normalized=0.500000
+    intensity=1.00: raw=0.200000, normalized=0.500000
+
+[FAIL] circadian_evening_ratio
+  Anchor Low (0.0):  0.400000
+  Anchor Mid (0.5):  0.400000
+  Anchor High (1.0): 0.400000
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+  Samples:
+    intensity=0.00: raw=0.400000, normalized=0.500000
+    intensity=0.25: raw=0.200000, normalized=0.500000
+    intensity=0.50: raw=0.400000, normalized=0.500000
+    intensity=0.75: raw=0.400000, normalized=0.500000
+    intensity=1.00: raw=0.400000, normalized=0.500000
+
+[FAIL] circadian_morning_ratio
+  Anchor Low (0.0):  0.200000
+  Anchor Mid (0.5):  0.000000
+  Anchor High (1.0): 0.000000
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.00 and 0.25 have similar values 0.0000 and 0.0000
+    - Collapsed: intensities 0.50 and 0.75 have similar values 1.0000 and 1.0000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+  Samples:
+    intensity=0.00: raw=0.200000, normalized=0.000000
+    intensity=0.25: raw=0.200000, normalized=0.000000
+    intensity=0.50: raw=0.000000, normalized=1.000000
+    intensity=0.75: raw=0.000000, normalized=1.000000
+    intensity=1.00: raw=0.000000, normalized=1.000000
+
+[FAIL] circadian_night_ratio
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.600000
+  Anchor High (1.0): 0.400000
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.25 and 0.50 have similar values 1.0000 and 1.0000
+    - Collapsed: intensities 0.50 and 0.75 have similar values 1.0000 and 1.0000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.000000
+    intensity=0.25: raw=0.800000, normalized=1.000000
+    intensity=0.50: raw=0.600000, normalized=1.000000
+    intensity=0.75: raw=0.600000, normalized=1.000000
+    intensity=1.00: raw=0.400000, normalized=1.000000
+
+[FAIL] digit_ratio
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.045455
+  Anchor High (1.0): 1.000000
+  Sample Count: 5
+  Violations:
+    - Non-monotonic: intensity 0.25 -> 0.50, but value 0.0562 -> 0.0455
+    - Collapsed: intensities 0.25 and 0.50 have similar values 0.0562 and 0.0455
+    - Collapsed: intensities 0.50 and 0.75 have similar values 0.0455 and 0.0667
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.000000
+    intensity=0.25: raw=0.056180, normalized=0.056180
+    intensity=0.50: raw=0.045455, normalized=0.045455
+    intensity=0.75: raw=0.066667, normalized=0.066667
+    intensity=1.00: raw=1.000000, normalized=1.000000
+
+[PASS] elaboration_score
+  Anchor Low (0.0):  0.020000
+  Anchor Mid (0.5):  0.112000
+  Anchor High (1.0): 0.188000
+  Sample Count: 5
+  Samples:
+    intensity=0.00: raw=0.020000, normalized=0.000000
+    intensity=0.25: raw=0.056000, normalized=0.214286
+    intensity=0.50: raw=0.112000, normalized=0.547619
+    intensity=0.75: raw=0.172000, normalized=0.904762
+    intensity=1.00: raw=0.188000, normalized=1.000000
+
+[FAIL] emotional_intensity_mean
+  Anchor Low (0.0):  0.006250
+  Anchor Mid (0.5):  0.009110
+  Anchor High (1.0): 0.042500
+  Sample Count: 8
+  Violations:
+    - Non-monotonic: intensity 0.25 -> 0.50, but value 1.0000 -> 0.0789
+    - Collapsed: intensities 0.50 and 0.75 have similar values 1.0000 and 1.0000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+  Samples:
+    intensity=0.00: raw=0.006250, normalized=0.000000
+    intensity=0.00: raw=0.000000, normalized=0.000000
+    intensity=0.25: raw=0.055263, normalized=1.000000
+    intensity=0.50: raw=0.009110, normalized=0.078889
+    intensity=0.50: raw=0.232495, normalized=1.000000
+    intensity=0.75: raw=0.091071, normalized=1.000000
+    intensity=1.00: raw=0.042500, normalized=1.000000
+    intensity=1.00: raw=1.000000, normalized=1.000000
+
+[FAIL] emotional_shift_frequency
+  Anchor Low (0.0):  0.750000
+  Anchor Mid (0.5):  1.000000
+  Anchor High (1.0): 0.750000
+  Sample Count: 8
+  Violations:
+    - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+  Samples:
+    intensity=0.00: raw=0.750000, normalized=0.500000
+    intensity=0.00: raw=0.000000, normalized=0.500000
+    intensity=0.25: raw=0.750000, normalized=0.500000
+    intensity=0.50: raw=1.000000, normalized=0.500000
+    intensity=0.50: raw=0.500000, normalized=0.500000
+    intensity=0.75: raw=1.000000, normalized=0.500000
+    intensity=1.00: raw=0.750000, normalized=0.500000
+    intensity=1.00: raw=1.000000, normalized=0.500000
+
+[FAIL] formality_score
+  Anchor Low (0.0):  0.346154
+  Anchor Mid (0.5):  0.500000
+  Anchor High (1.0): 0.500000
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.50 and 0.75 have similar values 1.0000 and 1.0000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+  Samples:
+    intensity=0.00: raw=0.346154, normalized=0.000000
+    intensity=0.25: raw=0.468750, normalized=0.796875
+    intensity=0.50: raw=0.500000, normalized=1.000000
+    intensity=0.75: raw=0.500000, normalized=1.000000
+    intensity=1.00: raw=0.500000, normalized=1.000000
+
+[FAIL] hapax_legomena_ratio
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.941176
+  Anchor High (1.0): 1.000000
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.000000
+    intensity=0.25: raw=0.333333, normalized=0.333333
+    intensity=0.50: raw=0.941176, normalized=0.941176
+    intensity=0.75: raw=1.000000, normalized=1.000000
+    intensity=1.00: raw=1.000000, normalized=1.000000
+
+[FAIL] initiation_rate
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.400000
+  Anchor High (1.0): 1.000000
+  Sample Count: 5
+  Violations:
+    - Non-monotonic: intensity 0.50 -> 0.75, but value 0.4000 -> 0.3333
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.000000
+    intensity=0.25: raw=0.200000, normalized=0.200000
+    intensity=0.50: raw=0.400000, normalized=0.400000
+    intensity=0.75: raw=0.333333, normalized=0.333333
+    intensity=1.00: raw=1.000000, normalized=1.000000
+
+[FAIL] lexical_richness
+  Anchor Low (0.0):  0.600000
+  Anchor Mid (0.5):  0.909091
+  Anchor High (1.0): 0.935484
+  Sample Count: 5
+  Violations:
+    - Non-monotonic: intensity 0.50 -> 0.75, but value 0.9213 -> 0.7217
+  Samples:
+    intensity=0.00: raw=0.600000, normalized=0.000000
+    intensity=0.25: raw=0.666667, normalized=0.198718
+    intensity=0.50: raw=0.909091, normalized=0.921329
+    intensity=0.75: raw=0.842105, normalized=0.721660
+    intensity=1.00: raw=0.935484, normalized=1.000000
+
+[FAIL] negative_ratio
+  Anchor Low (0.0):  0.200000
+  Anchor Mid (0.5):  0.000000
+  Anchor High (1.0): 0.600000
+  Sample Count: 8
+  Violations:
+    - Collapsed: intensities 0.00 and 0.25 have similar values 0.0000 and 0.0000
+    - Collapsed: intensities 0.25 and 0.50 have similar values 0.0000 and 0.0000
+    - Collapsed: intensities 0.50 and 0.75 have similar values 0.0000 and 0.0000
+  Samples:
+    intensity=0.00: raw=0.200000, normalized=0.000000
+    intensity=0.00: raw=0.000000, normalized=0.000000
+    intensity=0.25: raw=0.200000, normalized=0.000000
+    intensity=0.50: raw=0.000000, normalized=0.000000
+    intensity=0.50: raw=0.000000, normalized=0.000000
+    intensity=0.75: raw=0.200000, normalized=0.000000
+    intensity=1.00: raw=0.600000, normalized=1.000000
+    intensity=1.00: raw=1.000000, normalized=1.000000
+
+[FAIL] neutral_ratio
+  Anchor Low (0.0):  0.200000
+  Anchor Mid (0.5):  1.000000
+  Anchor High (1.0): 1.000000
+  Sample Count: 8
+  Violations:
+    - Non-monotonic: intensity 0.50 -> 0.50, but value 1.0000 -> 0.2500
+    - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+    - Non-monotonic: intensity 1.00 -> 1.00, but value 1.0000 -> 0.7500
+  Samples:
+    intensity=0.00: raw=0.200000, normalized=0.000000
+    intensity=0.00: raw=0.000000, normalized=0.000000
+    intensity=0.25: raw=0.600000, normalized=0.500000
+    intensity=0.50: raw=1.000000, normalized=1.000000
+    intensity=0.50: raw=0.400000, normalized=0.250000
+    intensity=0.75: raw=1.000000, normalized=1.000000
+    intensity=1.00: raw=1.000000, normalized=1.000000
+    intensity=1.00: raw=0.800000, normalized=0.750000
+
+[FAIL] politeness_score
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  1.000000
+  Anchor High (1.0): 0.526316
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.25 and 0.50 have similar values 1.0000 and 1.0000
+    - Collapsed: intensities 0.50 and 0.75 have similar values 1.0000 and 1.0000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.000000
+    intensity=0.25: raw=1.000000, normalized=1.000000
+    intensity=0.50: raw=1.000000, normalized=1.000000
+    intensity=0.75: raw=1.000000, normalized=1.000000
+    intensity=1.00: raw=0.526316, normalized=1.000000
+
+[FAIL] pos_adj_ratio
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.000000
+  Anchor High (1.0): 0.000000
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.500000
+    intensity=0.25: raw=0.000000, normalized=0.500000
+    intensity=0.50: raw=0.000000, normalized=0.500000
+    intensity=0.75: raw=0.000000, normalized=0.500000
+    intensity=1.00: raw=0.000000, normalized=0.500000
+
+[FAIL] pos_adp_ratio
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.000000
+  Anchor High (1.0): 0.000000
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.500000
+    intensity=0.25: raw=0.000000, normalized=0.500000
+    intensity=0.50: raw=0.000000, normalized=0.500000
+    intensity=0.75: raw=0.000000, normalized=0.500000
+    intensity=1.00: raw=0.000000, normalized=0.500000
+
+[FAIL] pos_adv_ratio
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.000000
+  Anchor High (1.0): 0.000000
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.500000
+    intensity=0.25: raw=0.000000, normalized=0.500000
+    intensity=0.50: raw=0.000000, normalized=0.500000
+    intensity=0.75: raw=0.000000, normalized=0.500000
+    intensity=1.00: raw=0.000000, normalized=0.500000
+
+[FAIL] pos_conj_ratio
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.000000
+  Anchor High (1.0): 0.000000
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.500000
+    intensity=0.25: raw=0.000000, normalized=0.500000
+    intensity=0.50: raw=0.000000, normalized=0.500000
+    intensity=0.75: raw=0.000000, normalized=0.500000
+    intensity=1.00: raw=0.000000, normalized=0.500000
+
+[FAIL] pos_det_ratio
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.000000
+  Anchor High (1.0): 0.000000
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.500000
+    intensity=0.25: raw=0.000000, normalized=0.500000
+    intensity=0.50: raw=0.000000, normalized=0.500000
+    intensity=0.75: raw=0.000000, normalized=0.500000
+    intensity=1.00: raw=0.000000, normalized=0.500000
+
+[FAIL] pos_noun_ratio
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.000000
+  Anchor High (1.0): 0.000000
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.500000
+    intensity=0.25: raw=0.000000, normalized=0.500000
+    intensity=0.50: raw=0.000000, normalized=0.500000
+    intensity=0.75: raw=0.000000, normalized=0.500000
+    intensity=1.00: raw=0.000000, normalized=0.500000
+
+[FAIL] pos_num_ratio
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.000000
+  Anchor High (1.0): 0.000000
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.500000
+    intensity=0.25: raw=0.000000, normalized=0.500000
+    intensity=0.50: raw=0.000000, normalized=0.500000
+    intensity=0.75: raw=0.000000, normalized=0.500000
+    intensity=1.00: raw=0.000000, normalized=0.500000
+
+[FAIL] pos_part_ratio
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.000000
+  Anchor High (1.0): 0.000000
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.500000
+    intensity=0.25: raw=0.000000, normalized=0.500000
+    intensity=0.50: raw=0.000000, normalized=0.500000
+    intensity=0.75: raw=0.000000, normalized=0.500000
+    intensity=1.00: raw=0.000000, normalized=0.500000
+
+[FAIL] pos_pron_ratio
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.000000
+  Anchor High (1.0): 0.000000
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.500000
+    intensity=0.25: raw=0.000000, normalized=0.500000
+    intensity=0.50: raw=0.000000, normalized=0.500000
+    intensity=0.75: raw=0.000000, normalized=0.500000
+    intensity=1.00: raw=0.000000, normalized=0.500000
+
+[FAIL] pos_verb_ratio
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.000000
+  Anchor High (1.0): 0.000000
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.500000
+    intensity=0.25: raw=0.000000, normalized=0.500000
+    intensity=0.50: raw=0.000000, normalized=0.500000
+    intensity=0.75: raw=0.000000, normalized=0.500000
+    intensity=1.00: raw=0.000000, normalized=0.500000
+
+[FAIL] positive_ratio
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.400000
+  Anchor High (1.0): 0.600000
+  Sample Count: 8
+  Violations:
+    - Collapsed: intensities 0.25 and 0.50 have similar values 0.6667 and 0.6667
+    - Non-monotonic: intensity 0.50 -> 0.75, but value 1.0000 -> 0.3333
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.000000
+    intensity=0.00: raw=0.000000, normalized=0.000000
+    intensity=0.25: raw=0.400000, normalized=0.666667
+    intensity=0.50: raw=0.400000, normalized=0.666667
+    intensity=0.50: raw=0.800000, normalized=1.000000
+    intensity=0.75: raw=0.200000, normalized=0.333333
+    intensity=1.00: raw=0.600000, normalized=1.000000
+    intensity=1.00: raw=1.000000, normalized=1.000000
+
+[FAIL] punctuation_ratio
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.073171
+  Anchor High (1.0): 0.067568
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.50 and 0.75 have similar values 1.0000 and 1.0000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.000000
+    intensity=0.25: raw=0.022989, normalized=0.340230
+    intensity=0.50: raw=0.073171, normalized=1.000000
+    intensity=0.75: raw=0.074866, normalized=1.000000
+    intensity=1.00: raw=0.067568, normalized=1.000000
+
+[FAIL] question_frequency
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.000000
+  Anchor High (1.0): 0.000000
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.500000
+    intensity=0.25: raw=0.000000, normalized=0.500000
+    intensity=0.50: raw=0.000000, normalized=0.500000
+    intensity=0.75: raw=0.000000, normalized=0.500000
+    intensity=1.00: raw=0.000000, normalized=0.500000
+
+[FAIL] response_rate
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.750000
+  Anchor High (1.0): 1.000000
+  Sample Count: 5
+  Violations:
+    - Non-monotonic: intensity 0.25 -> 0.50, but value 1.0000 -> 0.7500
+    - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.000000
+    intensity=0.25: raw=1.000000, normalized=1.000000
+    intensity=0.50: raw=0.750000, normalized=0.750000
+    intensity=0.75: raw=1.000000, normalized=1.000000
+    intensity=1.00: raw=1.000000, normalized=1.000000
+
+[FAIL] sentiment_consistency
+  Anchor Low (0.0):  0.559914
+  Anchor Mid (0.5):  0.632436
+  Anchor High (1.0): 0.671187
+  Sample Count: 8
+  Violations:
+    - Collapsed: intensities 0.00 and 0.25 have similar values 0.0000 and 0.0000
+    - Collapsed: intensities 0.50 and 0.75 have similar values 1.0000 and 1.0000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+  Samples:
+    intensity=0.00: raw=0.559914, normalized=0.000000
+    intensity=0.00: raw=0.505103, normalized=0.000000
+    intensity=0.25: raw=0.529607, normalized=0.000000
+    intensity=0.50: raw=0.632436, normalized=0.651753
+    intensity=0.50: raw=0.671187, normalized=1.000000
+    intensity=0.75: raw=0.688632, normalized=1.000000
+    intensity=1.00: raw=0.671187, normalized=1.000000
+    intensity=1.00: raw=1.000000, normalized=1.000000
+
+[PASS] sentiment_max
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.833333
+  Anchor High (1.0): 1.000000
+  Sample Count: 3
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.000000
+    intensity=0.50: raw=0.833333, normalized=0.833333
+    intensity=1.00: raw=1.000000, normalized=1.000000
+
+[PASS] sentiment_mean
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.253968
+  Anchor High (1.0): 1.000000
+  Sample Count: 3
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.000000
+    intensity=0.50: raw=0.253968, normalized=0.253968
+    intensity=1.00: raw=1.000000, normalized=1.000000
+
+[FAIL] sentiment_min
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.000000
+  Anchor High (1.0): 1.000000
+  Sample Count: 3
+  Violations:
+    - Collapsed: intensities 0.00 and 0.50 have similar values 0.0000 and 0.0000
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.000000
+    intensity=0.50: raw=0.000000, normalized=0.000000
+    intensity=1.00: raw=1.000000, normalized=1.000000
+
+[FAIL] sentiment_range
+  Anchor Low (0.0):  1.000000
+  Anchor Mid (0.5):  0.833333
+  Anchor High (1.0): 2.000000
+  Sample Count: 3
+  Violations:
+    - Collapsed: intensities 0.00 and 0.50 have similar values 0.0000 and 0.0000
+  Samples:
+    intensity=0.00: raw=1.000000, normalized=0.000000
+    intensity=0.50: raw=0.833333, normalized=0.000000
+    intensity=1.00: raw=2.000000, normalized=1.000000
+
+[PASS] sentiment_skewness
+  Anchor Low (0.0):  -1.500000
+  Anchor Mid (0.5):  0.000000
+  Anchor High (1.0): 1.500000
+  Sample Count: 3
+  Samples:
+    intensity=0.00: raw=-1.500000, normalized=0.000000
+    intensity=0.50: raw=0.000000, normalized=0.500000
+    intensity=1.00: raw=1.500000, normalized=1.000000
+
+[PASS] sentiment_std
+  Anchor Low (0.0):  0.333333
+  Anchor Mid (0.5):  0.661648
+  Anchor High (1.0): 0.916515
+  Sample Count: 3
+  Samples:
+    intensity=0.00: raw=0.333333, normalized=0.000000
+    intensity=0.50: raw=0.661648, normalized=0.562971
+    intensity=1.00: raw=0.916515, normalized=1.000000
+
+[PASS] sentiment_trend
+  Anchor Low (0.0):  -0.433333
+  Anchor Mid (0.5):  -0.000000
+  Anchor High (1.0): 0.477551
+  Sample Count: 3
+  Samples:
+    intensity=0.00: raw=-0.433333, normalized=0.000000
+    intensity=0.50: raw=-0.000000, normalized=0.475728
+    intensity=1.00: raw=0.477551, normalized=1.000000
+
+[PASS] sentiment_volatility
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.500000
+  Anchor High (1.0): 2.000000
+  Sample Count: 3
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.000000
+    intensity=0.50: raw=0.500000, normalized=0.250000
+    intensity=1.00: raw=2.000000, normalized=1.000000
+
+[FAIL] stopword_ratio
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.666667
+  Anchor High (1.0): 0.725275
+  Sample Count: 5
+  Violations:
+    - Non-monotonic: intensity 0.50 -> 0.75, but value 0.9192 -> 0.7813
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.000000
+    intensity=0.25: raw=0.352941, normalized=0.486631
+    intensity=0.50: raw=0.666667, normalized=0.919192
+    intensity=0.75: raw=0.566667, normalized=0.781313
+    intensity=1.00: raw=0.725275, normalized=1.000000
+
+[FAIL] type_token_ratio
+  Anchor Low (0.0):  0.083333
+  Anchor Mid (0.5):  0.950000
+  Anchor High (1.0): 1.000000
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+  Samples:
+    intensity=0.00: raw=0.083333, normalized=0.000000
+    intensity=0.25: raw=0.187500, normalized=0.113636
+    intensity=0.50: raw=0.950000, normalized=0.945455
+    intensity=0.75: raw=1.000000, normalized=1.000000
+    intensity=1.00: raw=1.000000, normalized=1.000000
+
+[FAIL] uppercase_ratio
+  Anchor Low (0.0):  0.000000
+  Anchor Mid (0.5):  0.160584
+  Anchor High (1.0): 1.000000
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.00 and 0.25 have similar values 0.0000 and 0.0496
+  Samples:
+    intensity=0.00: raw=0.000000, normalized=0.000000
+    intensity=0.25: raw=0.049587, normalized=0.049587
+    intensity=0.50: raw=0.160584, normalized=0.160584
+    intensity=0.75: raw=0.886364, normalized=0.886364
+    intensity=1.00: raw=1.000000, normalized=1.000000
+
+[FAIL] weekday_ratio
+  Anchor Low (0.0):  0.600000
+  Anchor Mid (0.5):  0.800000
+  Anchor High (1.0): 0.800000
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.25 and 0.50 have similar values 1.0000 and 1.0000
+    - Non-monotonic: intensity 0.50 -> 0.75, but value 1.0000 -> 0.0000
+  Samples:
+    intensity=0.00: raw=0.600000, normalized=0.000000
+    intensity=0.25: raw=1.000000, normalized=1.000000
+    intensity=0.50: raw=0.800000, normalized=1.000000
+    intensity=0.75: raw=0.600000, normalized=0.000000
+    intensity=1.00: raw=0.800000, normalized=1.000000
+
+[FAIL] weekend_ratio
+  Anchor Low (0.0):  0.200000
+  Anchor Mid (0.5):  0.000000
+  Anchor High (1.0): 0.400000
+  Sample Count: 5
+  Violations:
+    - Non-monotonic: intensity 0.25 -> 0.50, but value 1.0000 -> 0.0000
+    - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+  Samples:
+    intensity=0.00: raw=0.200000, normalized=0.000000
+    intensity=0.25: raw=0.400000, normalized=1.000000
+    intensity=0.50: raw=0.000000, normalized=0.000000
+    intensity=0.75: raw=0.400000, normalized=1.000000
+    intensity=1.00: raw=0.400000, normalized=1.000000
+
+[FAIL] whitespace_ratio
+  Anchor Low (0.0):  0.042553
+  Anchor Mid (0.5):  0.140351
+  Anchor High (1.0): 0.754875
+  Sample Count: 5
+  Violations:
+    - Collapsed: intensities 0.50 and 0.75 have similar values 0.1373 and 0.1473
+  Samples:
+    intensity=0.00: raw=0.042553, normalized=0.000000
+    intensity=0.25: raw=0.101852, normalized=0.083247
+    intensity=0.50: raw=0.140351, normalized=0.137294
+    intensity=0.75: raw=0.147465, normalized=0.147282
+    intensity=1.00: raw=0.754875, normalized=1.000000
+
+NORMALIZED RESULTS TABLE
+----------------------------------------
+ID                                       Intensity  Raw Value       Normalized     
+--------------------------------------------------------------------------------
+all_caps_word_ratio_0.0                  0.00       0.000000        0.000000       
+all_caps_word_ratio_0.25                 0.25       0.095238        0.095238       
+all_caps_word_ratio_0.5                  0.50       0.409091        0.409091       
+all_caps_word_ratio_0.75                 0.75       0.535714        0.535714       
+all_caps_word_ratio_1.0                  1.00       1.000000        1.000000       
+answer_frequency_0.0                     0.00       0.000000        0.000000       
+answer_frequency_0.25                    0.25       0.000000        0.000000       
+answer_frequency_0.5                     0.50       0.000000        0.000000       
+answer_frequency_0.75                    0.75       0.400000        0.666667       
+answer_frequency_1.0                     1.00       0.600000        1.000000       
+circadian_afternoon_ratio_0.0            0.00       0.200000        0.500000       
+circadian_afternoon_ratio_0.25           0.25       0.000000        0.500000       
+circadian_afternoon_ratio_0.5            0.50       0.000000        0.500000       
+circadian_afternoon_ratio_0.75           0.75       0.200000        0.500000       
+circadian_afternoon_ratio_1.0            1.00       0.200000        0.500000       
+circadian_evening_ratio_0.0              0.00       0.400000        0.500000       
+circadian_evening_ratio_0.25             0.25       0.200000        0.500000       
+circadian_evening_ratio_0.5              0.50       0.400000        0.500000       
+circadian_evening_ratio_0.75             0.75       0.400000        0.500000       
+circadian_evening_ratio_1.0              1.00       0.400000        0.500000       
+circadian_morning_ratio_0.0              0.00       0.200000        0.000000       
+circadian_morning_ratio_0.25             0.25       0.200000        0.000000       
+circadian_morning_ratio_0.5              0.50       0.000000        1.000000       
+circadian_morning_ratio_0.75             0.75       0.000000        1.000000       
+circadian_morning_ratio_1.0              1.00       0.000000        1.000000       
+circadian_night_ratio_0.0                0.00       0.000000        0.000000       
+circadian_night_ratio_0.25               0.25       0.800000        1.000000       
+circadian_night_ratio_0.5                0.50       0.600000        1.000000       
+circadian_night_ratio_0.75               0.75       0.600000        1.000000       
+circadian_night_ratio_1.0                1.00       0.400000        1.000000       
+digit_ratio_0.0                          0.00       0.000000        0.000000       
+digit_ratio_0.25                         0.25       0.056180        0.056180       
+digit_ratio_0.5                          0.50       0.045455        0.045455       
+digit_ratio_0.75                         0.75       0.066667        0.066667       
+digit_ratio_1.0                          1.00       1.000000        1.000000       
+elaboration_score_0.0                    0.00       0.020000        0.000000       
+elaboration_score_0.25                   0.25       0.056000        0.214286       
+elaboration_score_0.5                    0.50       0.112000        0.547619       
+elaboration_score_0.75                   0.75       0.172000        0.904762       
+elaboration_score_1.0                    1.00       0.188000        1.000000       
+emotional_intensity_mean_0.0             0.00       0.006250        0.000000       
+emotional_intensity_mean_0.0             0.00       0.000000        0.000000       
+emotional_intensity_mean_0.25            0.25       0.055263        1.000000       
+emotional_intensity_mean_0.5             0.50       0.009110        0.078889       
+emotional_intensity_mean_0.5             0.50       0.232495        1.000000       
+emotional_intensity_mean_0.75            0.75       0.091071        1.000000       
+emotional_intensity_mean_1.0             1.00       0.042500        1.000000       
+emotional_intensity_mean_1.0             1.00       1.000000        1.000000       
+emotional_shift_frequency_0.0            0.00       0.750000        0.500000       
+emotional_shift_frequency_0.0            0.00       0.000000        0.500000       
+emotional_shift_frequency_0.25           0.25       0.750000        0.500000       
+emotional_shift_frequency_0.5            0.50       1.000000        0.500000       
+emotional_shift_frequency_0.5            0.50       0.500000        0.500000       
+emotional_shift_frequency_0.75           0.75       1.000000        0.500000       
+emotional_shift_frequency_1.0            1.00       0.750000        0.500000       
+emotional_shift_frequency_1.0            1.00       1.000000        0.500000       
+formality_score_0.0                      0.00       0.346154        0.000000       
+formality_score_0.25                     0.25       0.468750        0.796875       
+formality_score_0.5                      0.50       0.500000        1.000000       
+formality_score_0.75                     0.75       0.500000        1.000000       
+formality_score_1.0                      1.00       0.500000        1.000000       
+hapax_legomena_ratio_0.0                 0.00       0.000000        0.000000       
+hapax_legomena_ratio_0.25                0.25       0.333333        0.333333       
+hapax_legomena_ratio_0.5                 0.50       0.941176        0.941176       
+hapax_legomena_ratio_0.75                0.75       1.000000        1.000000       
+hapax_legomena_ratio_1.0                 1.00       1.000000        1.000000       
+initiation_rate_0.0                      0.00       0.000000        0.000000       
+initiation_rate_0.25                     0.25       0.200000        0.200000       
+initiation_rate_0.5                      0.50       0.400000        0.400000       
+initiation_rate_0.75                     0.75       0.333333        0.333333       
+initiation_rate_1.0                      1.00       1.000000        1.000000       
+lexical_richness_0.0                     0.00       0.600000        0.000000       
+lexical_richness_0.25                    0.25       0.666667        0.198718       
+lexical_richness_0.5                     0.50       0.909091        0.921329       
+lexical_richness_0.75                    0.75       0.842105        0.721660       
+lexical_richness_1.0                     1.00       0.935484        1.000000       
+negative_ratio_0.0                       0.00       0.200000        0.000000       
+negative_ratio_0.0                       0.00       0.000000        0.000000       
+negative_ratio_0.25                      0.25       0.200000        0.000000       
+negative_ratio_0.5                       0.50       0.000000        0.000000       
+negative_ratio_0.5                       0.50       0.000000        0.000000       
+negative_ratio_0.75                      0.75       0.200000        0.000000       
+negative_ratio_1.0                       1.00       0.600000        1.000000       
+negative_ratio_1.0                       1.00       1.000000        1.000000       
+neutral_ratio_0.0                        0.00       0.200000        0.000000       
+neutral_ratio_0.0                        0.00       0.000000        0.000000       
+neutral_ratio_0.25                       0.25       0.600000        0.500000       
+neutral_ratio_0.5                        0.50       1.000000        1.000000       
+neutral_ratio_0.5                        0.50       0.400000        0.250000       
+neutral_ratio_0.75                       0.75       1.000000        1.000000       
+neutral_ratio_1.0                        1.00       1.000000        1.000000       
+neutral_ratio_1.0                        1.00       0.800000        0.750000       
+politeness_score_0.0                     0.00       0.000000        0.000000       
+politeness_score_0.25                    0.25       1.000000        1.000000       
+politeness_score_0.5                     0.50       1.000000        1.000000       
+politeness_score_0.75                    0.75       1.000000        1.000000       
+politeness_score_1.0                     1.00       0.526316        1.000000       
+pos_adj_ratio_0.0                        0.00       0.000000        0.500000       
+pos_adj_ratio_0.25                       0.25       0.000000        0.500000       
+pos_adj_ratio_0.5                        0.50       0.000000        0.500000       
+pos_adj_ratio_0.75                       0.75       0.000000        0.500000       
+pos_adj_ratio_1.0                        1.00       0.000000        0.500000       
+pos_adp_ratio_0.0                        0.00       0.000000        0.500000       
+pos_adp_ratio_0.25                       0.25       0.000000        0.500000       
+pos_adp_ratio_0.5                        0.50       0.000000        0.500000       
+pos_adp_ratio_0.75                       0.75       0.000000        0.500000       
+pos_adp_ratio_1.0                        1.00       0.000000        0.500000       
+pos_adv_ratio_0.0                        0.00       0.000000        0.500000       
+pos_adv_ratio_0.25                       0.25       0.000000        0.500000       
+pos_adv_ratio_0.5                        0.50       0.000000        0.500000       
+pos_adv_ratio_0.75                       0.75       0.000000        0.500000       
+pos_adv_ratio_1.0                        1.00       0.000000        0.500000       
+pos_conj_ratio_0.0                       0.00       0.000000        0.500000       
+pos_conj_ratio_0.25                      0.25       0.000000        0.500000       
+pos_conj_ratio_0.5                       0.50       0.000000        0.500000       
+pos_conj_ratio_0.75                      0.75       0.000000        0.500000       
+pos_conj_ratio_1.0                       1.00       0.000000        0.500000       
+pos_det_ratio_0.0                        0.00       0.000000        0.500000       
+pos_det_ratio_0.25                       0.25       0.000000        0.500000       
+pos_det_ratio_0.5                        0.50       0.000000        0.500000       
+pos_det_ratio_0.75                       0.75       0.000000        0.500000       
+pos_det_ratio_1.0                        1.00       0.000000        0.500000       
+pos_noun_ratio_0.0                       0.00       0.000000        0.500000       
+pos_noun_ratio_0.25                      0.25       0.000000        0.500000       
+pos_noun_ratio_0.5                       0.50       0.000000        0.500000       
+pos_noun_ratio_0.75                      0.75       0.000000        0.500000       
+pos_noun_ratio_1.0                       1.00       0.000000        0.500000       
+pos_num_ratio_0.0                        0.00       0.000000        0.500000       
+pos_num_ratio_0.25                       0.25       0.000000        0.500000       
+pos_num_ratio_0.5                        0.50       0.000000        0.500000       
+pos_num_ratio_0.75                       0.75       0.000000        0.500000       
+pos_num_ratio_1.0                        1.00       0.000000        0.500000       
+pos_part_ratio_0.0                       0.00       0.000000        0.500000       
+pos_part_ratio_0.25                      0.25       0.000000        0.500000       
+pos_part_ratio_0.5                       0.50       0.000000        0.500000       
+pos_part_ratio_0.75                      0.75       0.000000        0.500000       
+pos_part_ratio_1.0                       1.00       0.000000        0.500000       
+pos_pron_ratio_0.0                       0.00       0.000000        0.500000       
+pos_pron_ratio_0.25                      0.25       0.000000        0.500000       
+pos_pron_ratio_0.5                       0.50       0.000000        0.500000       
+pos_pron_ratio_0.75                      0.75       0.000000        0.500000       
+pos_pron_ratio_1.0                       1.00       0.000000        0.500000       
+pos_verb_ratio_0.0                       0.00       0.000000        0.500000       
+pos_verb_ratio_0.25                      0.25       0.000000        0.500000       
+pos_verb_ratio_0.5                       0.50       0.000000        0.500000       
+pos_verb_ratio_0.75                      0.75       0.000000        0.500000       
+pos_verb_ratio_1.0                       1.00       0.000000        0.500000       
+positive_ratio_0.0                       0.00       0.000000        0.000000       
+positive_ratio_0.0                       0.00       0.000000        0.000000       
+positive_ratio_0.25                      0.25       0.400000        0.666667       
+positive_ratio_0.5                       0.50       0.400000        0.666667       
+positive_ratio_0.5                       0.50       0.800000        1.000000       
+positive_ratio_0.75                      0.75       0.200000        0.333333       
+positive_ratio_1.0                       1.00       0.600000        1.000000       
+positive_ratio_1.0                       1.00       1.000000        1.000000       
+punctuation_ratio_0.0                    0.00       0.000000        0.000000       
+punctuation_ratio_0.25                   0.25       0.022989        0.340230       
+punctuation_ratio_0.5                    0.50       0.073171        1.000000       
+punctuation_ratio_0.75                   0.75       0.074866        1.000000       
+punctuation_ratio_1.0                    1.00       0.067568        1.000000       
+question_frequency_0.0                   0.00       0.000000        0.500000       
+question_frequency_0.25                  0.25       0.000000        0.500000       
+question_frequency_0.5                   0.50       0.000000        0.500000       
+question_frequency_0.75                  0.75       0.000000        0.500000       
+question_frequency_1.0                   1.00       0.000000        0.500000       
+response_rate_0.0                        0.00       0.000000        0.000000       
+response_rate_0.25                       0.25       1.000000        1.000000       
+response_rate_0.5                        0.50       0.750000        0.750000       
+response_rate_0.75                       0.75       1.000000        1.000000       
+response_rate_1.0                        1.00       1.000000        1.000000       
+sentiment_consistency_0.0                0.00       0.559914        0.000000       
+sentiment_consistency_0.0                0.00       0.505103        0.000000       
+sentiment_consistency_0.25               0.25       0.529607        0.000000       
+sentiment_consistency_0.5                0.50       0.632436        0.651753       
+sentiment_consistency_0.5                0.50       0.671187        1.000000       
+sentiment_consistency_0.75               0.75       0.688632        1.000000       
+sentiment_consistency_1.0                1.00       0.671187        1.000000       
+sentiment_consistency_1.0                1.00       1.000000        1.000000       
+sentiment_max_0.0                        0.00       0.000000        0.000000       
+sentiment_max_0.5                        0.50       0.833333        0.833333       
+sentiment_max_1.0                        1.00       1.000000        1.000000       
+sentiment_mean_0.0                       0.00       0.000000        0.000000       
+sentiment_mean_0.5                       0.50       0.253968        0.253968       
+sentiment_mean_1.0                       1.00       1.000000        1.000000       
+sentiment_min_0.0                        0.00       0.000000        0.000000       
+sentiment_min_0.5                        0.50       0.000000        0.000000       
+sentiment_min_1.0                        1.00       1.000000        1.000000       
+sentiment_range_0.0                      0.00       1.000000        0.000000       
+sentiment_range_0.5                      0.50       0.833333        0.000000       
+sentiment_range_1.0                      1.00       2.000000        1.000000       
+sentiment_skewness_0.0                   0.00       -1.500000       0.000000       
+sentiment_skewness_0.5                   0.50       0.000000        0.500000       
+sentiment_skewness_1.0                   1.00       1.500000        1.000000       
+sentiment_std_0.0                        0.00       0.333333        0.000000       
+sentiment_std_0.5                        0.50       0.661648        0.562971       
+sentiment_std_1.0                        1.00       0.916515        1.000000       
+sentiment_trend_0.0                      0.00       -0.433333       0.000000       
+sentiment_trend_0.5                      0.50       -0.000000       0.475728       
+sentiment_trend_1.0                      1.00       0.477551        1.000000       
+sentiment_volatility_0.0                 0.00       0.000000        0.000000       
+sentiment_volatility_0.5                 0.50       0.500000        0.250000       
+sentiment_volatility_1.0                 1.00       2.000000        1.000000       
+stopword_ratio_0.0                       0.00       0.000000        0.000000       
+stopword_ratio_0.25                      0.25       0.352941        0.486631       
+stopword_ratio_0.5                       0.50       0.666667        0.919192       
+stopword_ratio_0.75                      0.75       0.566667        0.781313       
+stopword_ratio_1.0                       1.00       0.725275        1.000000       
+type_token_ratio_0.0                     0.00       0.083333        0.000000       
+type_token_ratio_0.25                    0.25       0.187500        0.113636       
+type_token_ratio_0.5                     0.50       0.950000        0.945455       
+type_token_ratio_0.75                    0.75       1.000000        1.000000       
+type_token_ratio_1.0                     1.00       1.000000        1.000000       
+uppercase_ratio_0.0                      0.00       0.000000        0.000000       
+uppercase_ratio_0.25                     0.25       0.049587        0.049587       
+uppercase_ratio_0.5                      0.50       0.160584        0.160584       
+uppercase_ratio_0.75                     0.75       0.886364        0.886364       
+uppercase_ratio_1.0                      1.00       1.000000        1.000000       
+weekday_ratio_0.0                        0.00       0.600000        0.000000       
+weekday_ratio_0.25                       0.25       1.000000        1.000000       
+weekday_ratio_0.5                        0.50       0.800000        1.000000       
+weekday_ratio_0.75                       0.75       0.600000        0.000000       
+weekday_ratio_1.0                        1.00       0.800000        1.000000       
+weekend_ratio_0.0                        0.00       0.200000        0.000000       
+weekend_ratio_0.25                       0.25       0.400000        1.000000       
+weekend_ratio_0.5                        0.50       0.000000        0.000000       
+weekend_ratio_0.75                       0.75       0.400000        1.000000       
+weekend_ratio_1.0                        1.00       0.400000        1.000000       
+whitespace_ratio_0.0                     0.00       0.042553        0.000000       
+whitespace_ratio_0.25                    0.25       0.101852        0.083247       
+whitespace_ratio_0.5                     0.50       0.140351        0.137294       
+whitespace_ratio_0.75                    0.75       0.147465        0.147282       
+whitespace_ratio_1.0                     1.00       0.754875        1.000000       
+
+FAILED VECTORS REQUIRING REVIEW
+----------------------------------------
+
+lexical_richness:
+  - Non-monotonic: intensity 0.50 -> 0.75, but value 0.9213 -> 0.7217
+
+type_token_ratio:
+  - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+
+hapax_legomena_ratio:
+  - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+
+stopword_ratio:
+  - Non-monotonic: intensity 0.50 -> 0.75, but value 0.9192 -> 0.7813
+
+punctuation_ratio:
+  - Collapsed: intensities 0.50 and 0.75 have similar values 1.0000 and 1.0000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+
+whitespace_ratio:
+  - Collapsed: intensities 0.50 and 0.75 have similar values 0.1373 and 0.1473
+
+uppercase_ratio:
+  - Collapsed: intensities 0.00 and 0.25 have similar values 0.0000 and 0.0496
+
+digit_ratio:
+  - Non-monotonic: intensity 0.25 -> 0.50, but value 0.0562 -> 0.0455
+  - Collapsed: intensities 0.25 and 0.50 have similar values 0.0562 and 0.0455
+  - Collapsed: intensities 0.50 and 0.75 have similar values 0.0455 and 0.0667
+
+circadian_morning_ratio:
+  - Collapsed: intensities 0.00 and 0.25 have similar values 0.0000 and 0.0000
+  - Collapsed: intensities 0.50 and 0.75 have similar values 1.0000 and 1.0000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+
+circadian_afternoon_ratio:
+  - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+
+circadian_evening_ratio:
+  - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+
+circadian_night_ratio:
+  - Collapsed: intensities 0.25 and 0.50 have similar values 1.0000 and 1.0000
+  - Collapsed: intensities 0.50 and 0.75 have similar values 1.0000 and 1.0000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+
+weekday_ratio:
+  - Collapsed: intensities 0.25 and 0.50 have similar values 1.0000 and 1.0000
+  - Non-monotonic: intensity 0.50 -> 0.75, but value 1.0000 -> 0.0000
+
+weekend_ratio:
+  - Non-monotonic: intensity 0.25 -> 0.50, but value 1.0000 -> 0.0000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+
+pos_noun_ratio:
+  - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+
+pos_verb_ratio:
+  - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+
+pos_adj_ratio:
+  - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+
+pos_adv_ratio:
+  - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+
+pos_pron_ratio:
+  - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+
+pos_det_ratio:
+  - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+
+pos_adp_ratio:
+  - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+
+pos_conj_ratio:
+  - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+
+pos_num_ratio:
+  - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+
+pos_part_ratio:
+  - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+
+sentiment_consistency:
+  - Collapsed: intensities 0.00 and 0.25 have similar values 0.0000 and 0.0000
+  - Collapsed: intensities 0.50 and 0.75 have similar values 1.0000 and 1.0000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+
+positive_ratio:
+  - Collapsed: intensities 0.25 and 0.50 have similar values 0.6667 and 0.6667
+  - Non-monotonic: intensity 0.50 -> 0.75, but value 1.0000 -> 0.3333
+
+negative_ratio:
+  - Collapsed: intensities 0.00 and 0.25 have similar values 0.0000 and 0.0000
+  - Collapsed: intensities 0.25 and 0.50 have similar values 0.0000 and 0.0000
+  - Collapsed: intensities 0.50 and 0.75 have similar values 0.0000 and 0.0000
+
+neutral_ratio:
+  - Non-monotonic: intensity 0.50 -> 0.50, but value 1.0000 -> 0.2500
+  - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+  - Non-monotonic: intensity 1.00 -> 1.00, but value 1.0000 -> 0.7500
+
+emotional_intensity_mean:
+  - Non-monotonic: intensity 0.25 -> 0.50, but value 1.0000 -> 0.0789
+  - Collapsed: intensities 0.50 and 0.75 have similar values 1.0000 and 1.0000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+
+emotional_shift_frequency:
+  - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+
+response_rate:
+  - Non-monotonic: intensity 0.25 -> 0.50, but value 1.0000 -> 0.7500
+  - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+
+initiation_rate:
+  - Non-monotonic: intensity 0.50 -> 0.75, but value 0.4000 -> 0.3333
+
+question_frequency:
+  - Collapsed: intensities 0.00 and 0.25 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.25 and 0.50 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.50 and 0.75 have similar values 0.5000 and 0.5000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 0.5000 and 0.5000
+
+answer_frequency:
+  - Collapsed: intensities 0.00 and 0.25 have similar values 0.0000 and 0.0000
+  - Collapsed: intensities 0.25 and 0.50 have similar values 0.0000 and 0.0000
+
+politeness_score:
+  - Collapsed: intensities 0.25 and 0.50 have similar values 1.0000 and 1.0000
+  - Collapsed: intensities 0.50 and 0.75 have similar values 1.0000 and 1.0000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+
+formality_score:
+  - Collapsed: intensities 0.50 and 0.75 have similar values 1.0000 and 1.0000
+  - Collapsed: intensities 0.75 and 1.00 have similar values 1.0000 and 1.0000
+
+sentiment_min:
+  - Collapsed: intensities 0.00 and 0.50 have similar values 0.0000 and 0.0000
+
+sentiment_range:
+  - Collapsed: intensities 0.00 and 0.50 have similar values 0.0000 and 0.0000
+
+================================================================================
+NORMALIZATION FORMULAS (3-Point Piecewise Linear)
+================================================================================
+
+For each feature, use the following formula to normalize raw values to [0, 1]:
+
+
+# Normalization Formula for all_caps_word_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.409091
+#   v_1   (intensity=1.0) = 1.000000
+
+def normalize_all_caps_word_ratio(x):
+    v_0 = 0.000000
+    v_05 = 0.409091
+    v_1 = 1.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for answer_frequency
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.000000
+#   v_1   (intensity=1.0) = 0.600000
+
+def normalize_answer_frequency(x):
+    v_0 = 0.000000
+    v_05 = 0.000000
+    v_1 = 0.600000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for circadian_afternoon_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.200000
+#   v_0.5 (intensity=0.5) = 0.000000
+#   v_1   (intensity=1.0) = 0.200000
+
+def normalize_circadian_afternoon_ratio(x):
+    v_0 = 0.200000
+    v_05 = 0.000000
+    v_1 = 0.200000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for circadian_evening_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.400000
+#   v_0.5 (intensity=0.5) = 0.400000
+#   v_1   (intensity=1.0) = 0.400000
+
+def normalize_circadian_evening_ratio(x):
+    v_0 = 0.400000
+    v_05 = 0.400000
+    v_1 = 0.400000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for circadian_morning_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.200000
+#   v_0.5 (intensity=0.5) = 0.000000
+#   v_1   (intensity=1.0) = 0.000000
+
+def normalize_circadian_morning_ratio(x):
+    v_0 = 0.200000
+    v_05 = 0.000000
+    v_1 = 0.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for circadian_night_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.600000
+#   v_1   (intensity=1.0) = 0.400000
+
+def normalize_circadian_night_ratio(x):
+    v_0 = 0.000000
+    v_05 = 0.600000
+    v_1 = 0.400000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for digit_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.045455
+#   v_1   (intensity=1.0) = 1.000000
+
+def normalize_digit_ratio(x):
+    v_0 = 0.000000
+    v_05 = 0.045455
+    v_1 = 1.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for elaboration_score
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.020000
+#   v_0.5 (intensity=0.5) = 0.112000
+#   v_1   (intensity=1.0) = 0.188000
+
+def normalize_elaboration_score(x):
+    v_0 = 0.020000
+    v_05 = 0.112000
+    v_1 = 0.188000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for emotional_intensity_mean
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.006250
+#   v_0.5 (intensity=0.5) = 0.009110
+#   v_1   (intensity=1.0) = 0.042500
+
+def normalize_emotional_intensity_mean(x):
+    v_0 = 0.006250
+    v_05 = 0.009110
+    v_1 = 0.042500
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for emotional_shift_frequency
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.750000
+#   v_0.5 (intensity=0.5) = 1.000000
+#   v_1   (intensity=1.0) = 0.750000
+
+def normalize_emotional_shift_frequency(x):
+    v_0 = 0.750000
+    v_05 = 1.000000
+    v_1 = 0.750000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for formality_score
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.346154
+#   v_0.5 (intensity=0.5) = 0.500000
+#   v_1   (intensity=1.0) = 0.500000
+
+def normalize_formality_score(x):
+    v_0 = 0.346154
+    v_05 = 0.500000
+    v_1 = 0.500000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for hapax_legomena_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.941176
+#   v_1   (intensity=1.0) = 1.000000
+
+def normalize_hapax_legomena_ratio(x):
+    v_0 = 0.000000
+    v_05 = 0.941176
+    v_1 = 1.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for initiation_rate
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.400000
+#   v_1   (intensity=1.0) = 1.000000
+
+def normalize_initiation_rate(x):
+    v_0 = 0.000000
+    v_05 = 0.400000
+    v_1 = 1.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for lexical_richness
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.600000
+#   v_0.5 (intensity=0.5) = 0.909091
+#   v_1   (intensity=1.0) = 0.935484
+
+def normalize_lexical_richness(x):
+    v_0 = 0.600000
+    v_05 = 0.909091
+    v_1 = 0.935484
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for negative_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.200000
+#   v_0.5 (intensity=0.5) = 0.000000
+#   v_1   (intensity=1.0) = 0.600000
+
+def normalize_negative_ratio(x):
+    v_0 = 0.200000
+    v_05 = 0.000000
+    v_1 = 0.600000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for neutral_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.200000
+#   v_0.5 (intensity=0.5) = 1.000000
+#   v_1   (intensity=1.0) = 1.000000
+
+def normalize_neutral_ratio(x):
+    v_0 = 0.200000
+    v_05 = 1.000000
+    v_1 = 1.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for politeness_score
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 1.000000
+#   v_1   (intensity=1.0) = 0.526316
+
+def normalize_politeness_score(x):
+    v_0 = 0.000000
+    v_05 = 1.000000
+    v_1 = 0.526316
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for pos_adj_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.000000
+#   v_1   (intensity=1.0) = 0.000000
+
+def normalize_pos_adj_ratio(x):
+    v_0 = 0.000000
+    v_05 = 0.000000
+    v_1 = 0.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for pos_adp_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.000000
+#   v_1   (intensity=1.0) = 0.000000
+
+def normalize_pos_adp_ratio(x):
+    v_0 = 0.000000
+    v_05 = 0.000000
+    v_1 = 0.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for pos_adv_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.000000
+#   v_1   (intensity=1.0) = 0.000000
+
+def normalize_pos_adv_ratio(x):
+    v_0 = 0.000000
+    v_05 = 0.000000
+    v_1 = 0.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for pos_conj_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.000000
+#   v_1   (intensity=1.0) = 0.000000
+
+def normalize_pos_conj_ratio(x):
+    v_0 = 0.000000
+    v_05 = 0.000000
+    v_1 = 0.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for pos_det_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.000000
+#   v_1   (intensity=1.0) = 0.000000
+
+def normalize_pos_det_ratio(x):
+    v_0 = 0.000000
+    v_05 = 0.000000
+    v_1 = 0.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for pos_noun_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.000000
+#   v_1   (intensity=1.0) = 0.000000
+
+def normalize_pos_noun_ratio(x):
+    v_0 = 0.000000
+    v_05 = 0.000000
+    v_1 = 0.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for pos_num_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.000000
+#   v_1   (intensity=1.0) = 0.000000
+
+def normalize_pos_num_ratio(x):
+    v_0 = 0.000000
+    v_05 = 0.000000
+    v_1 = 0.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for pos_part_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.000000
+#   v_1   (intensity=1.0) = 0.000000
+
+def normalize_pos_part_ratio(x):
+    v_0 = 0.000000
+    v_05 = 0.000000
+    v_1 = 0.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for pos_pron_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.000000
+#   v_1   (intensity=1.0) = 0.000000
+
+def normalize_pos_pron_ratio(x):
+    v_0 = 0.000000
+    v_05 = 0.000000
+    v_1 = 0.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for pos_verb_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.000000
+#   v_1   (intensity=1.0) = 0.000000
+
+def normalize_pos_verb_ratio(x):
+    v_0 = 0.000000
+    v_05 = 0.000000
+    v_1 = 0.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for positive_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.400000
+#   v_1   (intensity=1.0) = 0.600000
+
+def normalize_positive_ratio(x):
+    v_0 = 0.000000
+    v_05 = 0.400000
+    v_1 = 0.600000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for punctuation_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.073171
+#   v_1   (intensity=1.0) = 0.067568
+
+def normalize_punctuation_ratio(x):
+    v_0 = 0.000000
+    v_05 = 0.073171
+    v_1 = 0.067568
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for question_frequency
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.000000
+#   v_1   (intensity=1.0) = 0.000000
+
+def normalize_question_frequency(x):
+    v_0 = 0.000000
+    v_05 = 0.000000
+    v_1 = 0.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for response_rate
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.750000
+#   v_1   (intensity=1.0) = 1.000000
+
+def normalize_response_rate(x):
+    v_0 = 0.000000
+    v_05 = 0.750000
+    v_1 = 1.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for sentiment_consistency
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.559914
+#   v_0.5 (intensity=0.5) = 0.632436
+#   v_1   (intensity=1.0) = 0.671187
+
+def normalize_sentiment_consistency(x):
+    v_0 = 0.559914
+    v_05 = 0.632436
+    v_1 = 0.671187
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for sentiment_max
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.833333
+#   v_1   (intensity=1.0) = 1.000000
+
+def normalize_sentiment_max(x):
+    v_0 = 0.000000
+    v_05 = 0.833333
+    v_1 = 1.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for sentiment_mean
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.253968
+#   v_1   (intensity=1.0) = 1.000000
+
+def normalize_sentiment_mean(x):
+    v_0 = 0.000000
+    v_05 = 0.253968
+    v_1 = 1.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for sentiment_min
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.000000
+#   v_1   (intensity=1.0) = 1.000000
+
+def normalize_sentiment_min(x):
+    v_0 = 0.000000
+    v_05 = 0.000000
+    v_1 = 1.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for sentiment_range
+# Anchor Points:
+#   v_0   (intensity=0.0) = 1.000000
+#   v_0.5 (intensity=0.5) = 0.833333
+#   v_1   (intensity=1.0) = 2.000000
+
+def normalize_sentiment_range(x):
+    v_0 = 1.000000
+    v_05 = 0.833333
+    v_1 = 2.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for sentiment_skewness
+# Anchor Points:
+#   v_0   (intensity=0.0) = -1.500000
+#   v_0.5 (intensity=0.5) = 0.000000
+#   v_1   (intensity=1.0) = 1.500000
+
+def normalize_sentiment_skewness(x):
+    v_0 = -1.500000
+    v_05 = 0.000000
+    v_1 = 1.500000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for sentiment_std
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.333333
+#   v_0.5 (intensity=0.5) = 0.661648
+#   v_1   (intensity=1.0) = 0.916515
+
+def normalize_sentiment_std(x):
+    v_0 = 0.333333
+    v_05 = 0.661648
+    v_1 = 0.916515
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for sentiment_trend
+# Anchor Points:
+#   v_0   (intensity=0.0) = -0.433333
+#   v_0.5 (intensity=0.5) = -0.000000
+#   v_1   (intensity=1.0) = 0.477551
+
+def normalize_sentiment_trend(x):
+    v_0 = -0.433333
+    v_05 = -0.000000
+    v_1 = 0.477551
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for sentiment_volatility
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.500000
+#   v_1   (intensity=1.0) = 2.000000
+
+def normalize_sentiment_volatility(x):
+    v_0 = 0.000000
+    v_05 = 0.500000
+    v_1 = 2.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for stopword_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.666667
+#   v_1   (intensity=1.0) = 0.725275
+
+def normalize_stopword_ratio(x):
+    v_0 = 0.000000
+    v_05 = 0.666667
+    v_1 = 0.725275
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for type_token_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.083333
+#   v_0.5 (intensity=0.5) = 0.950000
+#   v_1   (intensity=1.0) = 1.000000
+
+def normalize_type_token_ratio(x):
+    v_0 = 0.083333
+    v_05 = 0.950000
+    v_1 = 1.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for uppercase_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.000000
+#   v_0.5 (intensity=0.5) = 0.160584
+#   v_1   (intensity=1.0) = 1.000000
+
+def normalize_uppercase_ratio(x):
+    v_0 = 0.000000
+    v_05 = 0.160584
+    v_1 = 1.000000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for weekday_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.600000
+#   v_0.5 (intensity=0.5) = 0.800000
+#   v_1   (intensity=1.0) = 0.800000
+
+def normalize_weekday_ratio(x):
+    v_0 = 0.600000
+    v_05 = 0.800000
+    v_1 = 0.800000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for weekend_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.200000
+#   v_0.5 (intensity=0.5) = 0.000000
+#   v_1   (intensity=1.0) = 0.400000
+
+def normalize_weekend_ratio(x):
+    v_0 = 0.200000
+    v_05 = 0.000000
+    v_1 = 0.400000
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+# Normalization Formula for whitespace_ratio
+# Anchor Points:
+#   v_0   (intensity=0.0) = 0.042553
+#   v_0.5 (intensity=0.5) = 0.140351
+#   v_1   (intensity=1.0) = 0.754875
+
+def normalize_whitespace_ratio(x):
+    v_0 = 0.042553
+    v_05 = 0.140351
+    v_1 = 0.754875
+    
+    # Piecewise linear interpolation
+    if x <= v_05:
+        if v_05 == v_0:
+            normalized = 0.0
+        else:
+            normalized = 0.5 * (x - v_0) / (v_05 - v_0)
+    else:
+        if v_1 == v_05:
+            normalized = 1.0
+        else:
+            normalized = 0.5 + 0.5 * (x - v_05) / (v_1 - v_05)
+    
+    return max(0.0, min(1.0, normalized))
+
+
+================================================================================
+END OF REPORT
+================================================================================
+
+
+================================================================================
+FEATURE QUALITY CATEGORIZATION
+================================================================================
+
+## COMPLETELY USELESS (3+ Collapsed Violations)
+Features with 3 or more collapsed violations - these provide no discriminatory value:
+
+1. circadian_afternoon_ratio (4 collapsed)
+2. circadian_evening_ratio (4 collapsed)
+3. circadian_morning_ratio (3 collapsed)
+4. circadian_night_ratio (3 collapsed)
+5. digit_ratio (3 violations: 1 non-monotonic + 2 collapsed)
+6. emotional_intensity_mean (3 violations: 1 non-monotonic + 2 collapsed)
+7. emotional_shift_frequency (4 collapsed)
+8. negative_ratio (3 collapsed)
+9. politeness_score (3 collapsed)
+10. pos_adj_ratio (4 collapsed)
+11. pos_adp_ratio (4 collapsed)
+12. pos_adv_ratio (4 collapsed)
+13. pos_conj_ratio (4 collapsed)
+14. pos_det_ratio (4 collapsed)
+15. pos_noun_ratio (4 collapsed)
+16. pos_num_ratio (4 collapsed)
+17. pos_part_ratio (4 collapsed)
+18. pos_pron_ratio (4 collapsed)
+19. pos_verb_ratio (4 collapsed)
+20. question_frequency (4 collapsed)
+21. sentiment_consistency (3 collapsed)
+
+## CAN WORK (1-2 Violations: Collapsed or Non-Monotonic)
+Features with minor issues but still potentially useful:
+
+1. answer_frequency (2 collapsed)
+2. formality_score (2 collapsed)
+3. hapax_legomena_ratio (1 collapsed)
+4. initiation_rate (1 non-monotonic)
+5. lexical_richness (1 non-monotonic)
+6. neutral_ratio (2 violations: 2 non-monotonic + 1 collapsed)
+7. positive_ratio (2 violations: 1 collapsed + 1 non-monotonic)
+8. punctuation_ratio (2 collapsed)
+9. response_rate (2 violations: 1 non-monotonic + 1 collapsed)
+10. sentiment_min (1 collapsed)
+11. sentiment_range (1 collapsed)
+12. stopword_ratio (1 non-monotonic)
+13. type_token_ratio (1 collapsed)
+14. uppercase_ratio (1 collapsed)
+15. weekday_ratio (2 violations: 1 collapsed + 1 non-monotonic)
+16. weekend_ratio (2 violations: 1 non-monotonic + 1 collapsed)
+17. whitespace_ratio (1 collapsed)
+
+## PERFECT (No Violations)
+Features that passed all validation checks:
+
+1. all_caps_word_ratio
+2. elaboration_score
+3. sentiment_max
+4. sentiment_mean
+5. sentiment_skewness
+6. sentiment_std
+7. sentiment_trend
+8. sentiment_volatility
+
+
+================================================================================
+5-STEP PIECEWISE NORMALIZATION FUNCTIONS
+================================================================================
+
+Using the 5 data points (intensity 0.0, 0.25, 0.5, 0.75, 1.0) for each feature,
+the following piecewise linear functions normalize raw values to [0, 1]:
+
+
+# all_caps_word_ratio
+# Raw values: [0.0=0.000000, 0.25=0.095238, 0.5=0.409091, 0.75=0.535714, 1.0=1.000000]
+def normalize_all_caps_word_ratio(x):
+    if x <= 0.095238:
+        return 0.25 * (x - 0.000000) / (0.095238 - 0.000000) if 0.095238 != 0.000000 else 0.0
+    elif x <= 0.409091:
+        return 0.25 + 0.25 * (x - 0.095238) / (0.409091 - 0.095238)
+    elif x <= 0.535714:
+        return 0.50 + 0.25 * (x - 0.409091) / (0.535714 - 0.409091)
+    else:
+        return 0.75 + 0.25 * (x - 0.535714) / (1.000000 - 0.535714)
+
+
+# answer_frequency
+# Raw values: [0.0=0.000000, 0.25=0.000000, 0.5=0.000000, 0.75=0.400000, 1.0=0.600000]
+def normalize_answer_frequency(x):
+    if x <= 0.000000:
+        return 0.0
+    elif x <= 0.000000:
+        return 0.25
+    elif x <= 0.400000:
+        return 0.50 + 0.25 * (x - 0.000000) / (0.400000 - 0.000000)
+    else:
+        return 0.75 + 0.25 * (x - 0.400000) / (0.600000 - 0.400000)
+
+
+# elaboration_score
+# Raw values: [0.0=0.020000, 0.25=0.056000, 0.5=0.112000, 0.75=0.172000, 1.0=0.188000]
+def normalize_elaboration_score(x):
+    if x <= 0.056000:
+        return 0.25 * (x - 0.020000) / (0.056000 - 0.020000)
+    elif x <= 0.112000:
+        return 0.25 + 0.25 * (x - 0.056000) / (0.112000 - 0.056000)
+    elif x <= 0.172000:
+        return 0.50 + 0.25 * (x - 0.112000) / (0.172000 - 0.112000)
+    else:
+        return 0.75 + 0.25 * (x - 0.172000) / (0.188000 - 0.172000)
+
+
+# formality_score
+# Raw values: [0.0=0.346154, 0.25=0.468750, 0.5=0.500000, 0.75=0.500000, 1.0=0.500000]
+def normalize_formality_score(x):
+    if x <= 0.468750:
+        return 0.25 * (x - 0.346154) / (0.468750 - 0.346154)
+    elif x <= 0.500000:
+        return 0.25 + 0.25 * (x - 0.468750) / (0.500000 - 0.468750)
+    elif x <= 0.500000:
+        return 0.50
+    else:
+        return 0.75
+
+
+# hapax_legomena_ratio
+# Raw values: [0.0=0.000000, 0.25=0.333333, 0.5=0.941176, 0.75=1.000000, 1.0=1.000000]
+def normalize_hapax_legomena_ratio(x):
+    if x <= 0.333333:
+        return 0.25 * (x - 0.000000) / (0.333333 - 0.000000) if 0.333333 != 0.000000 else 0.0
+    elif x <= 0.941176:
+        return 0.25 + 0.25 * (x - 0.333333) / (0.941176 - 0.333333)
+    elif x <= 1.000000:
+        return 0.50 + 0.25 * (x - 0.941176) / (1.000000 - 0.941176)
+    else:
+        return 0.75
+
+
+# initiation_rate
+# Raw values: [0.0=0.000000, 0.25=0.200000, 0.5=0.400000, 0.75=0.333333, 1.0=1.000000]
+def normalize_initiation_rate(x):
+    if x <= 0.200000:
+        return 0.25 * (x - 0.000000) / (0.200000 - 0.000000) if 0.200000 != 0.000000 else 0.0
+    elif x <= 0.400000:
+        return 0.25 + 0.25 * (x - 0.200000) / (0.400000 - 0.200000)
+    elif x <= 0.333333:
+        return 0.50 + 0.25 * (x - 0.400000) / (0.333333 - 0.400000)
+    else:
+        return 0.75 + 0.25 * (x - 0.333333) / (1.000000 - 0.333333)
+
+
+# lexical_richness
+# Raw values: [0.0=0.600000, 0.25=0.666667, 0.5=0.909091, 0.75=0.842105, 1.0=0.935484]
+def normalize_lexical_richness(x):
+    if x <= 0.666667:
+        return 0.25 * (x - 0.600000) / (0.666667 - 0.600000)
+    elif x <= 0.909091:
+        return 0.25 + 0.25 * (x - 0.666667) / (0.909091 - 0.666667)
+    elif x <= 0.842105:
+        return 0.50 + 0.25 * (x - 0.909091) / (0.842105 - 0.909091)
+    else:
+        return 0.75 + 0.25 * (x - 0.842105) / (0.935484 - 0.842105)
+
+
+# punctuation_ratio
+# Raw values: [0.0=0.000000, 0.25=0.022989, 0.5=0.073171, 0.75=0.074866, 1.0=0.067568]
+def normalize_punctuation_ratio(x):
+    if x <= 0.022989:
+        return 0.25 * (x - 0.000000) / (0.022989 - 0.000000) if 0.022989 != 0.000000 else 0.0
+    elif x <= 0.073171:
+        return 0.25 + 0.25 * (x - 0.022989) / (0.073171 - 0.022989)
+    elif x <= 0.074866:
+        return 0.50 + 0.25 * (x - 0.073171) / (0.074866 - 0.073171)
+    else:
+        return 0.75 + 0.25 * (x - 0.074866) / (0.067568 - 0.074866)
+
+
+# response_rate
+# Raw values: [0.0=0.000000, 0.25=1.000000, 0.5=0.750000, 0.75=1.000000, 1.0=1.000000]
+def normalize_response_rate(x):
+    if x <= 1.000000:
+        return 0.25 * (x - 0.000000) / (1.000000 - 0.000000) if 1.000000 != 0.000000 else 0.0
+    elif x <= 0.750000:
+        return 0.25 + 0.25 * (x - 1.000000) / (0.750000 - 1.000000)
+    elif x <= 1.000000:
+        return 0.50 + 0.25 * (x - 0.750000) / (1.000000 - 0.750000)
+    else:
+        return 0.75
+
+
+# sentiment_min
+# Raw values: [0.0=0.000000, 0.25=N/A, 0.5=0.000000, 0.75=N/A, 1.0=1.000000]
+# Note: Only 3 data points available (0.0, 0.5, 1.0)
+def normalize_sentiment_min(x):
+    if x <= 0.000000:
+        return 0.0
+    elif x <= 0.000000:
+        return 0.50
+    else:
+        return 0.50 + 0.50 * (x - 0.000000) / (1.000000 - 0.000000)
+
+
+# sentiment_range
+# Raw values: [0.0=1.000000, 0.25=N/A, 0.5=0.833333, 0.75=N/A, 1.0=2.000000]
+# Note: Only 3 data points available (0.0, 0.5, 1.0)
+def normalize_sentiment_range(x):
+    if x <= 0.833333:
+        return 0.50 * (x - 1.000000) / (0.833333 - 1.000000)
+    else:
+        return 0.50 + 0.50 * (x - 0.833333) / (2.000000 - 0.833333)
+
+
+# sentiment_max
+# Raw values: [0.0=0.000000, 0.25=N/A, 0.5=0.833333, 0.75=N/A, 1.0=1.000000]
+# Note: Only 3 data points available (0.0, 0.5, 1.0)
+def normalize_sentiment_max(x):
+    if x <= 0.833333:
+        return 0.50 * (x - 0.000000) / (0.833333 - 0.000000) if 0.833333 != 0.000000 else 0.0
+    else:
+        return 0.50 + 0.50 * (x - 0.833333) / (1.000000 - 0.833333)
+
+
+# sentiment_mean
+# Raw values: [0.0=0.000000, 0.25=N/A, 0.5=0.253968, 0.75=N/A, 1.0=1.000000]
+# Note: Only 3 data points available (0.0, 0.5, 1.0)
+def normalize_sentiment_mean(x):
+    if x <= 0.253968:
+        return 0.50 * (x - 0.000000) / (0.253968 - 0.000000) if 0.253968 != 0.000000 else 0.0
+    else:
+        return 0.50 + 0.50 * (x - 0.253968) / (1.000000 - 0.253968)
+
+
+# sentiment_skewness
+# Raw values: [0.0=-1.500000, 0.25=N/A, 0.5=0.000000, 0.75=N/A, 1.0=1.500000]
+# Note: Only 3 data points available (0.0, 0.5, 1.0)
+def normalize_sentiment_skewness(x):
+    if x <= 0.000000:
+        return 0.50 * (x - (-1.500000)) / (0.000000 - (-1.500000))
+    else:
+        return 0.50 + 0.50 * (x - 0.000000) / (1.500000 - 0.000000)
+
+
+# sentiment_std
+# Raw values: [0.0=0.333333, 0.25=N/A, 0.5=0.661648, 0.75=N/A, 1.0=0.916515]
+# Note: Only 3 data points available (0.0, 0.5, 1.0)
+def normalize_sentiment_std(x):
+    if x <= 0.661648:
+        return 0.50 * (x - 0.333333) / (0.661648 - 0.333333)
+    else:
+        return 0.50 + 0.50 * (x - 0.661648) / (0.916515 - 0.661648)
+
+
+# sentiment_trend
+# Raw values: [0.0=-0.433333, 0.25=N/A, 0.5=0.000000, 0.75=N/A, 1.0=0.477551]
+# Note: Only 3 data points available (0.0, 0.5, 1.0)
+def normalize_sentiment_trend(x):
+    if x <= 0.000000:
+        return 0.50 * (x - (-0.433333)) / (0.000000 - (-0.433333))
+    else:
+        return 0.50 + 0.50 * (x - 0.000000) / (0.477551 - 0.000000)
+
+
+# sentiment_volatility
+# Raw values: [0.0=0.000000, 0.25=N/A, 0.5=0.500000, 0.75=N/A, 1.0=2.000000]
+# Note: Only 3 data points available (0.0, 0.5, 1.0)
+def normalize_sentiment_volatility(x):
+    if x <= 0.500000:
+        return 0.50 * (x - 0.000000) / (0.500000 - 0.000000) if 0.500000 != 0.000000 else 0.0
+    else:
+        return 0.50 + 0.50 * (x - 0.500000) / (2.000000 - 0.500000)
+
+
+# stopword_ratio
+# Raw values: [0.0=0.000000, 0.25=0.352941, 0.5=0.666667, 0.75=0.566667, 1.0=0.725275]
+def normalize_stopword_ratio(x):
+    if x <= 0.352941:
+        return 0.25 * (x - 0.000000) / (0.352941 - 0.000000) if 0.352941 != 0.000000 else 0.0
+    elif x <= 0.666667:
+        return 0.25 + 0.25 * (x - 0.352941) / (0.666667 - 0.352941)
+    elif x <= 0.566667:
+        return 0.50 + 0.25 * (x - 0.666667) / (0.566667 - 0.666667)
+    else:
+        return 0.75 + 0.25 * (x - 0.566667) / (0.725275 - 0.566667)
+
+
+# type_token_ratio
+# Raw values: [0.0=0.083333, 0.25=0.187500, 0.5=0.950000, 0.75=1.000000, 1.0=1.000000]
+def normalize_type_token_ratio(x):
+    if x <= 0.187500:
+        return 0.25 * (x - 0.083333) / (0.187500 - 0.083333)
+    elif x <= 0.950000:
+        return 0.25 + 0.25 * (x - 0.187500) / (0.950000 - 0.187500)
+    elif x <= 1.000000:
+        return 0.50 + 0.25 * (x - 0.950000) / (1.000000 - 0.950000)
+    else:
+        return 0.75
+
+
+# uppercase_ratio
+# Raw values: [0.0=0.000000, 0.25=0.049587, 0.5=0.160584, 0.75=0.886364, 1.0=1.000000]
+def normalize_uppercase_ratio(x):
+    if x <= 0.049587:
+        return 0.25 * (x - 0.000000) / (0.049587 - 0.000000) if 0.049587 != 0.000000 else 0.0
+    elif x <= 0.160584:
+        return 0.25 + 0.25 * (x - 0.049587) / (0.160584 - 0.049587)
+    elif x <= 0.886364:
+        return 0.50 + 0.25 * (x - 0.160584) / (0.886364 - 0.160584)
+    else:
+        return 0.75 + 0.25 * (x - 0.886364) / (1.000000 - 0.886364)
+
+
+# weekday_ratio
+# Raw values: [0.0=0.600000, 0.25=1.000000, 0.5=0.800000, 0.75=0.600000, 1.0=0.800000]
+def normalize_weekday_ratio(x):
+    if x <= 1.000000:
+        return 0.25 * (x - 0.600000) / (1.000000 - 0.600000)
+    elif x <= 0.800000:
+        return 0.25 + 0.25 * (x - 1.000000) / (0.800000 - 1.000000)
+    elif x <= 0.600000:
+        return 0.50 + 0.25 * (x - 0.800000) / (0.600000 - 0.800000)
+    else:
+        return 0.75 + 0.25 * (x - 0.600000) / (0.800000 - 0.600000)
+
+
+# weekend_ratio
+# Raw values: [0.0=0.200000, 0.25=0.400000, 0.5=0.000000, 0.75=0.400000, 1.0=0.400000]
+def normalize_weekend_ratio(x):
+    if x <= 0.400000:
+        return 0.25 * (x - 0.200000) / (0.400000 - 0.200000)
+    elif x <= 0.000000:
+        return 0.25 + 0.25 * (x - 0.400000) / (0.000000 - 0.400000)
+    elif x <= 0.400000:
+        return 0.50 + 0.25 * (x - 0.000000) / (0.400000 - 0.000000)
+    else:
+        return 0.75
+
+
+# whitespace_ratio
+# Raw values: [0.0=0.042553, 0.25=0.101852, 0.5=0.140351, 0.75=0.147465, 1.0=0.754875]
+def normalize_whitespace_ratio(x):
+    if x <= 0.101852:
+        return 0.25 * (x - 0.042553) / (0.101852 - 0.042553)
+    elif x <= 0.140351:
+        return 0.25 + 0.25 * (x - 0.101852) / (0.140351 - 0.101852)
+    elif x <= 0.147465:
+        return 0.50 + 0.25 * (x - 0.140351) / (0.147465 - 0.140351)
+    else:
+        return 0.75 + 0.25 * (x - 0.147465) / (0.754875 - 0.147465)
+
+
+================================================================================
+5-STEP PIECEWISE NORMALIZATION FUNCTIONS FOR "CAN WORK" FEATURES
+================================================================================
+
+The following features have 1-2 violations but can still be used with caution.
+For non-monotonic cases, problematic points are skipped and remaining points used.
+
+
+# answer_frequency (2 collapsed: 0.0-0.25-0.5 all same)
+# Raw values: [0.0=0.000000, 0.25=0.000000, 0.5=0.000000, 0.75=0.400000, 1.0=0.600000]
+# Using points: 0.0, 0.75, 1.0 (skipping collapsed 0.25 and 0.5)
+def normalize_answer_frequency(x):
+    if x <= 0.000000:
+        return 0.0
+    elif x <= 0.400000:
+        return 0.75 * (x - 0.000000) / (0.400000 - 0.000000)
+    else:
+        return 0.75 + 0.25 * (x - 0.400000) / (0.600000 - 0.400000)
+
+
+# formality_score (2 collapsed: 0.5-0.75-1.0 all same)
+# Raw values: [0.0=0.346154, 0.25=0.468750, 0.5=0.500000, 0.75=0.500000, 1.0=0.500000]
+# Using points: 0.0, 0.25, 0.5 (skipping collapsed 0.75 and 1.0)
+def normalize_formality_score(x):
+    if x <= 0.468750:
+        return 0.25 * (x - 0.346154) / (0.468750 - 0.346154)
+    else:
+        return 0.25 + 0.25 * (x - 0.468750) / (0.500000 - 0.468750)
+
+
+# hapax_legomena_ratio (1 collapsed: 0.75-1.0 same)
+# Raw values: [0.0=0.000000, 0.25=0.333333, 0.5=0.941176, 0.75=1.000000, 1.0=1.000000]
+# Using points: 0.0, 0.25, 0.5, 0.75 (skipping duplicate 1.0)
+def normalize_hapax_legomena_ratio(x):
+    if x <= 0.333333:
+        return 0.25 * (x - 0.000000) / (0.333333 - 0.000000) if 0.333333 != 0.000000 else 0.0
+    elif x <= 0.941176:
+        return 0.25 + 0.25 * (x - 0.333333) / (0.941176 - 0.333333)
+    else:
+        return 0.50 + 0.25 * (x - 0.941176) / (1.000000 - 0.941176)
+
+
+# initiation_rate (1 non-monotonic: 0.5->0.75 decreases)
+# Raw values: [0.0=0.000000, 0.25=0.200000, 0.5=0.400000, 0.75=0.333333, 1.0=1.000000]
+# Using points: 0.0, 0.25, 0.5, 1.0 (skipping non-monotonic 0.75)
+def normalize_initiation_rate(x):
+    if x <= 0.200000:
+        return 0.25 * (x - 0.000000) / (0.200000 - 0.000000) if 0.200000 != 0.000000 else 0.0
+    elif x <= 0.400000:
+        return 0.25 + 0.25 * (x - 0.200000) / (0.400000 - 0.200000)
+    else:
+        return 0.50 + 0.50 * (x - 0.400000) / (1.000000 - 0.400000)
+
+
+# lexical_richness (1 non-monotonic: 0.5->0.75 decreases)
+# Raw values: [0.0=0.600000, 0.25=0.666667, 0.5=0.909091, 0.75=0.842105, 1.0=0.935484]
+# Using points: 0.0, 0.25, 0.5, 1.0 (skipping non-monotonic 0.75)
+def normalize_lexical_richness(x):
+    if x <= 0.666667:
+        return 0.25 * (x - 0.600000) / (0.666667 - 0.600000)
+    elif x <= 0.909091:
+        return 0.25 + 0.25 * (x - 0.666667) / (0.909091 - 0.666667)
+    else:
+        return 0.50 + 0.50 * (x - 0.909091) / (0.935484 - 0.909091)
+
+
+# neutral_ratio (complex: multiple non-monotonic issues, has duplicates)
+# Raw values: [0.0=0.200000/0.000000, 0.25=0.600000, 0.5=1.000000/0.400000, 0.75=1.000000, 1.0=1.000000/0.800000]
+# Using cleaner points: 0.0=0.000000, 0.25=0.600000, 0.5=1.000000, 1.0=1.000000
+def normalize_neutral_ratio(x):
+    if x <= 0.600000:
+        return 0.25 * (x - 0.000000) / (0.600000 - 0.000000) if 0.600000 != 0.000000 else 0.0
+    else:
+        return 0.25 + 0.25 * (x - 0.600000) / (1.000000 - 0.600000)
+
+
+# positive_ratio (1 collapsed + 1 non-monotonic: 0.25-0.5 same, 0.5->0.75 decreases)
+# Raw values: [0.0=0.000000, 0.25=0.400000, 0.5=0.400000/0.800000, 0.75=0.200000, 1.0=0.600000/1.000000]
+# Using points: 0.0=0.000000, 0.25=0.400000, 0.5=0.800000, 1.0=1.000000 (skip non-monotonic 0.75)
+def normalize_positive_ratio(x):
+    if x <= 0.400000:
+        return 0.25 * (x - 0.000000) / (0.400000 - 0.000000) if 0.400000 != 0.000000 else 0.0
+    elif x <= 0.800000:
+        return 0.25 + 0.25 * (x - 0.400000) / (0.800000 - 0.400000)
+    else:
+        return 0.50 + 0.50 * (x - 0.800000) / (1.000000 - 0.800000)
+
+
+# punctuation_ratio (2 collapsed: 0.5-0.75-1.0 similar)
+# Raw values: [0.0=0.000000, 0.25=0.022989, 0.5=0.073171, 0.75=0.074866, 1.0=0.067568]
+# Using points: 0.0, 0.25, 0.5 (skipping collapsed 0.75 and problematic 1.0)
+def normalize_punctuation_ratio(x):
+    if x <= 0.022989:
+        return 0.25 * (x - 0.000000) / (0.022989 - 0.000000) if 0.022989 != 0.000000 else 0.0
+    else:
+        return 0.25 + 0.25 * (x - 0.022989) / (0.073171 - 0.022989)
+
+
+# response_rate (1 non-monotonic: 0.25->0.5 decreases, 1 collapsed: 0.75-1.0 same)
+# Raw values: [0.0=0.000000, 0.25=1.000000, 0.5=0.750000, 0.75=1.000000, 1.0=1.000000]
+# Using points: 0.0, 0.5, 0.75 (skip non-monotonic 0.25, use 0.75 as endpoint)
+def normalize_response_rate(x):
+    if x <= 0.750000:
+        return 0.50 * (x - 0.000000) / (0.750000 - 0.000000) if 0.750000 != 0.000000 else 0.0
+    else:
+        return 0.50 + 0.25 * (x - 0.750000) / (1.000000 - 0.750000)
+
+
+# sentiment_min (1 collapsed: 0.0-0.5 same)
+# Raw values: [0.0=0.000000, 0.5=0.000000, 1.0=1.000000]
+# Only 3 points, using 0.0 and 1.0
+def normalize_sentiment_min(x):
+    if x <= 0.000000:
+        return 0.0
+    else:
+        return (x - 0.000000) / (1.000000 - 0.000000)
+
+
+# sentiment_range (1 collapsed: 0.0-0.5 similar)
+# Raw values: [0.0=1.000000, 0.5=0.833333, 1.0=2.000000]
+# Only 3 points, all usable despite being close
+def normalize_sentiment_range(x):
+    if x <= 0.833333:
+        return 0.50 * (x - 1.000000) / (0.833333 - 1.000000)
+    else:
+        return 0.50 + 0.50 * (x - 0.833333) / (2.000000 - 0.833333)
+
+
+# stopword_ratio (1 non-monotonic: 0.5->0.75 decreases)
+# Raw values: [0.0=0.000000, 0.25=0.352941, 0.5=0.666667, 0.75=0.566667, 1.0=0.725275]
+# Using points: 0.0, 0.25, 0.5, 1.0 (skipping non-monotonic 0.75)
+def normalize_stopword_ratio(x):
+    if x <= 0.352941:
+        return 0.25 * (x - 0.000000) / (0.352941 - 0.000000) if 0.352941 != 0.000000 else 0.0
+    elif x <= 0.666667:
+        return 0.25 + 0.25 * (x - 0.352941) / (0.666667 - 0.352941)
+    else:
+        return 0.50 + 0.50 * (x - 0.666667) / (0.725275 - 0.666667)
+
+
+# type_token_ratio (1 collapsed: 0.75-1.0 same)
+# Raw values: [0.0=0.083333, 0.25=0.187500, 0.5=0.950000, 0.75=1.000000, 1.0=1.000000]
+# Using points: 0.0, 0.25, 0.5, 0.75 (skipping duplicate 1.0)
+def normalize_type_token_ratio(x):
+    if x <= 0.187500:
+        return 0.25 * (x - 0.083333) / (0.187500 - 0.083333)
+    elif x <= 0.950000:
+        return 0.25 + 0.25 * (x - 0.187500) / (0.950000 - 0.187500)
+    else:
+        return 0.50 + 0.25 * (x - 0.950000) / (1.000000 - 0.950000)
+
+
+# uppercase_ratio (1 collapsed: 0.0-0.25 similar)
+# Raw values: [0.0=0.000000, 0.25=0.049587, 0.5=0.160584, 0.75=0.886364, 1.0=1.000000]
+# All points usable, just very close at start
+def normalize_uppercase_ratio(x):
+    if x <= 0.049587:
+        return 0.25 * (x - 0.000000) / (0.049587 - 0.000000) if 0.049587 != 0.000000 else 0.0
+    elif x <= 0.160584:
+        return 0.25 + 0.25 * (x - 0.049587) / (0.160584 - 0.049587)
+    elif x <= 0.886364:
+        return 0.50 + 0.25 * (x - 0.160584) / (0.886364 - 0.160584)
+    else:
+        return 0.75 + 0.25 * (x - 0.886364) / (1.000000 - 0.886364)
+
+
+# weekday_ratio (1 collapsed + 1 non-monotonic: 0.25-0.5 same, 0.5->0.75 drops to 0)
+# Raw values: [0.0=0.600000, 0.25=1.000000, 0.5=0.800000, 0.75=0.600000, 1.0=0.800000]
+# Using points: 0.0, 0.25, 1.0 (skipping problematic middle points)
+def normalize_weekday_ratio(x):
+    if x <= 1.000000:
+        return 0.25 * (x - 0.600000) / (1.000000 - 0.600000)
+    else:
+        return 0.25 + 0.75 * (x - 1.000000) / (0.800000 - 1.000000)
+
+
+# weekend_ratio (1 non-monotonic: 0.25->0.5 drops, 1 collapsed: 0.75-1.0 same)
+# Raw values: [0.0=0.200000, 0.25=0.400000, 0.5=0.000000, 0.75=0.400000, 1.0=0.400000]
+# Using points: 0.0, 0.25, 0.75 (skipping non-monotonic 0.5, using 0.75 as endpoint)
+def normalize_weekend_ratio(x):
+    if x <= 0.400000:
+        return 0.25 * (x - 0.200000) / (0.400000 - 0.200000)
+    else:
+        return 0.25 + 0.50 * (x - 0.400000) / (0.400000 - 0.400000) if x <= 0.400000 else 0.75
+
+
+# whitespace_ratio (1 collapsed: 0.5-0.75 similar)
+# Raw values: [0.0=0.042553, 0.25=0.101852, 0.5=0.140351, 0.75=0.147465, 1.0=0.754875]
+# All points usable, just very close in middle
+def normalize_whitespace_ratio(x):
+    if x <= 0.101852:
+        return 0.25 * (x - 0.042553) / (0.101852 - 0.042553)
+    elif x <= 0.140351:
+        return 0.25 + 0.25 * (x - 0.101852) / (0.140351 - 0.101852)
+    elif x <= 0.147465:
+        return 0.50 + 0.25 * (x - 0.140351) / (0.147465 - 0.140351)
+    else:
+        return 0.75 + 0.25 * (x - 0.147465) / (0.754875 - 0.147465)
+
+
+================================================================================
+END OF ENHANCED REPORT
+================================================================================

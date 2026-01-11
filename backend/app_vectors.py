@@ -115,74 +115,17 @@ def extract_features():
 @app.route('/api/features/synthetic-generate', methods=['POST'])
 def generate_synthetic():
     """
-    Generate synthetic behavior vectors.
+    Synthetic vector generation (DEPRECATED - augmentation removed).
     
-    Input:
-    {
-        "vectors": [[...], [...]], // Original vectors
-        "n_synthetic": 10,
-        "method": "smote" // smote, noise, jitter, interpolate, adasyn
-    }
-    
-    Output:
-    {
-        "synthetic_vectors": [[...], [...], ...]
-    }
+    Returns empty result as SMOTE/noise augmentation has been removed.
     """
-    try:
-        data = request.get_json()
-        
-        if not data:
-            return jsonify({'error': 'No data provided'}), 400
-        
-        vectors = data.get('vectors', [])
-        
-        if not vectors:
-            stored = vector_store.get_all_vectors()
-            if stored:
-                vectors = stored
-            else:
-                return jsonify({'error': 'No vectors provided and none stored'}), 400
-        
-        n_synthetic = data.get('n_synthetic', 10)
-        method = data.get('method', 'smote')
-        
-        synthetic_vectors = synthetic_generator.generate_synthetic_vectors(
-            vectors, n_synthetic, method
-        )
-        
-        validated_vectors = []
-        for vec in synthetic_vectors:
-            is_valid, clipped = synthetic_generator.validate_vector(vec)
-            validated_vectors.append(clipped)
-        
-        store_result = data.get('store', False)
-        stored_ids = []
-        if store_result:
-            for i, vec in enumerate(validated_vectors):
-                metadata = {
-                    'synthetic': True,
-                    'method': method,
-                    'generated_at': datetime.now().isoformat()
-                }
-                vid = vector_store.add(vec, metadata)
-                stored_ids.append(vid)
-        
-        response = {
-            'success': True,
-            'synthetic_vectors': validated_vectors,
-            'count': len(validated_vectors),
-            'method': method
-        }
-        
-        if stored_ids:
-            response['stored_ids'] = stored_ids
-        
-        return jsonify(response), 200
-        
-    except Exception as e:
-        logger.error(f"Error generating synthetic vectors: {str(e)}")
-        return jsonify({'error': f'Synthetic generation failed: {str(e)}'}), 500
+    return jsonify({
+        'success': True,
+        'synthetic_vectors': [],
+        'count': 0,
+        'method': 'deprecated',
+        'message': 'Vector augmentation removed - use real conversation data instead'
+    }), 200
 
 
 @app.route('/api/vectors/list', methods=['GET'])
