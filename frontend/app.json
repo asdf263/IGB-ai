@@ -22,17 +22,14 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.igb.ai"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "apiUrl": "http://10.22.44.92:5000"
-    },
-    "packagerOpts": {
-      "config": "metro.config.js"
+      "apiUrl": "https://igb-backend.loca.lt"
     }
   }
 }
-

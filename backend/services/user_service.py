@@ -2,9 +2,11 @@
 User Service - MongoDB operations for user authentication and profiles
 """
 import os
+import ssl
+import certifi
 from pymongo import MongoClient
 from bson import ObjectId
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 import logging
 from datetime import datetime
 import uuid
@@ -27,7 +29,27 @@ class UserService:
     def _connect(self):
         """Establish MongoDB connection"""
         try:
-            self.client = MongoClient(self.mongodb_uri, serverSelectionTimeoutMS=5000)
+            # Check if using MongoDB Atlas (contains mongodb+srv or .mongodb.net)
+            is_atlas = 'mongodb+srv' in self.mongodb_uri or '.mongodb.net' in self.mongodb_uri
+            
+            if is_atlas:
+                # MongoDB Atlas requires TLS with proper certificate verification
+                # Use ssl context for better compatibility
+                import ssl
+                ssl_context = ssl.create_default_context(cafile=certifi.where())
+                ssl_context.check_hostname = True
+                ssl_context.verify_mode = ssl.CERT_REQUIRED
+                
+                self.client = MongoClient(
+                    self.mongodb_uri,
+                    serverSelectionTimeoutMS=10000,
+                    tls=True,
+                    tlsCAFile=certifi.where(),
+                )
+            else:
+                # Local MongoDB
+                self.client = MongoClient(self.mongodb_uri, serverSelectionTimeoutMS=5000)
+            
             self.db = self.client[self.db_name]
             self.users_collection = self.db['users']
             # Test connection
@@ -189,4 +211,43 @@ class UserService:
             {'uid': uid},
             {'$set': {'onboarding_complete': True, 'updated_at': datetime.now().isoformat()}}
         )
+    
+    def list_users(self, limit: int = 100, skip: int = 0) -> List[Dict[str, Any]]:
+        """
+        List all users with pagination
+        
+        Args:
+            limit: Maximum number of users to return
+            skip: Number of users to skip
+            
+        Returns:
+            List of user profiles
+        """
+        self._ensure_connected()
+        cursor = self.users_collection.find(
+            {},
+            {'password': 0, '_id': 0}  # Exclude password and MongoDB _id
+        ).skip(skip).limit(limit)
+        
+        users = []
+        for user in cursor:
+            users.append({
+                'uid': user['uid'],
+                'email': user['email'],
+                'profile': user.get('profile', {}),
+                'onboarding_complete': user.get('onboarding_complete', False),
+                'vector_id': user.get('vector_id')
+            })
+        
+        return users
+    
+    def count_users(self) -> int:
+        """
+        Get total count of users
+        
+        Returns:
+            Total number of users
+        """
+        self._ensure_connected()
+        return self.users_collection.count_documents({})
 

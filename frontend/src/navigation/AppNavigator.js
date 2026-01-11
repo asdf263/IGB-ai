@@ -6,26 +6,23 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import { AuthContext } from '../context/AuthContext';
 import AuthNavigator from './AuthNavigator';
-import OnboardingNavigator from './OnboardingNavigator';
 
-// Lazy load screens - only import when needed
-// Using factory functions to enable better code splitting
-const createLazyScreen = (importFn) => {
-  let Component = null;
-  return (props) => {
-    if (!Component) {
-      Component = importFn();
-    }
-    return <Component {...props} />;
-  };
-};
+// #region agent log - debug import fix
+console.log('[DEBUG-H1] About to import screens');
+// #endregion
 
-// Lazy screen factories
-const UploadScreen = createLazyScreen(() => require('../screens/UploadScreen').UploadScreen);
-const AnalysisScreen = createLazyScreen(() => require('../screens/AnalysisScreen').AnalysisScreen);
-const VectorDetailScreen = createLazyScreen(() => require('../screens/VectorDetailScreen').VectorDetailScreen);
-const ClusterGraphScreen = createLazyScreen(() => require('../screens/ClusterGraphScreen').ClusterGraphScreen);
-const SyntheticScreen = createLazyScreen(() => require('../screens/SyntheticScreen').SyntheticScreen);
+// Import screens directly (they use export default)
+const AnalysisScreen = require('../screens/AnalysisScreen').default;
+const VectorDetailScreen = require('../screens/VectorDetailScreen').default;
+const ProfileScreen = require('../screens/ProfileScreen').default;
+const BrowseUsersScreen = require('../screens/BrowseUsersScreen').default;
+
+// #region agent log - debug import validation
+console.log('[DEBUG-H1] AnalysisScreen type:', typeof AnalysisScreen);
+console.log('[DEBUG-H1] VectorDetailScreen type:', typeof VectorDetailScreen);
+console.log('[DEBUG-H1] ProfileScreen type:', typeof ProfileScreen);
+console.log('[DEBUG-H1] BrowseUsersScreen type:', typeof BrowseUsersScreen);
+// #endregion
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -34,99 +31,52 @@ const TabIcon = ({ name, color, size }) => (
   <IconButton icon={name} iconColor={color} size={size} />
 );
 
-const MainTabs = () => {
-  return (
-    <Tab.Navigator
-      screenOptions={{
-        tabBarActiveTintColor: '#6200ee',
-        tabBarInactiveTintColor: '#999',
-        headerShown: false,
+const MainTabs = () => (
+  <Tab.Navigator
+    screenOptions={{
+      tabBarActiveTintColor: '#6200ee',
+      tabBarInactiveTintColor: '#999',
+      headerShown: false,
+    }}
+  >
+    <Tab.Screen
+      name="Browse"
+      component={BrowseUsersScreen}
+      options={{
+        tabBarLabel: 'Browse',
+        tabBarIcon: ({ color, size }) => <TabIcon name="account-search" color={color} size={size} />,
       }}
-      lazy={true}
-    >
-      <Tab.Screen
-        name="Upload"
-        component={UploadScreen}
-        options={{
-          tabBarLabel: 'Upload',
-          tabBarIcon: ({ color, size }) => (
-            <TabIcon name="cloud-upload" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Clusters"
-        component={ClusterGraphScreen}
-        options={{
-          tabBarLabel: 'Clusters',
-          tabBarIcon: ({ color, size }) => (
-            <TabIcon name="graph" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Synthetic"
-        component={SyntheticScreen}
-        options={{
-          tabBarLabel: 'Synthetic',
-          tabBarIcon: ({ color, size }) => (
-            <TabIcon name="creation" color={color} size={size} />
-          ),
-        }}
-      />
-    </Tab.Navigator>
-  );
-};
+    />
+    <Tab.Screen
+      name="Profile"
+      component={ProfileScreen}
+      options={{
+        tabBarLabel: 'Profile',
+        tabBarIcon: ({ color, size }) => <TabIcon name="account" color={color} size={size} />,
+      }}
+    />
+  </Tab.Navigator>
+);
 
-const MainAppNavigator = () => {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: '#6200ee',
-        },
-        headerTintColor: '#fff',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
-      }}
-    >
-      <Stack.Screen
-        name="Main"
-        component={MainTabs}
-        options={{ title: 'IGB AI - Behavior Vectors' }}
-      />
-      <Stack.Screen
-        name="Analysis"
-        component={AnalysisScreen}
-        options={{ title: 'Analysis Results' }}
-      />
-      <Stack.Screen
-        name="VectorDetail"
-        component={VectorDetailScreen}
-        options={{ title: 'Vector Details' }}
-      />
-      <Stack.Screen
-        name="ClusterGraph"
-        component={ClusterGraphScreen}
-        options={{ title: 'Cluster Visualization' }}
-      />
-    </Stack.Navigator>
-  );
-};
+const MainAppNavigator = () => (
+  <Stack.Navigator
+    screenOptions={{
+      headerStyle: { backgroundColor: '#6200ee' },
+      headerTintColor: '#fff',
+      headerTitleStyle: { fontWeight: 'bold' },
+    }}
+  >
+    <Stack.Screen name="Main" component={MainTabs} options={{ title: 'IGB AI' }} />
+    <Stack.Screen name="Analysis" component={AnalysisScreen} options={{ title: 'Analysis' }} />
+    <Stack.Screen name="VectorDetail" component={VectorDetailScreen} options={{ title: 'Vector Details' }} />
+    <Stack.Screen name="UserProfile" component={ProfileScreen} options={{ title: 'User Profile' }} />
+  </Stack.Navigator>
+);
 
 const AppNavigator = () => {
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppNavigator.js:119',message:'AppNavigator entry, before useContext',data:{AuthContext_defined:typeof AuthContext !== 'undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
-  const contextValue = useContext(AuthContext);
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppNavigator.js:121',message:'after useContext',data:{contextValue_defined:typeof contextValue !== 'undefined',contextValue_null:contextValue === null,has_isAuthenticated:contextValue?.isAuthenticated !== undefined},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
-  const { isAuthenticated, isLoading, user } = contextValue || {};
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppNavigator.js:123',message:'after destructuring',data:{isAuthenticated,isLoading,user_defined:typeof user !== 'undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
+  const { isAuthenticated, isLoading } = useContext(AuthContext) || {};
+
+  console.log('[NAV] AppNavigator render - isAuthenticated:', isAuthenticated, 'isLoading:', isLoading);
 
   if (isLoading) {
     return (
@@ -138,13 +88,7 @@ const AppNavigator = () => {
 
   return (
     <NavigationContainer>
-      {!isAuthenticated ? (
-        <AuthNavigator />
-      ) : !user?.onboarding_complete ? (
-        <OnboardingNavigator />
-      ) : (
-        <MainAppNavigator />
-      )}
+      {isAuthenticated ? <MainAppNavigator /> : <AuthNavigator />}
     </NavigationContainer>
   );
 };
