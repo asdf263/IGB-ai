@@ -1099,4 +1099,21 @@ async def create_personas_from_analysis(analysis_id: str):
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 8000))
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=port,
+        reload=True,
+        reload_excludes=[
+            "*/__pycache__/*",
+            "*/.venv/*",
+            "*/data/*",
+            "*/.*",
+            "*.pyc",
+            "*.pyo",
+            "*.db",
+            "*.sqlite3",
+            "*/node_modules/*",
+            "*/.git/*",
+        ]
+    )
