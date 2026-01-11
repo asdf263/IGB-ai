@@ -1,0 +1,1259 @@
+# BATCH2 Calibration Data
+
+Synthetic conversational data for calibrating vector components.
+
+---
+
+## 1. whitespace_ratio
+
+### VECTOR_NAME: whitespace_ratio
+### INTENSITY: 0.0
+
+```json
+{
+  "messages": [
+    {
+      "sender": "user",
+      "text": "nospaceshere",
+      "timestamp": 1716000000
+    },
+    {
+      "sender": "assistant",
+      "text": "allsqueezedtogether",
+      "timestamp": 1716000004
+    },
+    {
+      "sender": "user",
+      "text": "textcompressedcompletely",
+      "timestamp": 1716000008
+    },
+    {
+      "sender": "assistant",
+      "text": "nothingseparated",
+      "timestamp": 1716000012
+    },
+    {
+      "sender": "user",
+      "text": "continuouscharacters",
+      "timestamp": 1716000016
+    },
+    {
+      "sender": "assistant",
+      "text": "morejoinedwords",
+      "timestamp": 1716000020
+    },
+    {
+      "sender": "user",
+      "text": "letterscombinedagain",
+      "timestamp": 1716000024
+    },
+    {
+      "sender": "assistant",
+      "text": "stillcontinuous",
+      "timestamp": 1716000028
+    },
+    {
+      "sender": "user",
+      "text": "unbrokenstring",
+      "timestamp": 1716000032
+    },
+    {
+      "sender": "assistant",
+      "text": "nospacesanywhere",
+      "timestamp": 1716000036
+    }
+  ]
+}
+```
+
+---
+
+### VECTOR_NAME: whitespace_ratio
+### INTENSITY: 0.25
+
+```json
+{
+  "messages": [
+    {
+      "sender": "user",
+      "text": "somespaceherebutnotmuch",
+      "timestamp": 1716000100
+    },
+    {
+      "sender": "assistant",
+      "text": "small gap appears",
+      "timestamp": 1716000105
+    },
+    {
+      "sender": "user",
+      "text": "wordsstart separating",
+      "timestamp": 1716000110
+    },
+    {
+      "sender": "assistant",
+      "text": "few spaces used",
+      "timestamp": 1716000115
+    },
+    {
+      "sender": "user",
+      "text": "compact sentence still",
+      "timestamp": 1716000120
+    },
+    {
+      "sender": "assistant",
+      "text": "slightly spread text",
+      "timestamp": 1716000125
+    },
+    {
+      "sender": "user",
+      "text": "not many spaces",
+      "timestamp": 1716000130
+    },
+    {
+      "sender": "assistant",
+      "text": "compression remains",
+      "timestamp": 1716000135
+    },
+    {
+      "sender": "user",
+      "text": "limited whitespace used",
+      "timestamp": 1716000140
+    },
+    {
+      "sender": "assistant",
+      "text": "few gaps exist",
+      "timestamp": 1716000145
+    }
+  ]
+}
+```
+
+---
+
+### VECTOR_NAME: whitespace_ratio
+### INTENSITY: 0.5
+
+```json
+{
+  "messages": [
+    {
+      "sender": "user",
+      "text": "some text here now",
+      "timestamp": 1716000200
+    },
+    {
+      "sender": "assistant",
+      "text": "spaces appear regularly",
+      "timestamp": 1716000206
+    },
+    {
+      "sender": "user",
+      "text": "words are clearly separated",
+      "timestamp": 1716000212
+    },
+    {
+      "sender": "assistant",
+      "text": "normal spacing pattern",
+      "timestamp": 1716000218
+    },
+    {
+      "sender": "user",
+      "text": "conversation looks typical",
+      "timestamp": 1716000224
+    },
+    {
+      "sender": "assistant",
+      "text": "messages remain readable",
+      "timestamp": 1716000230
+    },
+    {
+      "sender": "user",
+      "text": "spacing not extreme",
+      "timestamp": 1716000236
+    },
+    {
+      "sender": "assistant",
+      "text": "neither dense nor sparse",
+      "timestamp": 1716000242
+    },
+    {
+      "sender": "user",
+      "text": "balanced white space",
+      "timestamp": 1716000248
+    },
+    {
+      "sender": "assistant",
+      "text": "ordinary separation",
+      "timestamp": 1716000254
+    }
+  ]
+}
+```
+
+---
+
+### VECTOR_NAME: whitespace_ratio
+### INTENSITY: 0.75
+
+```json
+{
+  "messages": [
+    {
+      "sender": "user",
+      "text": "this text contains a lot of white space spread across sentences",
+      "timestamp": 1716000300
+    },
+    {
+      "sender": "assistant",
+      "text": "many words are separated widely with clear spacing",
+      "timestamp": 1716000308
+    },
+    {
+      "sender": "user",
+      "text": "phrases are open and less compact",
+      "timestamp": 1716000316
+    },
+    {
+      "sender": "assistant",
+      "text": "extra spacing makes the content feel expanded",
+      "timestamp": 1716000324
+    },
+    {
+      "sender": "user",
+      "text": "several additional gaps exist between terms",
+      "timestamp": 1716000332
+    },
+    {
+      "sender": "assistant",
+      "text": "there is noticeably more space than usual",
+      "timestamp": 1716000340
+    },
+    {
+      "sender": "user",
+      "text": "text stretches across the line comfortably",
+      "timestamp": 1716000348
+    },
+    {
+      "sender": "assistant",
+      "text": "this spacing is intentional",
+      "timestamp": 1716000356
+    },
+    {
+      "sender": "user",
+      "text": "wide separation improves clarity",
+      "timestamp": 1716000364
+    },
+    {
+      "sender": "assistant",
+      "text": "whitespace remains abundant",
+      "timestamp": 1716000372
+    }
+  ]
+}
+```
+
+---
+
+### VECTOR_NAME: whitespace_ratio
+### INTENSITY: 1.0
+
+```json
+{
+  "messages": [
+    {
+      "sender": "user",
+      "text": "t   h   i   s     t   e   x   t     i   s     s   p   a   c   e   d",
+      "timestamp": 1716000400
+    },
+    {
+      "sender": "assistant",
+      "text": "e   x   t   r   e   m   e     w   h   i   t   e   s   p   a   c   e",
+      "timestamp": 1716000408
+    },
+    {
+      "sender": "user",
+      "text": "e   v   e   r   y     c   h   a   r   a   c   t   e   r     s   e   p   a   r   a   t   e",
+      "timestamp": 1716000416
+    },
+    {
+      "sender": "assistant",
+      "text": "n   o     c   o   m   p   a   c   t   i   o   n",
+      "timestamp": 1716000424
+    },
+    {
+      "sender": "user",
+      "text": "w   h   i   t   e   s   p   a   c   e     m   a   x   i   m   u   m",
+      "timestamp": 1716000432
+    },
+    {
+      "sender": "assistant",
+      "text": "s   t   r   e   t   c   h   e   d     t   e   x   t",
+      "timestamp": 1716000440
+    },
+    {
+      "sender": "user",
+      "text": "g   a   p   s     e   v   e   r   y   w   h   e   r   e",
+      "timestamp": 1716000448
+    },
+    {
+      "sender": "assistant",
+      "text": "s   p   a   c   i   n   g     d   o   m   i   n   a   t   e   s",
+      "timestamp": 1716000456
+    },
+    {
+      "sender": "user",
+      "text": "m   i   n   i   m   a   l     t   o   k   e   n     d   e   n   s   i   t   y",
+      "timestamp": 1716000464
+    },
+    {
+      "sender": "assistant",
+      "text": "m   a   x   i   m   a   l     w   h   i   t   e   s   p   a   c   e",
+      "timestamp": 1716000472
+    }
+  ]
+}
+```
+
+---
+
+---
+
+## 2. uppercase_ratio
+
+### VECTOR_NAME: uppercase_ratio
+### INTENSITY: 0.0
+
+```json
+{
+  "messages": [
+    {
+      "sender": "user",
+      "text": "all text is lowercase only",
+      "timestamp": 1716001000
+    },
+    {
+      "sender": "assistant",
+      "text": "no uppercase letters appear",
+      "timestamp": 1716001005
+    },
+    {
+      "sender": "user",
+      "text": "everything remains small",
+      "timestamp": 1716001010
+    },
+    {
+      "sender": "assistant",
+      "text": "completely lowercase writing",
+      "timestamp": 1716001015
+    },
+    {
+      "sender": "user",
+      "text": "simple lowercase sentences",
+      "timestamp": 1716001020
+    },
+    {
+      "sender": "assistant",
+      "text": "not a single capital",
+      "timestamp": 1716001025
+    },
+    {
+      "sender": "user",
+      "text": "lowercase throughout conversation",
+      "timestamp": 1716001030
+    },
+    {
+      "sender": "assistant",
+      "text": "no capitalization used anywhere",
+      "timestamp": 1716001035
+    },
+    {
+      "sender": "user",
+      "text": "plain small letters only",
+      "timestamp": 1716001040
+    },
+    {
+      "sender": "assistant",
+      "text": "still lowercase text",
+      "timestamp": 1716001045
+    }
+  ]
+}
+```
+
+---
+
+### VECTOR_NAME: uppercase_ratio
+### INTENSITY: 0.25
+
+```json
+{
+  "messages": [
+    {
+      "sender": "user",
+      "text": "Some words are capitalized here",
+      "timestamp": 1716001100
+    },
+    {
+      "sender": "assistant",
+      "text": "others remain in lowercase form",
+      "timestamp": 1716001106
+    },
+    {
+      "sender": "user",
+      "text": "We are mixing cases slightly",
+      "timestamp": 1716001112
+    },
+    {
+      "sender": "assistant",
+      "text": "but most letters are still small",
+      "timestamp": 1716001118
+    },
+    {
+      "sender": "user",
+      "text": "Occasional capitals appear",
+      "timestamp": 1716001124
+    },
+    {
+      "sender": "assistant",
+      "text": "overall lowercase dominates",
+      "timestamp": 1716001130
+    },
+    {
+      "sender": "user",
+      "text": "A few capitals begin sentences",
+      "timestamp": 1716001136
+    },
+    {
+      "sender": "assistant",
+      "text": "yet majority remains lowercase",
+      "timestamp": 1716001142
+    },
+    {
+      "sender": "user",
+      "text": "Some Proper nouns occur",
+      "timestamp": 1716001148
+    },
+    {
+      "sender": "assistant",
+      "text": "lowercase mostly persists",
+      "timestamp": 1716001154
+    }
+  ]
+}
+```
+
+---
+
+### VECTOR_NAME: uppercase_ratio
+### INTENSITY: 0.5
+
+```json
+{
+  "messages": [
+    {
+      "sender": "user",
+      "text": "This Text Uses Mixed Case Regularly",
+      "timestamp": 1716001200
+    },
+    {
+      "sender": "assistant",
+      "text": "Both Uppercase And Lowercase Appear",
+      "timestamp": 1716001206
+    },
+    {
+      "sender": "user",
+      "text": "Capitalization Happens Often",
+      "timestamp": 1716001212
+    },
+    {
+      "sender": "assistant",
+      "text": "Lowercase Still Shares Space",
+      "timestamp": 1716001218
+    },
+    {
+      "sender": "user",
+      "text": "About Half Of Tokens Use Capitals",
+      "timestamp": 1716001224
+    },
+    {
+      "sender": "assistant",
+      "text": "The Rest Are Lowercase Words",
+      "timestamp": 1716001230
+    },
+    {
+      "sender": "user",
+      "text": "Case Variation Occurs Frequently",
+      "timestamp": 1716001236
+    },
+    {
+      "sender": "assistant",
+      "text": "Neither Type Dominates Fully",
+      "timestamp": 1716001242
+    },
+    {
+      "sender": "user",
+      "text": "Balanced Case Distribution",
+      "timestamp": 1716001248
+    },
+    {
+      "sender": "assistant",
+      "text": "Moderate Capital Presence",
+      "timestamp": 1716001254
+    }
+  ]
+}
+```
+
+---
+
+### VECTOR_NAME: uppercase_ratio
+### INTENSITY: 0.75
+
+```json
+{
+  "messages": [
+    {
+      "sender": "user",
+      "text": "MOST OF THIS TEXT USES CAPITAL LETTERS NOW",
+      "timestamp": 1716001300
+    },
+    {
+      "sender": "assistant",
+      "text": "ONLY SOME WORDS ARE LOWERCASE",
+      "timestamp": 1716001308
+    },
+    {
+      "sender": "user",
+      "text": "CAPITALIZATION DOMINATES STRONGLY",
+      "timestamp": 1716001316
+    },
+    {
+      "sender": "assistant",
+      "text": "FEW LOWERCASE TOKENS REMAIN",
+      "timestamp": 1716001324
+    },
+    {
+      "sender": "user",
+      "text": "UPPERCASE IS PREVALENT HERE",
+      "timestamp": 1716001332
+    },
+    {
+      "sender": "assistant",
+      "text": "THE CONVERSATION IS MOSTLY CAPITALIZED",
+      "timestamp": 1716001340
+    },
+    {
+      "sender": "user",
+      "text": "RARE lowercase occurs",
+      "timestamp": 1716001348
+    },
+    {
+      "sender": "assistant",
+      "text": "NEAR MAXIMUM CAPITALIZATION",
+      "timestamp": 1716001356
+    },
+    {
+      "sender": "user",
+      "text": "STRONG UPPERCASE PRESENCE",
+      "timestamp": 1716001364
+    },
+    {
+      "sender": "assistant",
+      "text": "MINIMAL LOWERCASE LEFT",
+      "timestamp": 1716001372
+    }
+  ]
+}
+```
+
+---
+
+### VECTOR_NAME: uppercase_ratio
+### INTENSITY: 1.0
+
+```json
+{
+  "messages": [
+    {
+      "sender": "user",
+      "text": "ALL WORDS ARE FULLY CAPITALIZED",
+      "timestamp": 1716001400
+    },
+    {
+      "sender": "assistant",
+      "text": "EVERY SINGLE LETTER IS UPPERCASE",
+      "timestamp": 1716001408
+    },
+    {
+      "sender": "user",
+      "text": "NO LOWERCASE APPEARS AT ALL",
+      "timestamp": 1716001416
+    },
+    {
+      "sender": "assistant",
+      "text": "TOTAL CAPITALIZATION THROUGHOUT",
+      "timestamp": 1716001424
+    },
+    {
+      "sender": "user",
+      "text": "EVERY TOKEN IS CAPITALIZED",
+      "timestamp": 1716001432
+    },
+    {
+      "sender": "assistant",
+      "text": "THE CONVERSATION USES ONLY UPPERCASE",
+      "timestamp": 1716001440
+    },
+    {
+      "sender": "user",
+      "text": "ABSOLUTE MAXIMUM UPPERCASE RATIO",
+      "timestamp": 1716001448
+    },
+    {
+      "sender": "assistant",
+      "text": "NO SMALL LETTERS EXIST",
+      "timestamp": 1716001456
+    },
+    {
+      "sender": "user",
+      "text": "EVERY CHARACTER IS UPPERCASE",
+      "timestamp": 1716001464
+    },
+    {
+      "sender": "assistant",
+      "text": "COMPLETE UPPERCASE COVERAGE",
+      "timestamp": 1716001472
+    }
+  ]
+}
+```
+
+---
+
+---
+
+## 3. digit_ratio
+
+### VECTOR_NAME: digit_ratio
+### INTENSITY: 0.0
+
+```json
+{
+  "messages": [
+    {
+      "sender": "user",
+      "text": "there are no digits here",
+      "timestamp": 1716002000
+    },
+    {
+      "sender": "assistant",
+      "text": "text only without numbers",
+      "timestamp": 1716002006
+    },
+    {
+      "sender": "user",
+      "text": "all words and letters",
+      "timestamp": 1716002012
+    },
+    {
+      "sender": "assistant",
+      "text": "still no digits present",
+      "timestamp": 1716002018
+    },
+    {
+      "sender": "user",
+      "text": "purely verbal content",
+      "timestamp": 1716002024
+    },
+    {
+      "sender": "assistant",
+      "text": "conversation remains numeric free",
+      "timestamp": 1716002030
+    },
+    {
+      "sender": "user",
+      "text": "zero numerals included",
+      "timestamp": 1716002036
+    },
+    {
+      "sender": "assistant",
+      "text": "no numbers appear",
+      "timestamp": 1716002042
+    },
+    {
+      "sender": "user",
+      "text": "letters only throughout",
+      "timestamp": 1716002048
+    },
+    {
+      "sender": "assistant",
+      "text": "still nothing numeric",
+      "timestamp": 1716002054
+    }
+  ]
+}
+```
+
+---
+
+### VECTOR_NAME: digit_ratio
+### INTENSITY: 0.25
+
+```json
+{
+  "messages": [
+    {
+      "sender": "user",
+      "text": "I saw 1 example today",
+      "timestamp": 1716002100
+    },
+    {
+      "sender": "assistant",
+      "text": "there were 2 options",
+      "timestamp": 1716002106
+    },
+    {
+      "sender": "user",
+      "text": "we selected 1 choice",
+      "timestamp": 1716002112
+    },
+    {
+      "sender": "assistant",
+      "text": "only a few digits appear",
+      "timestamp": 1716002118
+    },
+    {
+      "sender": "user",
+      "text": "mostly words with 1 number",
+      "timestamp": 1716002124
+    },
+    {
+      "sender": "assistant",
+      "text": "light numeric presence",
+      "timestamp": 1716002130
+    },
+    {
+      "sender": "user",
+      "text": "digits are rare",
+      "timestamp": 1716002136
+    },
+    {
+      "sender": "assistant",
+      "text": "text dominates overall",
+      "timestamp": 1716002142
+    },
+    {
+      "sender": "user",
+      "text": "we used just 1 or 2 digits",
+      "timestamp": 1716002148
+    },
+    {
+      "sender": "assistant",
+      "text": "ratio remains low",
+      "timestamp": 1716002154
+    }
+  ]
+}
+```
+
+---
+
+### VECTOR_NAME: digit_ratio
+### INTENSITY: 0.5
+
+```json
+{
+  "messages": [
+    {
+      "sender": "user",
+      "text": "we have 2 tasks and 3 meetings",
+      "timestamp": 1716002200
+    },
+    {
+      "sender": "assistant",
+      "text": "there are 4 notes and 5 reminders",
+      "timestamp": 1716002207
+    },
+    {
+      "sender": "user",
+      "text": "I finished 1 item and 2 remain",
+      "timestamp": 1716002214
+    },
+    {
+      "sender": "assistant",
+      "text": "schedule lists 6 events",
+      "timestamp": 1716002221
+    },
+    {
+      "sender": "user",
+      "text": "total is 3 completed",
+      "timestamp": 1716002228
+    },
+    {
+      "sender": "assistant",
+      "text": "remaining 3 items later",
+      "timestamp": 1716002235
+    },
+    {
+      "sender": "user",
+      "text": "numbers appear frequently",
+      "timestamp": 1716002242
+    },
+    {
+      "sender": "assistant",
+      "text": "text also appears often",
+      "timestamp": 1716002249
+    },
+    {
+      "sender": "user",
+      "text": "balanced digits and words",
+      "timestamp": 1716002256
+    },
+    {
+      "sender": "assistant",
+      "text": "mixed numeric content",
+      "timestamp": 1716002263
+    }
+  ]
+}
+```
+
+---
+
+### VECTOR_NAME: digit_ratio
+### INTENSITY: 0.75
+
+```json
+{
+  "messages": [
+    {
+      "sender": "user",
+      "text": "today 3 reports 4 datasets 5 results",
+      "timestamp": 1716002300
+    },
+    {
+      "sender": "assistant",
+      "text": "we processed 7 files 8 logs",
+      "timestamp": 1716002307
+    },
+    {
+      "sender": "user",
+      "text": "only 2 sentences used words",
+      "timestamp": 1716002314
+    },
+    {
+      "sender": "assistant",
+      "text": "9 updates 10 revisions",
+      "timestamp": 1716002321
+    },
+    {
+      "sender": "user",
+      "text": "6 analyses completed",
+      "timestamp": 1716002328
+    },
+    {
+      "sender": "assistant",
+      "text": "11 remaining items",
+      "timestamp": 1716002335
+    },
+    {
+      "sender": "user",
+      "text": "12 cases evaluated",
+      "timestamp": 1716002342
+    },
+    {
+      "sender": "assistant",
+      "text": "13 metrics tracked",
+      "timestamp": 1716002349
+    },
+    {
+      "sender": "user",
+      "text": "digits dominate text",
+      "timestamp": 1716002356
+    },
+    {
+      "sender": "assistant",
+      "text": "very high numeric ratio",
+      "timestamp": 1716002363
+    }
+  ]
+}
+```
+
+---
+
+### VECTOR_NAME: digit_ratio
+### INTENSITY: 1.0
+
+```json
+{
+  "messages": [
+    {
+      "sender": "user",
+      "text": "1 2 3 4 5",
+      "timestamp": 1716002400
+    },
+    {
+      "sender": "assistant",
+      "text": "6 7 8 9",
+      "timestamp": 1716002406
+    },
+    {
+      "sender": "user",
+      "text": "10 11 12",
+      "timestamp": 1716002412
+    },
+    {
+      "sender": "assistant",
+      "text": "13 14 15",
+      "timestamp": 1716002418
+    },
+    {
+      "sender": "user",
+      "text": "16 17 18",
+      "timestamp": 1716002424
+    },
+    {
+      "sender": "assistant",
+      "text": "19 20 21",
+      "timestamp": 1716002430
+    },
+    {
+      "sender": "user",
+      "text": "22 23 24",
+      "timestamp": 1716002436
+    },
+    {
+      "sender": "assistant",
+      "text": "25 26 27",
+      "timestamp": 1716002442
+    },
+    {
+      "sender": "user",
+      "text": "28 29 30",
+      "timestamp": 1716002448
+    },
+    {
+      "sender": "assistant",
+      "text": "31 32 33",
+      "timestamp": 1716002454
+    }
+  ]
+}
+```
+
+---
+
+---
+
+## 4. all_caps_word_ratio
+
+### VECTOR_NAME: all_caps_word_ratio
+### INTENSITY: 0.0
+
+```json
+{
+  "messages": [
+    {
+      "sender": "user",
+      "text": "no words are in full capitals here",
+      "timestamp": 1716003000
+    },
+    {
+      "sender": "assistant",
+      "text": "everything remains normally written",
+      "timestamp": 1716003005
+    },
+    {
+      "sender": "user",
+      "text": "there are no fully capitalized tokens",
+      "timestamp": 1716003010
+    },
+    {
+      "sender": "assistant",
+      "text": "text stays in regular case",
+      "timestamp": 1716003015
+    },
+    {
+      "sender": "user",
+      "text": "conversation uses standard casing",
+      "timestamp": 1716003020
+    },
+    {
+      "sender": "assistant",
+      "text": "no complete uppercase words",
+      "timestamp": 1716003025
+    },
+    {
+      "sender": "user",
+      "text": "all words look conventional",
+      "timestamp": 1716003030
+    },
+    {
+      "sender": "assistant",
+      "text": "none appear fully capitalized",
+      "timestamp": 1716003035
+    },
+    {
+      "sender": "user",
+      "text": "still normal capitalization pattern",
+      "timestamp": 1716003040
+    },
+    {
+      "sender": "assistant",
+      "text": "no all caps detected",
+      "timestamp": 1716003045
+    }
+  ]
+}
+```
+
+---
+
+### VECTOR_NAME: all_caps_word_ratio
+### INTENSITY: 0.25
+
+```json
+{
+  "messages": [
+    {
+      "sender": "user",
+      "text": "we should review THIS item later",
+      "timestamp": 1716003100
+    },
+    {
+      "sender": "assistant",
+      "text": "only SOME words appear capitalized",
+      "timestamp": 1716003106
+    },
+    {
+      "sender": "user",
+      "text": "most remain standard",
+      "timestamp": 1716003112
+    },
+    {
+      "sender": "assistant",
+      "text": "the ALL CAPS tokens are rare",
+      "timestamp": 1716003118
+    },
+    {
+      "sender": "user",
+      "text": "conversation is mostly lower case",
+      "timestamp": 1716003124
+    },
+    {
+      "sender": "assistant",
+      "text": "BUT some emphasis exists",
+      "timestamp": 1716003130
+    },
+    {
+      "sender": "user",
+      "text": "overall few all caps",
+      "timestamp": 1716003136
+    },
+    {
+      "sender": "assistant",
+      "text": "ratio stays low",
+      "timestamp": 1716003142
+    },
+    {
+      "sender": "user",
+      "text": "SOME emphasis occurs",
+      "timestamp": 1716003148
+    },
+    {
+      "sender": "assistant",
+      "text": "most words are normal",
+      "timestamp": 1716003154
+    }
+  ]
+}
+```
+
+---
+
+### VECTOR_NAME: all_caps_word_ratio
+### INTENSITY: 0.5
+
+```json
+{
+  "messages": [
+    {
+      "sender": "user",
+      "text": "many WORDS are WRITTEN in FULL CAPS",
+      "timestamp": 1716003200
+    },
+    {
+      "sender": "assistant",
+      "text": "others remain in normal case",
+      "timestamp": 1716003207
+    },
+    {
+      "sender": "user",
+      "text": "HALF of the tokens use emphasis",
+      "timestamp": 1716003214
+    },
+    {
+      "sender": "assistant",
+      "text": "remaining tokens do not",
+      "timestamp": 1716003221
+    },
+    {
+      "sender": "user",
+      "text": "UPPERCASE appears FREQUENTLY",
+      "timestamp": 1716003228
+    },
+    {
+      "sender": "assistant",
+      "text": "lowercase still exists",
+      "timestamp": 1716003235
+    },
+    {
+      "sender": "user",
+      "text": "MIXED usage continues",
+      "timestamp": 1716003242
+    },
+    {
+      "sender": "assistant",
+      "text": "ratio becomes balanced",
+      "timestamp": 1716003249
+    },
+    {
+      "sender": "user",
+      "text": "several WORDS emphasized",
+      "timestamp": 1716003256
+    },
+    {
+      "sender": "assistant",
+      "text": "others stay standard",
+      "timestamp": 1716003263
+    }
+  ]
+}
+```
+
+---
+
+### VECTOR_NAME: all_caps_word_ratio
+### INTENSITY: 0.75
+
+```json
+{
+  "messages": [
+    {
+      "sender": "user",
+      "text": "MOST WORDS ARE FULLY CAPITALIZED NOW with a few exceptions",
+      "timestamp": 1716003300
+    },
+    {
+      "sender": "assistant",
+      "text": "ALMOST EVERYTHING APPEARS IN ALL CAPS",
+      "timestamp": 1716003308
+    },
+    {
+      "sender": "user",
+      "text": "only several words are lowercase",
+      "timestamp": 1716003316
+    },
+    {
+      "sender": "assistant",
+      "text": "EMPHASIS IS DOMINANT HERE",
+      "timestamp": 1716003324
+    },
+    {
+      "sender": "user",
+      "text": "THE RATIO IS VERY HIGH",
+      "timestamp": 1716003332
+    },
+    {
+      "sender": "assistant",
+      "text": "lowercase words are rare",
+      "timestamp": 1716003340
+    },
+    {
+      "sender": "user",
+      "text": "SIGNIFICANT ALL CAPS PRESENCE",
+      "timestamp": 1716003348
+    },
+    {
+      "sender": "assistant",
+      "text": "STRONG UPPERCASE DOMINANCE",
+      "timestamp": 1716003356
+    },
+    {
+      "sender": "user",
+      "text": "few normal words exist",
+      "timestamp": 1716003364
+    },
+    {
+      "sender": "assistant",
+      "text": "HIGH EMPHASIS LEVEL",
+      "timestamp": 1716003372
+    }
+  ]
+}
+```
+
+---
+
+### VECTOR_NAME: all_caps_word_ratio
+### INTENSITY: 1.0
+
+```json
+{
+  "messages": [
+    {
+      "sender": "user",
+      "text": "EVERY SINGLE WORD IS ALL CAPS",
+      "timestamp": 1716003400
+    },
+    {
+      "sender": "assistant",
+      "text": "NO LOWERCASE WORDS APPEAR",
+      "timestamp": 1716003408
+    },
+    {
+      "sender": "user",
+      "text": "TOTAL UPPERCASE EMPHASIS",
+      "timestamp": 1716003416
+    },
+    {
+      "sender": "assistant",
+      "text": "COMPLETE CAPITALIZATION",
+      "timestamp": 1716003424
+    },
+    {
+      "sender": "user",
+      "text": "ABSOLUTE MAXIMUM ALL CAPS",
+      "timestamp": 1716003432
+    },
+    {
+      "sender": "assistant",
+      "text": "FULL EMPHASIS THROUGHOUT",
+      "timestamp": 1716003440
+    },
+    {
+      "sender": "user",
+      "text": "NO LOWERCASE ANYWHERE",
+      "timestamp": 1716003448
+    },
+    {
+      "sender": "assistant",
+      "text": "EVERY TOKEN CAPITALIZED",
+      "timestamp": 1716003456
+    },
+    {
+      "sender": "user",
+      "text": "ENTIRE CONVERSATION SHOUTED",
+      "timestamp": 1716003464
+    },
+    {
+      "sender": "assistant",
+      "text": "MAXIMUM ALL CAPS RATIO",
+      "timestamp": 1716003472
+    }
+  ]
+}
+```
+
+---

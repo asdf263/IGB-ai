@@ -9,7 +9,6 @@ from typing import List, Dict, Any, Tuple, Optional
 from .features.temporal_features import TemporalFeatureExtractor
 from .features.text_features import TextFeatureExtractor
 from .features.linguistic_features_spacy import LinguisticFeatureExtractorSpacy
-from .features.semantic_features_hf import SemanticFeatureExtractorHF
 from .features.sentiment_features import SentimentFeatureExtractor
 from .features.behavioral_features import BehavioralFeatureExtractor
 from .features.composite_features import CompositeFeatureExtractor
@@ -26,7 +25,6 @@ class UserFeatureExtractor:
         self.temporal_extractor = TemporalFeatureExtractor()
         self.text_extractor = TextFeatureExtractor()
         self.linguistic_extractor = LinguisticFeatureExtractorSpacy()
-        self.semantic_extractor = SemanticFeatureExtractorHF()
         self.sentiment_extractor = SentimentFeatureExtractor()
         self.behavioral_extractor = BehavioralFeatureExtractor()
         self.composite_extractor = CompositeFeatureExtractor()
@@ -62,7 +60,6 @@ class UserFeatureExtractor:
         temporal_features = self.temporal_extractor.extract(user_messages)
         text_features = self.text_extractor.extract(user_messages)
         linguistic_features = self.linguistic_extractor.extract(user_messages)
-        semantic_features = self.semantic_extractor.extract(user_messages)
         sentiment_features = self.sentiment_extractor.extract(user_messages)
         behavioral_features = self.behavioral_extractor.extract(messages, target_user)  # Needs full context
         
@@ -80,7 +77,7 @@ class UserFeatureExtractor:
             temporal_features=temporal_features,
             text_features=text_features,
             linguistic_features=linguistic_features,
-            semantic_features=semantic_features,
+            semantic_features={},
             sentiment_features=sentiment_features,
             behavioral_features=behavioral_features,
             graph_features={}
@@ -103,7 +100,6 @@ class UserFeatureExtractor:
         all_features.update({f'temporal_{k}': v for k, v in temporal_features.items()})
         all_features.update({f'text_{k}': v for k, v in text_features.items()})
         all_features.update({f'linguistic_{k}': v for k, v in linguistic_features.items()})
-        all_features.update({f'semantic_{k}': v for k, v in semantic_features.items()})
         all_features.update({f'sentiment_{k}': v for k, v in sentiment_features.items()})
         all_features.update({f'behavioral_{k}': v for k, v in behavioral_features.items()})
         all_features.update({f'composite_{k}': v for k, v in composite_features.items()})
@@ -227,7 +223,6 @@ class UserFeatureExtractor:
         names.extend([f'temporal_{n}' for n in self.temporal_extractor.get_feature_names()])
         names.extend([f'text_{n}' for n in self.text_extractor.get_feature_names()])
         names.extend([f'linguistic_{n}' for n in self.linguistic_extractor.get_feature_names()])
-        names.extend([f'semantic_{n}' for n in self.semantic_extractor.get_feature_names()])
         names.extend([f'sentiment_{n}' for n in self.sentiment_extractor.get_feature_names()])
         names.extend([f'behavioral_{n}' for n in self.behavioral_extractor.get_feature_names()])
         names.extend([f'composite_{n}' for n in self.composite_extractor.get_feature_names()])

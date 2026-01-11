@@ -1,6 +1,6 @@
 # Feature Extraction Documentation
 
-This document describes all features extracted from chat conversations, their types (raw vs synthetic/composite), calculation methods, and what the LLM personality system uses.
+Complete reference for all features extracted from chat conversations. All feature names, ranges, and counts match the actual implementation.
 
 ---
 
@@ -8,26 +8,24 @@ This document describes all features extracted from chat conversations, their ty
 
 | Category | Module | Feature Count | Type |
 |----------|--------|---------------|------|
-| Temporal | `temporal_features.py` | ~15 | Raw |
-| Text | `text_features.py` | 25 | Raw |
-| Linguistic | `linguistic_features_spacy.py` | 30 | Raw |
-| Semantic | `semantic_features_hf.py` | ~20 | Raw |
-| Sentiment | `sentiment_features.py` | 20 | Raw |
+| Temporal | `temporal_features.py` | 20 | Raw |
+| Text | `text_features.py` | 26 | Raw |
+| Linguistic | `linguistic_features_spacy.py` | 29 | Raw |
+| Sentiment | `sentiment_features.py` | 14 | Raw |
 | Behavioral | `behavioral_features.py` | 25 | Raw |
-| Graph | `graph_features.py` | ~15 | Raw |
-| Reaction | `reaction_features.py` | 30 | Raw |
+| Reaction | `reaction_features.py` | 29 | Raw |
+| Emotion | `emotion_transformer.py` | 20 | Raw (Transformer) |
+| Context | `conversation_context_features.py` | 25 | Raw |
 | Composite | `composite_features.py` | 15 | Synthetic |
-| **Emotion** | `emotion_transformer.py` | **20** | **Raw (Transformer)** |
-| **Context** | `conversation_context_features.py` | **25** | **Raw** |
-| LLM Synthetic | `llm_synthetic_features.py` | 20 | Synthetic |
+| LLM Synthetic | `llm_synthetic_features.py` | 25 | Synthetic |
 
-**Total: ~265 features**
+**Total: 228 features** (Semantic and Graph features removed)
 
 ---
 
 ## Raw Features
 
-### 1. Text Features (`text_features.py`)
+### 1. Text Features (`text_features.py`) - 26 features
 
 Basic text structure and metrics extracted directly from message content.
 
@@ -49,17 +47,45 @@ Basic text structure and metrics extracted directly from message content.
 | `shannon_entropy` | Word distribution entropy | 0-∞ |
 | `char_entropy` | Character distribution entropy | 0-∞ |
 | `stopword_ratio` | Stopwords / total words | 0-1 |
-| `uppercase_ratio` | Uppercase chars / total chars | 0-1 |
-| `digit_ratio` | Digit chars / total chars | 0-1 |
-| `punctuation_ratio` | Punctuation / total chars | 0-1 |
+| `uppercase_ratio` | Uppercase chars / total non-whitespace chars | 0-1 |
+| `digit_ratio` | Digit chars / total non-whitespace chars | 0-1 |
+| `punctuation_ratio` | Punctuation / total non-whitespace chars | 0-1 |
 | `whitespace_ratio` | Whitespace / total chars | 0-1 |
 | `emoji_density` | Emojis / total words | 0-∞ |
 | `url_density` | URLs / total words | 0-∞ |
 | `mention_density` | @mentions / total words | 0-∞ |
 | `hashtag_density` | #hashtags / total words | 0-∞ |
 | `question_mark_ratio` | Question marks / message count | 0-∞ |
+| `all_caps_word_ratio` | All-caps words / total words | 0-1 |
 
-### 2. Linguistic Features (`linguistic_features_spacy.py`)
+### 2. Temporal Features (`temporal_features.py`) - 20 features
+
+Timing patterns and temporal dynamics of messages.
+
+| Feature | Description | Range |
+|---------|-------------|-------|
+| `avg_response_latency` | Average time between messages (seconds) | 0-∞ |
+| `median_response_latency` | Median response time (seconds) | 0-∞ |
+| `std_response_latency` | Standard deviation of response times | 0-∞ |
+| `min_response_latency` | Minimum response time (seconds) | 0-∞ |
+| `max_response_latency` | Maximum response time (seconds) | 0-∞ |
+| `response_latency_skewness` | Skewness of response time distribution | -∞ to ∞ |
+| `response_latency_kurtosis` | Kurtosis of response time distribution | -∞ to ∞ |
+| `burstiness_score` | Burstiness of messaging pattern | -1 to 1 |
+| `message_interval_autocorr` | Autocorrelation of message intervals | -1 to 1 |
+| `avg_messages_per_hour` | Average messages per hour | 0-∞ |
+| `avg_messages_per_day` | Average messages per day | 0-∞ |
+| `message_frequency_variance` | Variance in messaging frequency | 0-∞ |
+| `session_count` | Number of conversation sessions | 0-∞ |
+| `avg_session_length` | Average session duration (seconds) | 0-∞ |
+| `circadian_morning_ratio` | Messages in morning (6am-12pm) / total | 0-1 |
+| `circadian_afternoon_ratio` | Messages in afternoon (12pm-6pm) / total | 0-1 |
+| `circadian_evening_ratio` | Messages in evening (6pm-12am) / total | 0-1 |
+| `circadian_night_ratio` | Messages at night (12am-6am) / total | 0-1 |
+| `weekday_ratio` | Messages on weekdays / total | 0-1 |
+| `weekend_ratio` | Messages on weekends / total | 0-1 |
+
+### 3. Linguistic Features (`linguistic_features_spacy.py`) - 29 features
 
 Grammar and syntax features extracted using spaCy NLP.
 
@@ -96,7 +122,7 @@ Grammar and syntax features extracted using spaCy NLP.
 | `avg_sentence_length` | Average tokens per sentence | 0-∞ |
 | `readability_score` | Flesch-Kincaid readability | 0-100 |
 
-### 3. Sentiment Features (`sentiment_features.py`)
+### 4. Sentiment Features (`sentiment_features.py`) - 14 features
 
 Emotional and sentiment analysis features.
 
@@ -114,18 +140,10 @@ Emotional and sentiment analysis features.
 | `sentiment_volatility` | Average absolute sentiment change | 0-2 | |
 | `sentiment_trend` | Linear trend slope | -∞ to ∞ | |
 | `sentiment_consistency` | 1 / (1 + std) | 0-1 | |
-| `emotion_joy_ratio` | Joy words / total emotion words | 0-1 | **Often 0** |
-| `emotion_sadness_ratio` | Sadness words / total emotion words | 0-1 | **Often 0** |
-| `emotion_anger_ratio` | Anger words / total emotion words | 0-1 | **Often 0** |
-| `emotion_fear_ratio` | Fear words / total emotion words | 0-1 | **Often 0** |
-| `emotion_surprise_ratio` | Surprise words / total emotion words | 0-1 | **Often 0** |
-| `emotion_disgust_ratio` | Disgust words / total emotion words | 0-1 | **Often 0** |
 | `emotional_intensity_mean` | Average intensity (intensifiers + punctuation) | 0-1 | |
 | `emotional_shift_frequency` | Significant sentiment shifts / transitions | 0-1 | |
 
-**Known Issue**: Emotion ratios often zero out because they rely on exact word matches from small lexicons. Most casual conversation doesn't use explicit emotion words like "joyful" or "furious".
-
-### 4. Behavioral Features (`behavioral_features.py`)
+### 5. Behavioral Features (`behavioral_features.py`) - 25 features
 
 Conversational behavior and social signal patterns.
 
@@ -157,7 +175,7 @@ Conversational behavior and social signal patterns.
 | `criticism_ratio` | Criticism phrases / messages | 0-1 |
 | `self_disclosure_level` | Self-disclosure phrases / messages | 0-1 |
 
-### 5. Reaction Features (`reaction_features.py`)
+### 6. Reaction Features (`reaction_features.py`) - 29 features
 
 How a user reacts to the other person's messages.
 
@@ -176,7 +194,7 @@ How a user reacts to the other person's messages.
 | `topic_following_rate` | Shared words / trigger words | 0-1 |
 | `topic_expansion_rate` | New words added / 10 | 0-1 |
 | `topic_deflection_rate` | Complete topic changes | 0-1 |
-| `semantic_alignment` | Word overlap average | 0-1 |
+| `semantic_alignment` | Word overlap average (text-based) | 0-1 |
 | `conversation_steering` | Questions in responses | 0-1 |
 | `affirmation_tendency` | Affirmation words in responses | 0-1 |
 | `disagreement_tendency` | Disagreement words in responses | 0-1 |
@@ -198,55 +216,33 @@ How a user reacts to the other person's messages.
 
 ## Synthetic/Composite Features
 
-### 6. Composite Features (`composite_features.py`)
+### 7. Emotion Transformer Features (`emotion_transformer.py`) - 20 features
 
-Derived features combining multiple raw features.
-
-| Feature | Calculation | Range |
-|---------|-------------|-------|
-| `social_energy_index` | msg_length × frequency × sentiment | 0-1 |
-| `emotional_volatility_index` | sentiment_std × latency_variance | 0-1 |
-| `attentiveness_index` | (question_freq + response_rate + speed) / 3 | 0-1 |
-| `confidence_index` | (assertive / hedge + assertiveness) / 2 | 0-1 |
-| `expressiveness_index` | (emoji × 10 + sentiment_range + intensity) / 3 | 0-1 |
-| `topic_coherence_score` | (coherence + concentration) / 2 | 0-1 |
-| `communication_efficiency` | (richness + elaboration) × length_factor | 0-1 |
-| `engagement_quality` | (engagement + response_rate + positive) / 3 | 0-1 |
-| `personality_consistency` | 1 - |formality - directness| | 0-1 |
-| `interaction_rhythm_score` | (1 - burstiness + balance) / 2 | 0-1 |
-| `semantic_richness` | (entropy + diversity) / 2 | 0-1 |
-| `conversational_depth` | (clause_depth + elaboration + abstraction) / 3 | 0-1 |
-| `responsiveness_quality` | (speed_score + response_rate) / 2 | 0-1 |
-| `emotional_intelligence_proxy` | (empathy + support + consistency) / 3 | 0-1 |
-| `overall_behavior_score` | Mean of all composite features | 0-1 |
-
-### 7. Emotion Transformer Features (`emotion_transformer.py`)
-
-**NEW**: Transformer-based emotion detection using HuggingFace models (replaces word-list based detection).
+Transformer-based emotion detection using HuggingFace models.
 
 Uses model: `SamLowe/roberta-base-go_emotions` (27 emotion labels, mapped to 10 categories)
 
 | Feature | Description | Range |
 |---------|-------------|-------|
-| `emotion_joy_score` | Joy/happiness intensity | 0-1 |
-| `emotion_sadness_score` | Sadness intensity | 0-1 |
-| `emotion_anger_score` | Anger intensity | 0-1 |
-| `emotion_fear_score` | Fear/anxiety intensity | 0-1 |
-| `emotion_surprise_score` | Surprise intensity | 0-1 |
-| `emotion_disgust_score` | Disgust intensity | 0-1 |
-| `emotion_love_score` | Love/affection intensity | 0-1 |
-| `emotion_optimism_score` | Optimism intensity | 0-1 |
-| `emotion_trust_score` | Trust intensity | 0-1 |
-| `emotion_anticipation_score` | Anticipation/excitement intensity | 0-1 |
-| `dominant_emotion_consistency` | How consistent is the dominant emotion | 0-1 |
-| `emotion_diversity` | How many different emotions expressed | 0-1 |
-| `emotion_intensity_mean` | Average emotional intensity | 0-1 |
-| `emotion_intensity_max` | Maximum emotional intensity | 0-1 |
-| `positive_emotion_ratio` | Positive / total emotions | 0-1 |
-| `negative_emotion_ratio` | Negative / total emotions | 0-1 |
-| `emotion_transition_rate` | How often dominant emotion changes | 0-1 |
-| `emotional_range` | Range of emotional intensity | 0-1 |
-| `emotion_entropy` | Entropy of emotion distribution | 0-1 |
+| `joy_score` | Joy/happiness intensity | 0-1 |
+| `sadness_score` | Sadness intensity | 0-1 |
+| `anger_score` | Anger intensity | 0-1 |
+| `fear_score` | Fear/anxiety intensity | 0-1 |
+| `surprise_score` | Surprise intensity | 0-1 |
+| `disgust_score` | Disgust intensity | 0-1 |
+| `love_score` | Love/affection intensity | 0-1 |
+| `optimism_score` | Optimism intensity | 0-1 |
+| `trust_score` | Trust intensity | 0-1 |
+| `anticipation_score` | Anticipation/excitement intensity | 0-1 |
+| `dominant_consistency` | How consistent is the dominant emotion | 0-1 |
+| `diversity` | How many different emotions expressed | 0-1 |
+| `intensity_mean` | Average emotional intensity | 0-1 |
+| `intensity_max` | Maximum emotional intensity | 0-1 |
+| `positive_ratio` | Positive / total emotions | 0-1 |
+| `negative_ratio` | Negative / total emotions | 0-1 |
+| `transition_rate` | How often dominant emotion changes | 0-1 |
+| `range` | Range of emotional intensity | 0-1 |
+| `entropy` | Entropy of emotion distribution | 0-1 |
 | `mixed_emotion_frequency` | How often multiple emotions co-occur | 0-1 |
 
 **Advantages over word-list approach**:
@@ -255,9 +251,9 @@ Uses model: `SamLowe/roberta-base-go_emotions` (27 emotion labels, mapped to 10 
 - Works with casual language, slang, and typos
 - Provides confidence scores, not binary detection
 
-### 8. Conversation Context Features (`conversation_context_features.py`)
+### 8. Conversation Context Features (`conversation_context_features.py`) - 25 features
 
-**NEW**: Features about conversation flow, topic transitions, and dialogue dynamics.
+Features about conversation flow, topic transitions, and dialogue dynamics.
 
 | Feature | Description | Range |
 |---------|-------------|-------|
@@ -287,27 +283,59 @@ Uses model: `SamLowe/roberta-base-go_emotions` (27 emotion labels, mapped to 10 
 | `phase_transition_smoothness` | How smooth are phase transitions | 0-1 |
 | `conversation_arc_completeness` | Does it have proper opening/closing | 0-1 |
 
-### 9. LLM Synthetic Features (`llm_synthetic_features.py`)
+### 9. Composite Features (`composite_features.py`) - 15 features
 
-High-level abstracted features designed for LLM personality synthesis. These are more interpretable and robust than raw features.
+Derived features combining multiple raw features.
 
-| Feature | Description | Calculation |
-|---------|-------------|-------------|
-| `communication_warmth` | Overall warmth/friendliness | sentiment + empathy + support + positive_ratio |
-| `intellectual_engagement` | Depth of thought/analysis | vocabulary_richness + question_freq + elaboration + complexity |
-| `social_dominance` | Conversational control | initiation + dominance + assertiveness + topic_control |
-| `emotional_expressiveness` | Emotional display level | emoji + exclamation + sentiment_range + intensity |
-| `conversational_energy` | Overall energy/enthusiasm | response_enthusiasm + engagement + word_count + exclamation |
-| `linguistic_sophistication` | Language complexity | readability + lexical_richness + sentence_length + vocabulary |
-| `interpersonal_attunement` | Responsiveness to others | mirroring + matching + responsiveness + alignment |
-| `self_focus_tendency` | Self vs other orientation | first_person + self_disclosure + topic_deflection |
-| `humor_playfulness` | Lightheartedness | humor_density + lol_ratio + playful_markers |
-| `formality_level` | Formal vs casual style | formality + formal_markers - informal_markers |
-| `agreement_orientation` | Agreeable vs challenging | affirmation + agreement - disagreement |
-| `emotional_stability` | Consistency of mood | 1 - volatility - sentiment_std |
-| `curiosity_openness` | Interest in new topics | question_freq + topic_expansion + interest_signals |
-| `supportiveness` | Tendency to support others | support_ratio + empathy + encouragement |
-| `directness_clarity` | Clear vs hedged communication | directness + assertiveness - hedge_ratio |
+| Feature | Calculation | Range |
+|---------|-------------|-------|
+| `social_energy_index` | msg_length × frequency × sentiment | 0-1 |
+| `emotional_volatility_index` | sentiment_std × latency_variance | 0-1 |
+| `attentiveness_index` | (question_freq + response_rate + speed) / 3 | 0-1 |
+| `confidence_index` | (assertive / hedge + assertiveness) / 2 | 0-1 |
+| `expressiveness_index` | (emoji × 10 + sentiment_range + intensity) / 3 | 0-1 |
+| `topic_coherence_score` | (coherence + concentration) / 2 | 0-1 |
+| `communication_efficiency` | (richness + elaboration) × length_factor | 0-1 |
+| `engagement_quality` | (engagement + response_rate + positive) / 3 | 0-1 |
+| `personality_consistency` | 1 - |formality - directness| | 0-1 |
+| `interaction_rhythm_score` | (1 - burstiness + balance) / 2 | 0-1 |
+| `semantic_richness` | (entropy + lexical_richness) / 2 | 0-1 |
+| `conversational_depth` | (clause_depth + elaboration + complexity) / 3 | 0-1 |
+| `responsiveness_quality` | (speed_score + response_rate) / 2 | 0-1 |
+| `emotional_intelligence_proxy` | (empathy + support + consistency) / 3 | 0-1 |
+| `overall_behavior_score` | Mean of all composite features | 0-1 |
+
+### 10. LLM Synthetic Features (`llm_synthetic_features.py`) - 25 features
+
+High-level abstracted features designed for LLM personality synthesis. More interpretable and robust than raw features.
+
+| Feature | Description | Range |
+|---------|-------------|-------|
+| `communication_warmth` | Overall warmth/friendliness | 0-1 |
+| `intellectual_engagement` | Depth of thought/analysis | 0-1 |
+| `social_dominance` | Conversational control | 0-1 |
+| `emotional_expressiveness` | Emotional display level | 0-1 |
+| `conversational_energy` | Overall energy/enthusiasm | 0-1 |
+| `linguistic_sophistication` | Language complexity | 0-1 |
+| `interpersonal_attunement` | Responsiveness to others | 0-1 |
+| `self_focus_tendency` | Self vs other orientation | 0-1 |
+| `humor_playfulness` | Lightheartedness | 0-1 |
+| `formality_level` | Formal vs casual style | 0-1 |
+| `agreement_orientation` | Agreeable vs challenging | 0-1 |
+| `emotional_stability` | Consistency of mood | 0-1 |
+| `curiosity_openness` | Interest in new topics | 0-1 |
+| `supportiveness` | Tendency to support others | 0-1 |
+| `directness_clarity` | Clear vs hedged communication | 0-1 |
+| `verbosity_level` | Response length/detail | 0-1 |
+| `positivity_bias` | Positive vs negative tone | 0-1 |
+| `engagement_consistency` | Consistency of engagement | 0-1 |
+| `adaptive_communication` | Style adaptation to partner | 0-1 |
+| `conversational_initiative` | Tendency to lead conversation | 0-1 |
+| `typing_intensity` | Uppercase/punctuation intensity | 0-1 |
+| `message_brevity` | Short vs long messages | 0-1 |
+| `response_tempo` | Fast vs slow response pattern | 0-1 |
+| `text_expressiveness` | Emoji/punctuation expressiveness | 0-1 |
+| `conversation_rhythm` | Consistency of messaging rhythm | 0-1 |
 
 ---
 

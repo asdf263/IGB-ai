@@ -1,0 +1,439 @@
+{
+  "circadian_morning_ratio": {
+    "0.0": {
+      "messages": [
+        {"sender": "user", "text": "we will talk later today", "timestamp": 1716054000},
+        {"sender": "assistant", "text": "let us continue this afternoon", "timestamp": 1716057600},
+        {"sender": "user", "text": "evening works for me", "timestamp": 1716064800},
+        {"sender": "assistant", "text": "night might also be fine", "timestamp": 1716072000},
+        {"sender": "user", "text": "not in the morning", "timestamp": 1716075600},
+        {"sender": "assistant", "text": "avoid early hours", "timestamp": 1716079200},
+        {"sender": "user", "text": "later in the day makes sense", "timestamp": 1716082800},
+        {"sender": "assistant", "text": "we can schedule late", "timestamp": 1716086400},
+        {"sender": "user", "text": "afternoon or evening preferred", "timestamp": 1716090000},
+        {"sender": "assistant", "text": "morning will not be used", "timestamp": 1716093600}
+      ]
+    },
+    "0.25": {
+      "messages": [
+        {"sender": "user", "text": "a few messages arrive in the morning", "timestamp": 1716010800},
+        {"sender": "assistant", "text": "then most occur later in the day", "timestamp": 1716032400},
+        {"sender": "user", "text": "afternoon discussion follows", "timestamp": 1716043200},
+        {"sender": "assistant", "text": "evening response as well", "timestamp": 1716050400},
+        {"sender": "user", "text": "only some morning activity", "timestamp": 1716014400},
+        {"sender": "assistant", "text": "most are afternoon or evening", "timestamp": 1716057600},
+        {"sender": "user", "text": "night messages appear too", "timestamp": 1716079200},
+        {"sender": "assistant", "text": "ratio favors later hours", "timestamp": 1716086400},
+        {"sender": "user", "text": "few early interactions", "timestamp": 1716018000},
+        {"sender": "assistant", "text": "mainly not morning", "timestamp": 1716090000}
+      ]
+    },
+    "0.5": {
+      "messages": [
+        {"sender": "user", "text": "we start talking in the morning", "timestamp": 1716007200},
+        {"sender": "assistant", "text": "some messages later", "timestamp": 1716028800},
+        {"sender": "user", "text": "morning again with updates", "timestamp": 1716010800},
+        {"sender": "assistant", "text": "afternoon work continues", "timestamp": 1716036000},
+        {"sender": "user", "text": "half occur before noon", "timestamp": 1716014400},
+        {"sender": "assistant", "text": "half after noon", "timestamp": 1716043200},
+        {"sender": "user", "text": "morning replies exist", "timestamp": 1716018000},
+        {"sender": "assistant", "text": "evening replies exist too", "timestamp": 1716061200},
+        {"sender": "user", "text": "balanced daily timing", "timestamp": 1716021600},
+        {"sender": "assistant", "text": "roughly equal distribution", "timestamp": 1716068400}
+      ]
+    },
+    "0.75": {
+      "messages": [
+        {"sender": "user", "text": "most messages are sent during morning hours", "timestamp": 1716003600},
+        {"sender": "assistant", "text": "more morning coordination happens", "timestamp": 1716005400},
+        {"sender": "user", "text": "early updates continue", "timestamp": 1716007200},
+        {"sender": "assistant", "text": "several morning reminders", "timestamp": 1716009000},
+        {"sender": "user", "text": "few afternoon notes", "timestamp": 1716036000},
+        {"sender": "assistant", "text": "some evening responses", "timestamp": 1716064800},
+        {"sender": "user", "text": "predominantly before noon", "timestamp": 1716010800},
+        {"sender": "assistant", "text": "limited later discussion", "timestamp": 1716075600},
+        {"sender": "user", "text": "morning dominates here", "timestamp": 1716012600},
+        {"sender": "assistant", "text": "early time sends most", "timestamp": 1716014400}
+      ]
+    },
+    "1.0": {
+      "messages": [
+        {"sender": "user", "text": "all of these messages occur during morning hours", "timestamp": 1716001800},
+        {"sender": "assistant", "text": "every interaction before noon", "timestamp": 1716003600},
+        {"sender": "user", "text": "strictly early communication", "timestamp": 1716005400},
+        {"sender": "assistant", "text": "noon not yet reached", "timestamp": 1716007200},
+        {"sender": "user", "text": "only morning discussion", "timestamp": 1716009000},
+        {"sender": "assistant", "text": "all messages before midday", "timestamp": 1716010800},
+        {"sender": "user", "text": "consistent morning timing", "timestamp": 1716012600},
+        {"sender": "assistant", "text": "nothing scheduled for later", "timestamp": 1716014400},
+        {"sender": "user", "text": "exclusive early window", "timestamp": 1716016200},
+        {"sender": "assistant", "text": "complete morning concentration", "timestamp": 1716018000}
+      ]
+    }
+  },
+
+  "circadian_afternoon_ratio": {
+    "0.0": {
+      "messages": [
+        {"sender": "user", "text": "all conversation happens outside afternoon", "timestamp": 1715985600},
+        {"sender": "assistant", "text": "messages are in morning", "timestamp": 1715992800},
+        {"sender": "user", "text": "or late evening", "timestamp": 1716021600},
+        {"sender": "assistant", "text": "or night hours", "timestamp": 1716036000},
+        {"sender": "user", "text": "none after noon to evening", "timestamp": 1716043200},
+        {"sender": "assistant", "text": "no mid day content", "timestamp": 1716046800},
+        {"sender": "user", "text": "strict avoidance of afternoon", "timestamp": 1716050400},
+        {"sender": "assistant", "text": "time stays early or late", "timestamp": 1716054000},
+        {"sender": "user", "text": "no afternoon posting", "timestamp": 1716057600},
+        {"sender": "assistant", "text": "afternoon ratio zero", "timestamp": 1716061200}
+      ]
+    },
+    "0.25": {
+      "messages": [
+        {"sender": "user", "text": "few messages fall into afternoon hours", "timestamp": 1716032400},
+        {"sender": "assistant", "text": "most occur morning or night", "timestamp": 1715992800},
+        {"sender": "user", "text": "limited midday activity", "timestamp": 1716036000},
+        {"sender": "assistant", "text": "evening remains more common", "timestamp": 1716064800},
+        {"sender": "user", "text": "only occasional afternoon times", "timestamp": 1716039600},
+        {"sender": "assistant", "text": "others outside window", "timestamp": 1716072000},
+        {"sender": "user", "text": "afternoon small proportion", "timestamp": 1716043200},
+        {"sender": "assistant", "text": "timing spread elsewhere", "timestamp": 1716007200},
+        {"sender": "user", "text": "minor midday presence", "timestamp": 1716046800},
+        {"sender": "assistant", "text": "rest non afternoon", "timestamp": 1716082800}
+      ]
+    },
+    "0.5": {
+      "messages": [
+        {"sender": "user", "text": "some messages happen in afternoon", "timestamp": 1716036000},
+        {"sender": "assistant", "text": "others in morning", "timestamp": 1716000000},
+        {"sender": "user", "text": "balanced midday occurrence", "timestamp": 1716039600},
+        {"sender": "assistant", "text": "evening also appears", "timestamp": 1716068400},
+        {"sender": "user", "text": "half around afternoon", "timestamp": 1716043200},
+        {"sender": "assistant", "text": "half not", "timestamp": 1715996400},
+        {"sender": "user", "text": "mixed schedule", "timestamp": 1716050400},
+        {"sender": "assistant", "text": "even split", "timestamp": 1716014400},
+        {"sender": "user", "text": "neither dominates", "timestamp": 1716057600},
+        {"sender": "assistant", "text": "ratio near half", "timestamp": 1716025200}
+      ]
+    },
+    "0.75": {
+      "messages": [
+        {"sender": "user", "text": "most of these messages happen in the afternoon window", "timestamp": 1716032400},
+        {"sender": "assistant", "text": "midday dominates timing", "timestamp": 1716036000},
+        {"sender": "user", "text": "a few occur evening", "timestamp": 1716068400},
+        {"sender": "assistant", "text": "many between noon and evening", "timestamp": 1716043200},
+        {"sender": "user", "text": "primary interval afternoon", "timestamp": 1716046800},
+        {"sender": "assistant", "text": "later hours sometimes used", "timestamp": 1716075600},
+        {"sender": "user", "text": "majority mid day", "timestamp": 1716050400},
+        {"sender": "assistant", "text": "minor outside interval", "timestamp": 1715992800},
+        {"sender": "user", "text": "afternoon mostly", "timestamp": 1716054000},
+        {"sender": "assistant", "text": "concentrated noon to evening", "timestamp": 1716057600}
+      ]
+    },
+    "1.0": {
+      "messages": [
+        {"sender": "user", "text": "all messages occur strictly in afternoon hours", "timestamp": 1716032400},
+        {"sender": "assistant", "text": "no morning usage", "timestamp": 1716036000},
+        {"sender": "user", "text": "no evening usage", "timestamp": 1716039600},
+        {"sender": "assistant", "text": "exclusive midday timing", "timestamp": 1716043200},
+        {"sender": "user", "text": "every message between noon and evening", "timestamp": 1716046800},
+        {"sender": "assistant", "text": "only this circadian window", "timestamp": 1716050400},
+        {"sender": "user", "text": "completely afternoon bound", "timestamp": 1716054000},
+        {"sender": "assistant", "text": "none outside this period", "timestamp": 1716057600},
+        {"sender": "user", "text": "full afternoon concentration", "timestamp": 1716061200},
+        {"sender": "assistant", "text": "maximum ratio achieved", "timestamp": 1716064800}
+      ]
+    }
+  },
+
+  "circadian_evening_ratio": {
+    "0.0": {
+      "messages": [
+        {"sender": "user", "text": "only morning or afternoon messages", "timestamp": 1716003600},
+        {"sender": "assistant", "text": "none after sunset", "timestamp": 1716021600},
+        {"sender": "user", "text": "no evening interaction", "timestamp": 1716007200},
+        {"sender": "assistant", "text": "strictly daytime", "timestamp": 1716014400},
+        {"sender": "user", "text": "completely excludes evening", "timestamp": 1716028800},
+        {"sender": "assistant", "text": "night sometimes used", "timestamp": 1716075600},
+        {"sender": "user", "text": "but not evening", "timestamp": 1716079200},
+        {"sender": "assistant", "text": "evening ratio zero", "timestamp": 1716082800},
+        {"sender": "user", "text": "not after work hours", "timestamp": 1715989200},
+        {"sender": "assistant", "text": "only non evening", "timestamp": 1715992800}
+      ]
+    },
+    "0.25": {
+      "messages": [
+        {"sender": "user", "text": "few evening responses appear", "timestamp": 1716072000},
+        {"sender": "assistant", "text": "most daytime", "timestamp": 1716003600},
+        {"sender": "user", "text": "some at dusk", "timestamp": 1716068400},
+        {"sender": "assistant", "text": "majority earlier", "timestamp": 1716018000},
+        {"sender": "user", "text": "evening small portion", "timestamp": 1716075600},
+        {"sender": "assistant", "text": "rest not evening", "timestamp": 1716032400},
+        {"sender": "user", "text": "limited after work", "timestamp": 1716079200},
+        {"sender": "assistant", "text": "greater afternoon use", "timestamp": 1716043200},
+        {"sender": "user", "text": "few late messages", "timestamp": 1716082800},
+        {"sender": "assistant", "text": "ratio stays low", "timestamp": 1715996400}
+      ]
+    },
+    "0.5": {
+      "messages": [
+        {"sender": "user", "text": "many messages appear in the evening", "timestamp": 1716072000},
+        {"sender": "assistant", "text": "others earlier in the day", "timestamp": 1716010800},
+        {"sender": "user", "text": "after sunset used often", "timestamp": 1716075600},
+        {"sender": "assistant", "text": "mornings also used", "timestamp": 1716007200},
+        {"sender": "user", "text": "roughly half evening", "timestamp": 1716079200},
+        {"sender": "assistant", "text": "half daytime", "timestamp": 1716036000},
+        {"sender": "user", "text": "balanced distribution", "timestamp": 1716082800},
+        {"sender": "assistant", "text": "neither dominates", "timestamp": 1715992800},
+        {"sender": "user", "text": "equal window usage", "timestamp": 1716086400},
+        {"sender": "assistant", "text": "mid ratio", "timestamp": 1716000000}
+      ]
+    },
+    "0.75": {
+      "messages": [
+        {"sender": "user", "text": "most conversation happens during evening hours", "timestamp": 1716072000},
+        {"sender": "assistant", "text": "messages concentrated after sunset", "timestamp": 1716075600},
+        {"sender": "user", "text": "a few in afternoon", "timestamp": 1716043200},
+        {"sender": "assistant", "text": "many late replies", "timestamp": 1716079200},
+        {"sender": "user", "text": "evening is primary time", "timestamp": 1716082800},
+        {"sender": "assistant", "text": "minor daytime content", "timestamp": 1716007200},
+        {"sender": "user", "text": "evening dominant pattern", "timestamp": 1716086400},
+        {"sender": "assistant", "text": "some night activity", "timestamp": 1716093600},
+        {"sender": "user", "text": "limited morning", "timestamp": 1715992800},
+        {"sender": "assistant", "text": "evening strongly used", "timestamp": 1716097200}
+      ]
+    },
+    "1.0": {
+      "messages": [
+        {"sender": "user", "text": "every message happens in the evening", "timestamp": 1716072000},
+        {"sender": "assistant", "text": "all after sunset", "timestamp": 1716075600},
+        {"sender": "user", "text": "nothing earlier", "timestamp": 1716079200},
+        {"sender": "assistant", "text": "strict evening range", "timestamp": 1716082800},
+        {"sender": "user", "text": "no daytime timing", "timestamp": 1716086400},
+        {"sender": "assistant", "text": "exclusive evening", "timestamp": 1716090000},
+        {"sender": "user", "text": "same time window always", "timestamp": 1716093600},
+        {"sender": "assistant", "text": "full ratio", "timestamp": 1716097200},
+        {"sender": "user", "text": "maximum evening presence", "timestamp": 1716100800},
+        {"sender": "assistant", "text": "only evening interactions", "timestamp": 1716104400}
+      ]
+    }
+  },
+
+  "circadian_night_ratio": {
+    "0.0": {
+      "messages": [
+        {"sender": "user", "text": "all messages sent daytime", "timestamp": 1716007200},
+        {"sender": "assistant", "text": "none at night", "timestamp": 1716028800},
+        {"sender": "user", "text": "only morning", "timestamp": 1715996400},
+        {"sender": "assistant", "text": "or afternoon", "timestamp": 1716032400},
+        {"sender": "user", "text": "no late hours used", "timestamp": 1716050400},
+        {"sender": "assistant", "text": "evening excluded too", "timestamp": 1716064800},
+        {"sender": "user", "text": "strictly before dark", "timestamp": 1716061200},
+        {"sender": "assistant", "text": "night ratio zero", "timestamp": 1716057600},
+        {"sender": "user", "text": "no overnight messages", "timestamp": 1716046800},
+        {"sender": "assistant", "text": "time span daylight only", "timestamp": 1716039600}
+      ]
+    },
+    "0.25": {
+      "messages": [
+        {"sender": "user", "text": "few messages appear at night", "timestamp": 1716111600},
+        {"sender": "assistant", "text": "most earlier", "timestamp": 1716064800},
+        {"sender": "user", "text": "some late replies", "timestamp": 1716115200},
+        {"sender": "assistant", "text": "but mainly day", "timestamp": 1716036000},
+        {"sender": "user", "text": "night is minority", "timestamp": 1716118800},
+        {"sender": "assistant", "text": "ratio low overall", "timestamp": 1716003600},
+        {"sender": "user", "text": "couple of midnight messages", "timestamp": 1716122400},
+        {"sender": "assistant", "text": "others during day", "timestamp": 1716014400},
+        {"sender": "user", "text": "restricted night use", "timestamp": 1716126000},
+        {"sender": "assistant", "text": "mostly not night", "timestamp": 1715992800}
+      ]
+    },
+    "0.5": {
+      "messages": [
+        {"sender": "user", "text": "several night messages", "timestamp": 1716111600},
+        {"sender": "assistant", "text": "several day messages", "timestamp": 1716032400},
+        {"sender": "user", "text": "equal proportion", "timestamp": 1716115200},
+        {"sender": "assistant", "text": "half overnight", "timestamp": 1716118800},
+        {"sender": "user", "text": "half daytime", "timestamp": 1716003600},
+        {"sender": "assistant", "text": "balanced window usage", "timestamp": 1716021600},
+        {"sender": "user", "text": "mixed circadian behavior", "timestamp": 1716122400},
+        {"sender": "assistant", "text": "night not dominant", "timestamp": 1715996400},
+        {"sender": "user", "text": "day not dominant either", "timestamp": 1716126000},
+        {"sender": "assistant", "text": "distributed evenly", "timestamp": 1716010800}
+      ]
+    },
+    "0.75": {
+      "messages": [
+        {"sender": "user", "text": "most activity takes place at night", "timestamp": 1716111600},
+        {"sender": "assistant", "text": "late hour messages dominate", "timestamp": 1716115200},
+        {"sender": "user", "text": "few daytime items", "timestamp": 1716036000},
+        {"sender": "assistant", "text": "predominantly after midnight", "timestamp": 1716118800},
+        {"sender": "user", "text": "many overnight updates", "timestamp": 1716122400},
+        {"sender": "assistant", "text": "occasional day", "timestamp": 1716007200},
+        {"sender": "user", "text": "night window primary", "timestamp": 1716126000},
+        {"sender": "assistant", "text": "small day subset", "timestamp": 1716018000},
+        {"sender": "user", "text": "late messages frequent", "timestamp": 1716129600},
+        {"sender": "assistant", "text": "ratio high", "timestamp": 1716133200}
+      ]
+    },
+    "1.0": {
+      "messages": [
+        {"sender": "user", "text": "all conversation occurs at night", "timestamp": 1716111600},
+        {"sender": "assistant", "text": "strictly after midnight", "timestamp": 1716115200},
+        {"sender": "user", "text": "no day messages", "timestamp": 1716118800},
+        {"sender": "assistant", "text": "exclusive night period", "timestamp": 1716122400},
+        {"sender": "user", "text": "complete overnight usage", "timestamp": 1716126000},
+        {"sender": "assistant", "text": "no sunlight hours", "timestamp": 1716129600},
+        {"sender": "user", "text": "all very late messages", "timestamp": 1716133200},
+        {"sender": "assistant", "text": "none earlier", "timestamp": 1716136800},
+        {"sender": "user", "text": "full night concentration", "timestamp": 1716140400},
+        {"sender": "assistant", "text": "maximum night ratio", "timestamp": 1716144000}
+      ]
+    }
+  },
+
+  "weekday_ratio": {
+    "0.0": {
+      "messages": [
+        {"sender": "user", "text": "all of these messages occur on weekends", "timestamp": 1716086400},
+        {"sender": "assistant", "text": "strictly saturday or sunday", "timestamp": 1716172800},
+        {"sender": "user", "text": "no weekday days", "timestamp": 1716259200},
+        {"sender": "assistant", "text": "weekday ratio zero", "timestamp": 1716345600},
+        {"sender": "user", "text": "only weekend activity", "timestamp": 1716432000},
+        {"sender": "assistant", "text": "never monday to friday", "timestamp": 1716518400},
+        {"sender": "user", "text": "messages saturday", "timestamp": 1716604800},
+        {"sender": "assistant", "text": "messages sunday", "timestamp": 1716691200},
+        {"sender": "user", "text": "excludes workdays", "timestamp": 1716777600},
+        {"sender": "assistant", "text": "solely weekend", "timestamp": 1716864000}
+      ]
+    },
+    "0.25": {
+      "messages": [
+        {"sender": "user", "text": "few weekday messages appear", "timestamp": 1715884800},
+        {"sender": "assistant", "text": "many weekend ones", "timestamp": 1716086400},
+        {"sender": "user", "text": "weekday minority", "timestamp": 1715971200},
+        {"sender": "assistant", "text": "ratio low", "timestamp": 1716172800},
+        {"sender": "user", "text": "several weekend messages", "timestamp": 1716259200},
+        {"sender": "assistant", "text": "some weekday", "timestamp": 1715906400},
+        {"sender": "user", "text": "more saturday sunday", "timestamp": 1716345600},
+        {"sender": "assistant", "text": "less monday friday", "timestamp": 1715928000},
+        {"sender": "user", "text": "few workday points", "timestamp": 1715992800},
+        {"sender": "assistant", "text": "mostly weekend timing", "timestamp": 1716432000}
+      ]
+    },
+    "0.5": {
+      "messages": [
+        {"sender": "user", "text": "equal weekday and weekend messages", "timestamp": 1715884800},
+        {"sender": "assistant", "text": "half during workdays", "timestamp": 1715971200},
+        {"sender": "user", "text": "half during weekend", "timestamp": 1716086400},
+        {"sender": "assistant", "text": "balanced distribution", "timestamp": 1716172800},
+        {"sender": "user", "text": "neither dominates", "timestamp": 1716259200},
+        {"sender": "assistant", "text": "schedule split", "timestamp": 1716345600},
+        {"sender": "user", "text": "mixed calendar timing", "timestamp": 1716432000},
+        {"sender": "assistant", "text": "ratio near half", "timestamp": 1716518400},
+        {"sender": "user", "text": "weekday presence clear", "timestamp": 1715906400},
+        {"sender": "assistant", "text": "weekend presence clear", "timestamp": 1716604800}
+      ]
+    },
+    "0.75": {
+      "messages": [
+        {"sender": "user", "text": "most messages happen during weekdays", "timestamp": 1715884800},
+        {"sender": "assistant", "text": "few during weekend", "timestamp": 1716086400},
+        {"sender": "user", "text": "monday to friday dominate", "timestamp": 1715928000},
+        {"sender": "assistant", "text": "weekend minor", "timestamp": 1716172800},
+        {"sender": "user", "text": "many office day interactions", "timestamp": 1716014400},
+        {"sender": "assistant", "text": "some saturday sunday", "timestamp": 1716259200},
+        {"sender": "user", "text": "mostly weekdays", "timestamp": 1716100800},
+        {"sender": "assistant", "text": "ratio high", "timestamp": 1716345600},
+        {"sender": "user", "text": "weekday concentration", "timestamp": 1716187200},
+        {"sender": "assistant", "text": "limited weekend", "timestamp": 1716432000}
+      ]
+    },
+    "1.0": {
+      "messages": [
+        {"sender": "user", "text": "all of these happen exclusively on weekdays", "timestamp": 1715884800},
+        {"sender": "assistant", "text": "monday through friday only", "timestamp": 1715971200},
+        {"sender": "user", "text": "no saturday", "timestamp": 1716057600},
+        {"sender": "assistant", "text": "no sunday", "timestamp": 1716144000},
+        {"sender": "user", "text": "weekend excluded fully", "timestamp": 1716230400},
+        {"sender": "assistant", "text": "only workdays", "timestamp": 1716316800},
+        {"sender": "user", "text": "weekday exclusive", "timestamp": 1716403200},
+        {"sender": "assistant", "text": "never weekend usage", "timestamp": 1716489600},
+        {"sender": "user", "text": "complete weekday ratio", "timestamp": 1716576000},
+        {"sender": "assistant", "text": "maximum weekday value", "timestamp": 1716662400}
+      ]
+    }
+  },
+
+  "weekend_ratio": {
+    "0.0": {
+      "messages": [
+        {"sender": "user", "text": "all communication happens on weekdays", "timestamp": 1715884800},
+        {"sender": "assistant", "text": "monday to friday only", "timestamp": 1715971200},
+        {"sender": "user", "text": "no saturday sunday", "timestamp": 1716057600},
+        {"sender": "assistant", "text": "zero weekend presence", "timestamp": 1716144000},
+        {"sender": "user", "text": "strict weekday limitation", "timestamp": 1716230400},
+        {"sender": "assistant", "text": "no weekend activity", "timestamp": 1716316800},
+        {"sender": "user", "text": "workdays exclusively", "timestamp": 1716403200},
+        {"sender": "assistant", "text": "never saturday", "timestamp": 1716489600},
+        {"sender": "user", "text": "never sunday", "timestamp": 1716576000},
+        {"sender": "assistant", "text": "ratio absolutely zero", "timestamp": 1716662400}
+      ]
+    },
+    "0.25": {
+      "messages": [
+        {"sender": "user", "text": "few weekend messages appear", "timestamp": 1716086400},
+        {"sender": "assistant", "text": "mostly weekday", "timestamp": 1715884800},
+        {"sender": "user", "text": "some saturday", "timestamp": 1716172800},
+        {"sender": "assistant", "text": "some sunday", "timestamp": 1716259200},
+        {"sender": "user", "text": "but many weekday notes", "timestamp": 1715906400},
+        {"sender": "assistant", "text": "ratio remains low", "timestamp": 1715928000},
+        {"sender": "user", "text": "few off day messages", "timestamp": 1716345600},
+        {"sender": "assistant", "text": "more weekday traffic", "timestamp": 1716014400},
+        {"sender": "user", "text": "weekend minority", "timestamp": 1716432000},
+        {"sender": "assistant", "text": "workday majority", "timestamp": 1716100800}
+      ]
+    },
+    "0.5": {
+      "messages": [
+        {"sender": "user", "text": "equal weekday and weekend messaging", "timestamp": 1715884800},
+        {"sender": "assistant", "text": "half saturday sunday", "timestamp": 1716086400},
+        {"sender": "user", "text": "half during workdays", "timestamp": 1715971200},
+        {"sender": "assistant", "text": "balanced proportions", "timestamp": 1716172800},
+        {"sender": "user", "text": "weekend presence clear", "timestamp": 1716259200},
+        {"sender": "assistant", "text": "weekday presence clear", "timestamp": 1715906400},
+        {"sender": "user", "text": "mixture of both segments", "timestamp": 1716345600},
+        {"sender": "assistant", "text": "ratio near half", "timestamp": 1716014400},
+        {"sender": "user", "text": "sunday and monday included", "timestamp": 1716432000},
+        {"sender": "assistant", "text": "saturday and friday included", "timestamp": 1716100800}
+      ]
+    },
+    "0.75": {
+      "messages": [
+        {"sender": "user", "text": "most messages occur on weekends", "timestamp": 1716086400},
+        {"sender": "assistant", "text": "few on weekdays", "timestamp": 1715884800},
+        {"sender": "user", "text": "saturday dominant", "timestamp": 1716172800},
+        {"sender": "assistant", "text": "sunday also common", "timestamp": 1716259200},
+        {"sender": "user", "text": "some monday content", "timestamp": 1715906400},
+        {"sender": "assistant", "text": "but weekend majority", "timestamp": 1716345600},
+        {"sender": "user", "text": "mostly saturday sunday", "timestamp": 1716432000},
+        {"sender": "assistant", "text": "ratio high", "timestamp": 1716518400},
+        {"sender": "user", "text": "few weekday messages", "timestamp": 1716014400},
+        {"sender": "assistant", "text": "weekend concentrated", "timestamp": 1716604800}
+      ]
+    },
+    "1.0": {
+      "messages": [
+        {"sender": "user", "text": "all messages take place on weekends", "timestamp": 1716086400},
+        {"sender": "assistant", "text": "only saturday or sunday", "timestamp": 1716172800},
+        {"sender": "user", "text": "no weekday communication", "timestamp": 1716259200},
+        {"sender": "assistant", "text": "exclusive weekend window", "timestamp": 1716345600},
+        {"sender": "user", "text": "never monday friday", "timestamp": 1716432000},
+        {"sender": "assistant", "text": "full weekend ratio", "timestamp": 1716518400},
+        {"sender": "user", "text": "weekdays excluded", "timestamp": 1716604800},
+        {"sender": "assistant", "text": "complete weekend concentration", "timestamp": 1716691200},
+        {"sender": "user", "text": "maximum possible value", "timestamp": 1716777600},
+        {"sender": "assistant", "text": "all weekend messages", "timestamp": 1716864000}
+      ]
+    }
+  }
+}

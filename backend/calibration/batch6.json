@@ -1,0 +1,512 @@
+{
+  "response_rate": {
+    "0.0": {
+      "messages": [
+        {"sender": "user", "text": "hey are you there", "timestamp": 1718000000},
+        {"sender": "user", "text": "hello?", "timestamp": 1718000600},
+        {"sender": "user", "text": "just checking", "timestamp": 1718001200},
+        {"sender": "user", "text": "can you reply", "timestamp": 1718001800},
+        {"sender": "user", "text": "still waiting", "timestamp": 1718002400},
+        {"sender": "user", "text": "any update", "timestamp": 1718003000},
+        {"sender": "user", "text": "please respond", "timestamp": 1718003600},
+        {"sender": "user", "text": "are you busy", "timestamp": 1718004200},
+        {"sender": "user", "text": "let me know", "timestamp": 1718004800},
+        {"sender": "user", "text": "no response received", "timestamp": 1718005400}
+      ]
+    },
+    "0.25": {
+      "messages": [
+        {"sender": "user", "text": "hey are you free", "timestamp": 1718006000},
+        {"sender": "assistant", "text": "yes what is up", "timestamp": 1718006060},
+        {"sender": "user", "text": "just wanted to ask something", "timestamp": 1718007200},
+        {"sender": "user", "text": "do you have time later", "timestamp": 1718008400},
+        {"sender": "assistant", "text": "maybe later", "timestamp": 1718008460},
+        {"sender": "user", "text": "okay I will text again", "timestamp": 1718009600},
+        {"sender": "user", "text": "are you still around", "timestamp": 1718010800},
+        {"sender": "user", "text": "hello again", "timestamp": 1718012000},
+        {"sender": "assistant", "text": "sorry busy", "timestamp": 1718012060},
+        {"sender": "user", "text": "all right", "timestamp": 1718013200}
+      ]
+    },
+    "0.5": {
+      "messages": [
+        {"sender": "user", "text": "hey", "timestamp": 1718014000},
+        {"sender": "assistant", "text": "hey", "timestamp": 1718014060},
+        {"sender": "user", "text": "how was your day", "timestamp": 1718015200},
+        {"sender": "assistant", "text": "pretty good", "timestamp": 1718015260},
+        {"sender": "user", "text": "mine was okay", "timestamp": 1718016400},
+        {"sender": "assistant", "text": "nice to hear", "timestamp": 1718016460},
+        {"sender": "user", "text": "did you finish the work", "timestamp": 1718017600},
+        {"sender": "user", "text": "I sent notes", "timestamp": 1718018800},
+        {"sender": "assistant", "text": "I will check", "timestamp": 1718018860},
+        {"sender": "assistant", "text": "thanks", "timestamp": 1718019460}
+      ]
+    },
+    "0.75": {
+      "messages": [
+        {"sender": "user", "text": "hey are you available", "timestamp": 1718020000},
+        {"sender": "assistant", "text": "yes I am here", "timestamp": 1718020060},
+        {"sender": "user", "text": "can you review this", "timestamp": 1718020600},
+        {"sender": "assistant", "text": "sure send it", "timestamp": 1718020660},
+        {"sender": "user", "text": "I sent the file", "timestamp": 1718021200},
+        {"sender": "assistant", "text": "got it", "timestamp": 1718021260},
+        {"sender": "user", "text": "what do you think", "timestamp": 1718021800},
+        {"sender": "assistant", "text": "looks good", "timestamp": 1718021860},
+        {"sender": "user", "text": "thanks for quick reply", "timestamp": 1718022400},
+        {"sender": "assistant", "text": "no problem", "timestamp": 1718022460}
+      ]
+    },
+    "1.0": {
+      "messages": [
+        {"sender": "user", "text": "hi", "timestamp": 1718023000},
+        {"sender": "assistant", "text": "hi", "timestamp": 1718023060},
+        {"sender": "user", "text": "are you free", "timestamp": 1718023600},
+        {"sender": "assistant", "text": "yes", "timestamp": 1718023660},
+        {"sender": "user", "text": "can you look at this", "timestamp": 1718024200},
+        {"sender": "assistant", "text": "on it now", "timestamp": 1718024260},
+        {"sender": "user", "text": "how does it seem", "timestamp": 1718024800},
+        {"sender": "assistant", "text": "very clear", "timestamp": 1718024860},
+        {"sender": "user", "text": "great", "timestamp": 1718025400},
+        {"sender": "assistant", "text": "always responding quickly", "timestamp": 1718025460}
+      ]
+    }
+  },
+
+  "initiation_rate": {
+    "0.0": {
+      "messages": [
+        {"sender": "assistant", "text": "hey are you there", "timestamp": 1718030000},
+        {"sender": "assistant", "text": "let me know when free", "timestamp": 1718030600},
+        {"sender": "assistant", "text": "I can call later", "timestamp": 1718031200},
+        {"sender": "assistant", "text": "just checking in", "timestamp": 1718031800},
+        {"sender": "assistant", "text": "any update", "timestamp": 1718032400},
+        {"sender": "assistant", "text": "still available", "timestamp": 1718033000},
+        {"sender": "assistant", "text": "message me", "timestamp": 1718033600},
+        {"sender": "assistant", "text": "here if needed", "timestamp": 1718034200},
+        {"sender": "assistant", "text": "following up", "timestamp": 1718034800},
+        {"sender": "assistant", "text": "ping again", "timestamp": 1718035400}
+      ]
+    },
+    "0.25": {
+      "messages": [
+        {"sender": "assistant", "text": "hey", "timestamp": 1718036000},
+        {"sender": "user", "text": "hi", "timestamp": 1718036060},
+        {"sender": "assistant", "text": "how is work going", "timestamp": 1718036600},
+        {"sender": "user", "text": "fine so far", "timestamp": 1718037660},
+        {"sender": "user", "text": "I will text later", "timestamp": 1718038800},
+        {"sender": "assistant", "text": "okay", "timestamp": 1718038860},
+        {"sender": "user", "text": "back now", "timestamp": 1718040000},
+        {"sender": "assistant", "text": "welcome back", "timestamp": 1718040060},
+        {"sender": "user", "text": "what next", "timestamp": 1718041200},
+        {"sender": "assistant", "text": "we can continue", "timestamp": 1718041260}
+      ]
+    },
+    "0.5": {
+      "messages": [
+        {"sender": "user", "text": "hey", "timestamp": 1718042000},
+        {"sender": "assistant", "text": "hi", "timestamp": 1718042060},
+        {"sender": "assistant", "text": "how are you", "timestamp": 1718042600},
+        {"sender": "user", "text": "good you", "timestamp": 1718043660},
+        {"sender": "user", "text": "what are you doing later", "timestamp": 1718044800},
+        {"sender": "assistant", "text": "not much", "timestamp": 1718044860},
+        {"sender": "assistant", "text": "maybe finishing work", "timestamp": 1718045400},
+        {"sender": "user", "text": "same here", "timestamp": 1718046460},
+        {"sender": "assistant", "text": "talk later", "timestamp": 1718047000},
+        {"sender": "user", "text": "sure", "timestamp": 1718048060}
+      ]
+    },
+    "0.75": {
+      "messages": [
+        {"sender": "user", "text": "hey", "timestamp": 1718050000},
+        {"sender": "user", "text": "how are things", "timestamp": 1718050600},
+        {"sender": "assistant", "text": "good", "timestamp": 1718050660},
+        {"sender": "user", "text": "want to meet later", "timestamp": 1718051200},
+        {"sender": "assistant", "text": "sure", "timestamp": 1718051260},
+        {"sender": "user", "text": "maybe at six", "timestamp": 1718051800},
+        {"sender": "assistant", "text": "works", "timestamp": 1718051860},
+        {"sender": "user", "text": "I will bring notes", "timestamp": 1718052400},
+        {"sender": "assistant", "text": "okay", "timestamp": 1718052460},
+        {"sender": "user", "text": "see you soon", "timestamp": 1718053000}
+      ]
+    },
+    "1.0": {
+      "messages": [
+        {"sender": "user", "text": "hi", "timestamp": 1718054000},
+        {"sender": "user", "text": "are you around", "timestamp": 1718054600},
+        {"sender": "user", "text": "can you call", "timestamp": 1718055200},
+        {"sender": "user", "text": "let us meet", "timestamp": 1718055800},
+        {"sender": "user", "text": "I have updates", "timestamp": 1718056400},
+        {"sender": "user", "text": "sent the file", "timestamp": 1718057000},
+        {"sender": "user", "text": "check it", "timestamp": 1718057600},
+        {"sender": "user", "text": "any thoughts", "timestamp": 1718058200},
+        {"sender": "user", "text": "message me", "timestamp": 1718058800},
+        {"sender": "user", "text": "waiting", "timestamp": 1718059400}
+      ]
+    }
+  },
+
+  "question_frequency": {
+    "0.0": {
+      "messages": [
+        {"sender": "user", "text": "I finished the task", "timestamp": 1718060000},
+        {"sender": "assistant", "text": "I reviewed it", "timestamp": 1718060060},
+        {"sender": "user", "text": "the document is uploaded", "timestamp": 1718060600},
+        {"sender": "assistant", "text": "the notes are clear", "timestamp": 1718060660},
+        {"sender": "user", "text": "I added comments", "timestamp": 1718061200},
+        {"sender": "assistant", "text": "I read the comments", "timestamp": 1718061260},
+        {"sender": "user", "text": "we can submit", "timestamp": 1718061800},
+        {"sender": "assistant", "text": "submission completed", "timestamp": 1718061860},
+        {"sender": "user", "text": "all done", "timestamp": 1718062400},
+        {"sender": "assistant", "text": "process finished", "timestamp": 1718062460}
+      ]
+    },
+    "0.25": {
+      "messages": [
+        {"sender": "user", "text": "I sent the file", "timestamp": 1718063000},
+        {"sender": "assistant", "text": "okay", "timestamp": 1718063060},
+        {"sender": "user", "text": "it should open fine", "timestamp": 1718063600},
+        {"sender": "assistant", "text": "did you include the notes", "timestamp": 1718063660},
+        {"sender": "user", "text": "yes", "timestamp": 1718064200},
+        {"sender": "assistant", "text": "looks good", "timestamp": 1718064260},
+        {"sender": "user", "text": "the summary is at bottom", "timestamp": 1718064800},
+        {"sender": "assistant", "text": "great", "timestamp": 1718064860},
+        {"sender": "user", "text": "we can submit later", "timestamp": 1718065400},
+        {"sender": "assistant", "text": "sounds good", "timestamp": 1718065460}
+      ]
+    },
+    "0.5": {
+      "messages": [
+        {"sender": "user", "text": "how does this look", "timestamp": 1718066000},
+        {"sender": "assistant", "text": "pretty good", "timestamp": 1718066060},
+        {"sender": "assistant", "text": "did you check the references", "timestamp": 1718066600},
+        {"sender": "user", "text": "not yet", "timestamp": 1718067660},
+        {"sender": "user", "text": "should I verify them now", "timestamp": 1718068200},
+        {"sender": "assistant", "text": "yes please", "timestamp": 1718068260},
+        {"sender": "assistant", "text": "where is the appendix", "timestamp": 1718068800},
+        {"sender": "user", "text": "at the end", "timestamp": 1718069860},
+        {"sender": "user", "text": "is anything missing", "timestamp": 1718070400},
+        {"sender": "assistant", "text": "no that is all", "timestamp": 1718070460}
+      ]
+    },
+    "0.75": {
+      "messages": [
+        {"sender": "user", "text": "can you read this", "timestamp": 1718071000},
+        {"sender": "assistant", "text": "yes", "timestamp": 1718071060},
+        {"sender": "user", "text": "what do you think", "timestamp": 1718071600},
+        {"sender": "assistant", "text": "it is good", "timestamp": 1718071660},
+        {"sender": "assistant", "text": "should we edit section two", "timestamp": 1718072200},
+        {"sender": "user", "text": "maybe", "timestamp": 1718073260},
+        {"sender": "user", "text": "does the graph make sense", "timestamp": 1718073800},
+        {"sender": "assistant", "text": "mostly", "timestamp": 1718073860},
+        {"sender": "assistant", "text": "can we simplify the table", "timestamp": 1718074400},
+        {"sender": "user", "text": "yes we can", "timestamp": 1718074460}
+      ]
+    },
+    "1.0": {
+      "messages": [
+        {"sender": "user", "text": "how are you", "timestamp": 1718075000},
+        {"sender": "assistant", "text": "good and you", "timestamp": 1718075060},
+        {"sender": "user", "text": "what are you doing", "timestamp": 1718075600},
+        {"sender": "assistant", "text": "working why", "timestamp": 1718075660},
+        {"sender": "user", "text": "can you help me", "timestamp": 1718076200},
+        {"sender": "assistant", "text": "with what exactly", "timestamp": 1718076260},
+        {"sender": "user", "text": "did you see my email", "timestamp": 1718076800},
+        {"sender": "assistant", "text": "which one", "timestamp": 1718076860},
+        {"sender": "user", "text": "should we meet today", "timestamp": 1718077400},
+        {"sender": "assistant", "text": "what time", "timestamp": 1718077460}
+      ]
+    }
+  },
+
+  "answer_frequency": {
+    "0.0": {
+      "messages": [
+        {"sender": "user", "text": "how are you", "timestamp": 1718080000},
+        {"sender": "user", "text": "did you get my text", "timestamp": 1718080600},
+        {"sender": "user", "text": "can you meet later", "timestamp": 1718081200},
+        {"sender": "user", "text": "what time works", "timestamp": 1718081800},
+        {"sender": "user", "text": "are you busy", "timestamp": 1718082400},
+        {"sender": "user", "text": "hello", "timestamp": 1718083000},
+        {"sender": "user", "text": "just checking in", "timestamp": 1718083600},
+        {"sender": "user", "text": "any update", "timestamp": 1718084200},
+        {"sender": "user", "text": "please respond", "timestamp": 1718084800},
+        {"sender": "user", "text": "still nothing", "timestamp": 1718085400}
+      ]
+    },
+    "0.25": {
+      "messages": [
+        {"sender": "user", "text": "what time are you free", "timestamp": 1718086000},
+        {"sender": "assistant", "text": "later", "timestamp": 1718086060},
+        {"sender": "user", "text": "can you meet today", "timestamp": 1718086600},
+        {"sender": "assistant", "text": "maybe", "timestamp": 1718086660},
+        {"sender": "user", "text": "did you read my note", "timestamp": 1718087200},
+        {"sender": "user", "text": "should I resend it", "timestamp": 1718087800},
+        {"sender": "assistant", "text": "sure", "timestamp": 1718087860},
+        {"sender": "user", "text": "do you agree with the plan", "timestamp": 1718088400},
+        {"sender": "user", "text": "is that okay", "timestamp": 1718089000},
+        {"sender": "assistant", "text": "yes", "timestamp": 1718089060}
+      ]
+    },
+    "0.5": {
+      "messages": [
+        {"sender": "user", "text": "how are you", "timestamp": 1718090000},
+        {"sender": "assistant", "text": "good", "timestamp": 1718090060},
+        {"sender": "user", "text": "what time works", "timestamp": 1718090600},
+        {"sender": "assistant", "text": "six", "timestamp": 1718090660},
+        {"sender": "assistant", "text": "where should we meet", "timestamp": 1718091200},
+        {"sender": "user", "text": "library", "timestamp": 1718092260},
+        {"sender": "user", "text": "did you finish the task", "timestamp": 1718092800},
+        {"sender": "assistant", "text": "almost", "timestamp": 1718092860},
+        {"sender": "assistant", "text": "can you send the file", "timestamp": 1718093400},
+        {"sender": "user", "text": "sent", "timestamp": 1718094460}
+      ]
+    },
+    "0.75": {
+      "messages": [
+        {"sender": "assistant", "text": "when is the deadline", "timestamp": 1718095000},
+        {"sender": "user", "text": "tomorrow", "timestamp": 1718095060},
+        {"sender": "assistant", "text": "can you share notes", "timestamp": 1718095600},
+        {"sender": "user", "text": "already shared", "timestamp": 1718095660},
+        {"sender": "assistant", "text": "did you check section two", "timestamp": 1718096200},
+        {"sender": "user", "text": "yes", "timestamp": 1718096260},
+        {"sender": "assistant", "text": "where is the graph", "timestamp": 1718096800},
+        {"sender": "user", "text": "third page", "timestamp": 1718096860},
+        {"sender": "assistant", "text": "is citation correct", "timestamp": 1718097400},
+        {"sender": "user", "text": "yes it is", "timestamp": 1718097460}
+      ]
+    },
+    "1.0": {
+      "messages": [
+        {"sender": "assistant", "text": "what time works", "timestamp": 1718098000},
+        {"sender": "user", "text": "six", "timestamp": 1718098060},
+        {"sender": "assistant", "text": "where should we meet", "timestamp": 1718098600},
+        {"sender": "user", "text": "library", "timestamp": 1718098660},
+        {"sender": "assistant", "text": "did you send the file", "timestamp": 1718099200},
+        {"sender": "user", "text": "yes", "timestamp": 1718099260},
+        {"sender": "assistant", "text": "is appendix complete", "timestamp": 1718099800},
+        {"sender": "user", "text": "yes", "timestamp": 1718099860},
+        {"sender": "assistant", "text": "is table updated", "timestamp": 1718100400},
+        {"sender": "user", "text": "yes it is", "timestamp": 1718100460}
+      ]
+    }
+  },
+
+  "elaboration_score": {
+    "0.0": {
+      "messages": [
+        {"sender": "user", "text": "ok", "timestamp": 1718101000},
+        {"sender": "assistant", "text": "ok", "timestamp": 1718101060},
+        {"sender": "user", "text": "fine", "timestamp": 1718101600},
+        {"sender": "assistant", "text": "sure", "timestamp": 1718101660},
+        {"sender": "user", "text": "done", "timestamp": 1718102200},
+        {"sender": "assistant", "text": "thanks", "timestamp": 1718102260},
+        {"sender": "user", "text": "sent", "timestamp": 1718102800},
+        {"sender": "assistant", "text": "received", "timestamp": 1718102860},
+        {"sender": "user", "text": "bye", "timestamp": 1718103400},
+        {"sender": "assistant", "text": "bye", "timestamp": 1718103460}
+      ]
+    },
+    "0.25": {
+      "messages": [
+        {"sender": "user", "text": "okay I finished it", "timestamp": 1718104000},
+        {"sender": "assistant", "text": "good", "timestamp": 1718104060},
+        {"sender": "user", "text": "sent the document", "timestamp": 1718104600},
+        {"sender": "assistant", "text": "thanks", "timestamp": 1718104660},
+        {"sender": "user", "text": "let me know", "timestamp": 1718105200},
+        {"sender": "assistant", "text": "will do", "timestamp": 1718105260},
+        {"sender": "user", "text": "meeting later", "timestamp": 1718105800},
+        {"sender": "assistant", "text": "yes", "timestamp": 1718105860},
+        {"sender": "user", "text": "six pm", "timestamp": 1718106400},
+        {"sender": "assistant", "text": "works", "timestamp": 1718106460}
+      ]
+    },
+    "0.5": {
+      "messages": [
+        {"sender": "user", "text": "I finished the draft and added comments", "timestamp": 1718107000},
+        {"sender": "assistant", "text": "great thanks for doing that", "timestamp": 1718107060},
+        {"sender": "user", "text": "the main ideas are summarized at the end", "timestamp": 1718107600},
+        {"sender": "assistant", "text": "I will read them carefully", "timestamp": 1718107660},
+        {"sender": "user", "text": "let me know what needs revision", "timestamp": 1718108200},
+        {"sender": "assistant", "text": "sure I will mark suggestions", "timestamp": 1718108260},
+        {"sender": "user", "text": "we can discuss changes tomorrow", "timestamp": 1718108800},
+        {"sender": "assistant", "text": "sounds good to me", "timestamp": 1718108860},
+        {"sender": "user", "text": "thanks again", "timestamp": 1718109400},
+        {"sender": "assistant", "text": "no problem", "timestamp": 1718109460}
+      ]
+    },
+    "0.75": {
+      "messages": [
+        {"sender": "user", "text": "I completed the full draft with detailed explanations for each section", "timestamp": 1718110000},
+        {"sender": "assistant", "text": "excellent that will help a lot", "timestamp": 1718110060},
+        {"sender": "user", "text": "I also included examples to clarify complicated parts", "timestamp": 1718110600},
+        {"sender": "assistant", "text": "those should make review easier", "timestamp": 1718110660},
+        {"sender": "user", "text": "there are notes describing why I changed some arguments", "timestamp": 1718111200},
+        {"sender": "assistant", "text": "I appreciate that context", "timestamp": 1718111260},
+        {"sender": "user", "text": "a longer summary is at the end of the document", "timestamp": 1718111800},
+        {"sender": "assistant", "text": "great overview", "timestamp": 1718111860},
+        {"sender": "user", "text": "we can refine wording later", "timestamp": 1718112400},
+        {"sender": "assistant", "text": "yes we can polish it", "timestamp": 1718112460}
+      ]
+    },
+    "1.0": {
+      "messages": [
+        {"sender": "user", "text": "I prepared an extensive draft that thoroughly explains each concept in multiple paragraphs", "timestamp": 1718113000},
+        {"sender": "assistant", "text": "that level of detail is impressive", "timestamp": 1718113060},
+        {"sender": "user", "text": "I added in depth commentary showing my reasoning step by step", "timestamp": 1718113600},
+        {"sender": "assistant", "text": "it will make understanding very easy", "timestamp": 1718113660},
+        {"sender": "user", "text": "each section now contains comprehensive elaboration and examples", "timestamp": 1718114200},
+        {"sender": "assistant", "text": "this is fully developed", "timestamp": 1718114260},
+        {"sender": "user", "text": "the summary integrates every major idea with supporting explanation", "timestamp": 1718114800},
+        {"sender": "assistant", "text": "extremely complete", "timestamp": 1718114860},
+        {"sender": "user", "text": "nothing was left vague or brief", "timestamp": 1718115400},
+        {"sender": "assistant", "text": "maximum elaboration", "timestamp": 1718115460}
+      ]
+    }
+  },
+
+  "politeness_score": {
+    "0.0": {
+      "messages": [
+        {"sender": "user", "text": "send it now", "timestamp": 1718116000},
+        {"sender": "assistant", "text": "fine", "timestamp": 1718116060},
+        {"sender": "user", "text": "you forgot again", "timestamp": 1718116600},
+        {"sender": "assistant", "text": "whatever", "timestamp": 1718116660},
+        {"sender": "user", "text": "do it fast", "timestamp": 1718117200},
+        {"sender": "assistant", "text": "ok", "timestamp": 1718117260},
+        {"sender": "user", "text": "that was bad", "timestamp": 1718117800},
+        {"sender": "assistant", "text": "does not matter", "timestamp": 1718117860},
+        {"sender": "user", "text": "fix it", "timestamp": 1718118400},
+        {"sender": "assistant", "text": "fine", "timestamp": 1718118460}
+      ]
+    },
+    "0.25": {
+      "messages": [
+        {"sender": "user", "text": "please send it", "timestamp": 1718119000},
+        {"sender": "assistant", "text": "okay", "timestamp": 1718119060},
+        {"sender": "user", "text": "you missed one part", "timestamp": 1718119600},
+        {"sender": "assistant", "text": "I will check", "timestamp": 1718119660},
+        {"sender": "user", "text": "can you fix it soon", "timestamp": 1718120200},
+        {"sender": "assistant", "text": "sure", "timestamp": 1718120260},
+        {"sender": "user", "text": "that would help", "timestamp": 1718120800},
+        {"sender": "assistant", "text": "no problem", "timestamp": 1718120860},
+        {"sender": "user", "text": "thanks", "timestamp": 1718121400},
+        {"sender": "assistant", "text": "welcome", "timestamp": 1718121460}
+      ]
+    },
+    "0.5": {
+      "messages": [
+        {"sender": "user", "text": "could you please review this when you have time", "timestamp": 1718122000},
+        {"sender": "assistant", "text": "yes I can do that", "timestamp": 1718122060},
+        {"sender": "user", "text": "I would appreciate your feedback", "timestamp": 1718122600},
+        {"sender": "assistant", "text": "I will try to be thorough", "timestamp": 1718122660},
+        {"sender": "user", "text": "thank you for helping", "timestamp": 1718123200},
+        {"sender": "assistant", "text": "you are welcome", "timestamp": 1718123260},
+        {"sender": "user", "text": "please let me know if anything is unclear", "timestamp": 1718123800},
+        {"sender": "assistant", "text": "sure I will let you know", "timestamp": 1718123860},
+        {"sender": "user", "text": "that means a lot", "timestamp": 1718124400},
+        {"sender": "assistant", "text": "happy to help", "timestamp": 1718124460}
+      ]
+    },
+    "0.75": {
+      "messages": [
+        {"sender": "user", "text": "would you mind reviewing this for me please", "timestamp": 1718125000},
+        {"sender": "assistant", "text": "of course I would be happy to", "timestamp": 1718125060},
+        {"sender": "user", "text": "thank you so much for taking the time", "timestamp": 1718125600},
+        {"sender": "assistant", "text": "my pleasure", "timestamp": 1718125660},
+        {"sender": "user", "text": "I really appreciate your help with this", "timestamp": 1718126200},
+        {"sender": "assistant", "text": "I am glad to support", "timestamp": 1718126260},
+        {"sender": "user", "text": "please let me know if I can return the favor", "timestamp": 1718126800},
+        {"sender": "assistant", "text": "that is very kind of you", "timestamp": 1718126860},
+        {"sender": "user", "text": "thanks again", "timestamp": 1718127400},
+        {"sender": "assistant", "text": "you are very welcome", "timestamp": 1718127460}
+      ]
+    },
+    "1.0": {
+      "messages": [
+        {"sender": "user", "text": "would you be so kind as to review this document at your convenience", "timestamp": 1718128000},
+        {"sender": "assistant", "text": "I would be delighted to assist you", "timestamp": 1718128060},
+        {"sender": "user", "text": "your help is sincerely appreciated", "timestamp": 1718128600},
+        {"sender": "assistant", "text": "it is an honor to help", "timestamp": 1718128660},
+        {"sender": "user", "text": "please accept my gratitude for your support", "timestamp": 1718129200},
+        {"sender": "assistant", "text": "thank you for your gracious words", "timestamp": 1718129260},
+        {"sender": "user", "text": "if there is anything you require do let me know", "timestamp": 1718129800},
+        {"sender": "assistant", "text": "I truly appreciate your offer", "timestamp": 1718129860},
+        {"sender": "user", "text": "many thanks again", "timestamp": 1718130400},
+        {"sender": "assistant", "text": "with utmost pleasure", "timestamp": 1718130460}
+      ]
+    }
+  },
+
+  "formality_score": {
+    "0.0": {
+      "messages": [
+        {"sender": "user", "text": "hey what's up", "timestamp": 1718131000},
+        {"sender": "assistant", "text": "not much", "timestamp": 1718131060},
+        {"sender": "user", "text": "yeah cool", "timestamp": 1718131600},
+        {"sender": "assistant", "text": "nice", "timestamp": 1718131660},
+        {"sender": "user", "text": "lol that was weird", "timestamp": 1718132200},
+        {"sender": "assistant", "text": "ikr", "timestamp": 1718132260},
+        {"sender": "user", "text": "gonna send it", "timestamp": 1718132800},
+        {"sender": "assistant", "text": "k do it", "timestamp": 1718132860},
+        {"sender": "user", "text": "brb", "timestamp": 1718133400},
+        {"sender": "assistant", "text": "ok", "timestamp": 1718133460}
+      ]
+    },
+    "0.25": {
+      "messages": [
+        {"sender": "user", "text": "hey I sent the doc", "timestamp": 1718134000},
+        {"sender": "assistant", "text": "got it thanks", "timestamp": 1718134060},
+        {"sender": "user", "text": "kinda messy though", "timestamp": 1718134600},
+        {"sender": "assistant", "text": "no worries", "timestamp": 1718134660},
+        {"sender": "user", "text": "I'll fix some stuff", "timestamp": 1718135200},
+        {"sender": "assistant", "text": "sounds good", "timestamp": 1718135260},
+        {"sender": "user", "text": "let me know", "timestamp": 1718135800},
+        {"sender": "assistant", "text": "sure thing", "timestamp": 1718135860},
+        {"sender": "user", "text": "thanks", "timestamp": 1718136400},
+        {"sender": "assistant", "text": "np", "timestamp": 1718136460}
+      ]
+    },
+    "0.5": {
+      "messages": [
+        {"sender": "user", "text": "I sent the document earlier today", "timestamp": 1718137000},
+        {"sender": "assistant", "text": "I received it thank you", "timestamp": 1718137060},
+        {"sender": "user", "text": "some sections need revision", "timestamp": 1718137600},
+        {"sender": "assistant", "text": "I agree with that", "timestamp": 1718137660},
+        {"sender": "user", "text": "we should review them tomorrow", "timestamp": 1718138200},
+        {"sender": "assistant", "text": "that would be helpful", "timestamp": 1718138260},
+        {"sender": "user", "text": "please share your comments", "timestamp": 1718138800},
+        {"sender": "assistant", "text": "I will add notes", "timestamp": 1718138860},
+        {"sender": "user", "text": "great thanks", "timestamp": 1718139400},
+        {"sender": "assistant", "text": "you are welcome", "timestamp": 1718139460}
+      ]
+    },
+    "0.75": {
+      "messages": [
+        {"sender": "user", "text": "I have submitted the completed document for your review", "timestamp": 1718140000},
+        {"sender": "assistant", "text": "I confirm its receipt thank you", "timestamp": 1718140060},
+        {"sender": "user", "text": "several portions may require additional revision", "timestamp": 1718140600},
+        {"sender": "assistant", "text": "I will examine them carefully", "timestamp": 1718140660},
+        {"sender": "user", "text": "we may schedule a meeting to discuss these changes", "timestamp": 1718141200},
+        {"sender": "assistant", "text": "that plan appears reasonable", "timestamp": 1718141260},
+        {"sender": "user", "text": "please provide comments at your convenience", "timestamp": 1718141800},
+        {"sender": "assistant", "text": "I will do so promptly", "timestamp": 1718141860},
+        {"sender": "user", "text": "thank you for your assistance", "timestamp": 1718142400},
+        {"sender": "assistant", "text": "happy to assist", "timestamp": 1718142460}
+      ]
+    },
+    "1.0": {
+      "messages": [
+        {"sender": "user", "text": "I am writing to inform you that the finalized document has now been submitted for your formal evaluation", "timestamp": 1718143000},
+        {"sender": "assistant", "text": "I hereby acknowledge successful receipt of the document", "timestamp": 1718143060},
+        {"sender": "user", "text": "several sections may benefit from additional clarification and refinement", "timestamp": 1718143600},
+        {"sender": "assistant", "text": "I will conduct a comprehensive review of these portions", "timestamp": 1718143660},
+        {"sender": "user", "text": "it may be advisable to arrange a formal meeting to discuss proposed revisions", "timestamp": 1718144200},
+        {"sender": "assistant", "text": "such a meeting would indeed be appropriate", "timestamp": 1718144260},
+        {"sender": "user", "text": "please provide written feedback at your earliest convenience", "timestamp": 1718144800},
+        {"sender": "assistant", "text": "I shall endeavor to do so promptly", "timestamp": 1718144860},
+        {"sender": "user", "text": "your cooperation is greatly appreciated", "timestamp": 1718145400},
+        {"sender": "assistant", "text": "it is my pleasure to assist", "timestamp": 1718145460}
+      ]
+    }
+  }
+}
