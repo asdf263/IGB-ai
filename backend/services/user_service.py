@@ -110,6 +110,62 @@ class UserService:
             'onboarding_complete': False
         }
     
+    def create_user_with_uid(self, uid: str, email: str, profile: Dict[str, Any] = None) -> Dict[str, Any]:
+        """
+        Create a new user account with a specific UID (from Supabase).
+        
+        This is used when syncing users from Supabase authentication to ensure
+        the MongoDB user has the same UID as the Supabase user.
+        
+        Args:
+            uid: User UID (from Supabase)
+            email: User email/username
+            profile: Optional profile data dictionary
+            
+        Returns:
+            User document with uid
+        """
+        self._ensure_connected()
+        
+        # Check if user already exists by UID or email
+        existing_by_uid = self.users_collection.find_one({'uid': uid})
+        if existing_by_uid:
+            raise ValueError('User with this UID already exists')
+        
+        existing_by_email = self.users_collection.find_one({'email': email})
+        if existing_by_email:
+            # If email exists but different UID, update the UID to match Supabase
+            logger.info(f"Updating existing user {email} with new Supabase UID: {uid}")
+            self.users_collection.update_one(
+                {'email': email},
+                {'$set': {
+                    'uid': uid,
+                    'profile': {**existing_by_email.get('profile', {}), **(profile or {})},
+                    'updated_at': datetime.now().isoformat()
+                }}
+            )
+            return self.get_user_by_uid(uid)
+        
+        # Create new user document with provided UID
+        user_doc = {
+            'uid': uid,
+            'email': email,
+            'profile': profile or {},
+            'created_at': datetime.now().isoformat(),
+            'updated_at': datetime.now().isoformat(),
+            'onboarding_complete': False
+        }
+        
+        result = self.users_collection.insert_one(user_doc)
+        logger.info(f"Created new user with Supabase UID: {uid}, email: {email}")
+        
+        return {
+            'uid': uid,
+            'email': email,
+            'profile': profile or {},
+            'onboarding_complete': False
+        }
+    
     def authenticate_user(self, email: str, password: str) -> Optional[Dict[str, Any]]:
         """
         Authenticate user with email and password

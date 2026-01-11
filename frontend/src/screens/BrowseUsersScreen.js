@@ -3,7 +3,7 @@ import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Animated } 
 import { Text, Avatar, Divider, ActivityIndicator } from 'react-native-paper';
 import { AuthContext } from '../context/AuthContext';
 import { getAllUsers } from '../services/userApi';
-import { formatHeightDisplay, formatLocationDisplay } from '../constants/profileOptions';
+import { formatHeightDisplay } from '../constants/profileOptions';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -114,8 +114,10 @@ const BrowseUsersScreen = () => {
   };
 
   const formatLocation = (profileData) => {
-    const loc = formatLocationDisplay(profileData?.city, profileData?.state);
-    return loc || profileData?.location || 'Not specified';
+    const city = profileData?.city;
+    const country = profileData?.country;
+    if (city && country) return `${city}, ${country}`;
+    return city || country || profileData?.location || 'Not specified';
   };
 
   if (loading) {
@@ -193,7 +195,6 @@ const BrowseUsersScreen = () => {
                 {/* Profile Header */}
                 <View style={styles.headerSection}>
                   <View style={styles.avatarContainer}>
-                    <View style={styles.avatarShadow} />
                     <Avatar.Text
                       size={110}
                       label={getInitials(currentUser?.email, profileData?.name)}
@@ -369,9 +370,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   profileContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
     padding: 8,
-    paddingTop: 16,
-    paddingBottom: 24,
+    paddingVertical: 16,
   },
   // 3D Card Container
   cardContainer: {
@@ -428,15 +430,6 @@ const styles = StyleSheet.create({
   avatarContainer: {
     position: 'relative',
     marginBottom: 16,
-  },
-  avatarShadow: {
-    position: 'absolute',
-    top: 8,
-    left: 8,
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    backgroundColor: 'rgba(98, 0, 238, 0.25)',
   },
   avatar: {
     backgroundColor: '#6200ee',

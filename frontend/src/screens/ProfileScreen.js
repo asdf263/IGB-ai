@@ -3,7 +3,7 @@ import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Card, Text, Button, Avatar, Divider, ActivityIndicator } from 'react-native-paper';
 import { AuthContext } from '../context/AuthContext';
 import { getUser } from '../services/userApi';
-import { formatHeightDisplay, formatLocationDisplay } from '../constants/profileOptions';
+import { formatHeightDisplay } from '../constants/profileOptions';
 
 /**
  * ProfileScreen - Displays user profile information
@@ -77,7 +77,10 @@ const ProfileScreen = ({ route }) => {
   };
 
   const formatLocation = () => {
-    return formatLocationDisplay(profileData?.city, profileData?.state) || profileData?.location || 'Not specified';
+    const city = profileData?.city;
+    const country = profileData?.country;
+    if (city && country) return `${city}, ${country}`;
+    return city || country || profileData?.location || 'Not specified';
   };
 
   if (loading) {

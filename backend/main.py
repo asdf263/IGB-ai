@@ -37,6 +37,7 @@ from services.storage_service import StorageService
 from services.personality_service import PersonalityService
 from services.ecosystem_service import EcosystemService
 from services.user_service import UserService
+from services.instagram_parser import parse_instagram_zip
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -209,13 +210,24 @@ class LoginRequest(BaseModel):
 
 class ProfileUpdateRequest(BaseModel):
     name: Optional[str] = None
+    age: Optional[int] = None
     instagram_handle: Optional[str] = None
     bio: Optional[str] = None
     interests: Optional[List[str]] = None
     location: Optional[str] = None
+    city: Optional[str] = None
+    country: Optional[str] = None
+    state: Optional[str] = None
     ethnicity: Optional[str] = None
     height: Optional[str] = None
     height_unit: Optional[str] = None
+
+
+class UserSyncRequest(BaseModel):
+    """Request model for syncing user data from Supabase to MongoDB"""
+    uid: str
+    email: str
+    profile: Optional[Dict[str, Any]] = None
 
 
 # ============== Health Check ==============
@@ -282,6 +294,65 @@ async def signup(request: SignupRequest):
         print(f"[SIGNUP] ERROR: {str(e)}")
         logger.error(f"Signup error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Signup failed: {str(e)}")
+
+
+@app.post("/api/users/sync")
+async def sync_user(request: UserSyncRequest):
+    """Sync user data from Supabase to MongoDB (create or update).
+    
+    This endpoint is called after Supabase authentication to ensure
+    the user exists in MongoDB with their profile data.
+    """
+    print(f"\n{'='*60}")
+    print(f"[SYNC] === USER SYNC REQUEST ===")
+    print(f"[SYNC] UID: {request.uid}")
+    print(f"[SYNC] Email: {request.email}")
+    print(f"[SYNC] Profile: {request.profile}")
+    print(f"{'='*60}")
+    
+    if not user_service:
+        print("[SYNC] ERROR: MongoDB not connected!")
+        raise HTTPException(status_code=503, detail="User service not available (MongoDB not connected)")
+    
+    try:
+        # Check if user already exists by UID
+        existing_user = user_service.get_user_by_uid(request.uid)
+        
+        if existing_user:
+            print(f"[SYNC] User exists, updating profile...")
+            # Update existing user's profile by merging
+            if request.profile:
+                existing_profile = existing_user.get('profile', {})
+                merged_profile = {**existing_profile, **request.profile}
+                user_service.update_user_profile(request.uid, merged_profile)
+            
+            updated_user = user_service.get_user_by_uid(request.uid)
+            print(f"[SYNC] SUCCESS - User profile updated!")
+            return {
+                "success": True,
+                "action": "updated",
+                "uid": request.uid,
+                "email": request.email,
+                "profile": updated_user.get('profile', {}),
+                "message": "User profile synced successfully"
+            }
+        else:
+            print(f"[SYNC] User doesn't exist, creating new user...")
+            # Create new user in MongoDB with Supabase UID
+            user_service.create_user_with_uid(request.uid, request.email, request.profile or {})
+            print(f"[SYNC] SUCCESS - New user created!")
+            return {
+                "success": True,
+                "action": "created",
+                "uid": request.uid,
+                "email": request.email,
+                "profile": request.profile or {},
+                "message": "User created and synced successfully"
+            }
+    except Exception as e:
+        print(f"[SYNC] ERROR: {str(e)}")
+        logger.error(f"User sync error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"User sync failed: {str(e)}")
 
 
 @app.post("/api/users/login")
@@ -398,49 +469,107 @@ async def update_profile(uid: str, request: ProfileUpdateRequest):
 
 @app.post("/api/users/{uid}/upload-chat")
 async def upload_chat(uid: str, file: UploadFile = File(...)):
-    """Upload chat data and extract behavior vector for user"""
+    """Upload chat data and extract behavior vector for user.
+    
+    Supports:
+    - JSON files: Standard chat format {messages: [{sender, text, timestamp}, ...]}
+    - ZIP files: Instagram data export archives
+    """
     if not user_service:
         raise HTTPException(status_code=503, detail="User service not available")
     
     try:
-        # Read and parse the uploaded file
+        # Read the uploaded file
         content = await file.read()
+        filename = file.filename or ""
+        content_type = file.content_type or ""
         
-        try:
-            chat_data = json.loads(content.decode('utf-8'))
-        except json.JSONDecodeError:
-            raise HTTPException(status_code=400, detail="Invalid JSON file")
+        logger.info(f"[UPLOAD] Processing file: {filename}, type: {content_type}, size: {len(content)} bytes")
         
-        # Extract messages from chat data
-        messages = chat_data if isinstance(chat_data, list) else chat_data.get('messages', [])
+        messages = []
+        owner_name = None
+        file_type = "unknown"
+        
+        # Detect file type and parse accordingly
+        is_zip = (
+            filename.lower().endswith('.zip') or
+            content_type in ['application/zip', 'application/x-zip-compressed'] or
+            content[:4] == b'PK\x03\x04'  # ZIP magic bytes
+        )
+        
+        if is_zip:
+            # Parse Instagram ZIP export (only owner's messages are returned)
+            file_type = "instagram_zip"
+            logger.info(f"[UPLOAD] Detected Instagram ZIP file")
+            
+            try:
+                # parse_instagram_zip with owner_only=True (default) returns only owner's messages
+                messages, owner_name = parse_instagram_zip(content, owner_only=True)
+                logger.info(f"[UPLOAD] Extracted {len(messages)} messages from owner '{owner_name}'")
+            except ValueError as e:
+                raise HTTPException(status_code=400, detail=str(e))
+            except Exception as e:
+                logger.error(f"[UPLOAD] ZIP parsing error: {str(e)}")
+                raise HTTPException(status_code=400, detail=f"Failed to parse Instagram ZIP: {str(e)}")
+        else:
+            # Try to parse as JSON
+            file_type = "json"
+            try:
+                chat_data = json.loads(content.decode('utf-8'))
+                all_messages = chat_data if isinstance(chat_data, list) else chat_data.get('messages', [])
+                
+                # Filter to only include messages from "user" (not "bot" or other senders)
+                # This ensures we only vectorize the user's own messages
+                messages = [msg for msg in all_messages if msg.get('sender', '').lower() == 'user']
+                owner_name = "user"
+                
+                logger.info(f"[UPLOAD] Filtered to {len(messages)} user messages (out of {len(all_messages)} total)")
+                
+            except (json.JSONDecodeError, UnicodeDecodeError) as e:
+                raise HTTPException(status_code=400, detail="Invalid file format. Expected JSON or Instagram ZIP export.")
         
         if not messages:
-            raise HTTPException(status_code=400, detail="No messages found in chat data")
+            raise HTTPException(status_code=400, detail="No messages from user found in uploaded file")
+        
+        logger.info(f"[UPLOAD] Processing {len(messages)} user messages for vectorization")
         
         # Extract behavior vector
         vector, labels = feature_extractor.extract(messages)
         categories = feature_extractor.extract_by_category(messages)
         
-        # Store vector
+        # Store vector with metadata
         metadata = {
             "uid": uid,
             "message_count": len(messages),
             "extracted_at": datetime.now().isoformat(),
-            "filename": file.filename
+            "filename": filename,
+            "file_type": file_type
         }
+        
+        if owner_name:
+            metadata["owner_name"] = owner_name
+        
         vector_id = vector_store.add(vector, metadata)
         
         # Link vector to user
         user_service.link_vector_to_user(uid, vector_id)
         
-        return {
+        logger.info(f"[UPLOAD] Vector stored with ID: {vector_id}")
+        
+        response = {
             "success": True,
             "vector_id": vector_id,
             "feature_count": len(vector),
             "message_count": len(messages),
+            "file_type": file_type,
             "categories": {k: dict(v) for k, v in categories.items()},
             "category_summary": feature_extractor.get_category_summary(messages)
         }
+        
+        if owner_name:
+            response["owner_name"] = owner_name
+        
+        return response
         
     except HTTPException:
         raise

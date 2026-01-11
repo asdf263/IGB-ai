@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import { Button, Text, Snackbar, ProgressBar, Card } from 'react-native-paper';
+import { Button, Text, Snackbar, ProgressBar, Card, Chip } from 'react-native-paper';
 import * as DocumentPicker from 'expo-document-picker';
 
 const OnboardingStep3_ChatUpload = ({ navigation, route }) => {
@@ -14,21 +14,46 @@ const OnboardingStep3_ChatUpload = ({ navigation, route }) => {
   console.log('[ONBOARD-3] Rendering Step 3 - Chat Upload');
   console.log('[ONBOARD-3] Data received:', { email: accountData.email, name: profileData.name });
 
+  // Determine file type from name or MIME type
+  const getFileType = (file) => {
+    if (!file) return null;
+    const name = file.name?.toLowerCase() || '';
+    const mimeType = file.mimeType?.toLowerCase() || '';
+    
+    if (name.endsWith('.zip') || mimeType.includes('zip')) {
+      return 'instagram';
+    }
+    return 'json';
+  };
+
   const pickFile = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: ['application/json', 'text/plain'],
+        type: [
+          'application/json',
+          'text/plain',
+          'application/zip',
+          'application/x-zip-compressed',
+          'application/octet-stream', // Some devices report ZIP as this
+        ],
         copyToCacheDirectory: true,
       });
 
       if (!result.canceled && result.assets[0]) {
         const file = result.assets[0];
-        if (file.size > 50 * 1024 * 1024) {
-          setErrorMessage('File size must be less than 50MB');
+        const fileType = getFileType(file);
+        
+        // Different size limits based on file type
+        const maxSize = fileType === 'instagram' ? 150 * 1024 * 1024 : 50 * 1024 * 1024;
+        const maxSizeLabel = fileType === 'instagram' ? '150MB' : '50MB';
+        
+        if (file.size > maxSize) {
+          setErrorMessage(`File size must be less than ${maxSizeLabel}`);
           setShowError(true);
           return;
         }
-        console.log('[ONBOARD-3] File selected:', file.name);
+        
+        console.log('[ONBOARD-3] File selected:', file.name, 'Type:', fileType);
         setSelectedFile(file);
       }
     } catch (error) {
@@ -56,6 +81,8 @@ const OnboardingStep3_ChatUpload = ({ navigation, route }) => {
     navigation.goBack();
   };
 
+  const fileType = getFileType(selectedFile);
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -69,24 +96,38 @@ const OnboardingStep3_ChatUpload = ({ navigation, route }) => {
             Step 3 of 4: Chat Data
           </Text>
           <Text variant="bodyMedium" style={styles.subtitle}>
-            Upload your chat logs to create your behavior vector (required)
+            Upload your Instagram data export (ZIP) or chat logs (JSON)
           </Text>
 
           <Card style={styles.card}>
             <Card.Content>
               {selectedFile ? (
                 <View>
-                  <Text variant="titleMedium" style={styles.fileName}>
-                    {selectedFile.name}
-                  </Text>
+                  <View style={styles.fileHeader}>
+                    <Text variant="titleMedium" style={styles.fileName}>
+                      {selectedFile.name}
+                    </Text>
+                    <Chip 
+                      mode="outlined" 
+                      compact
+                      style={fileType === 'instagram' ? styles.instagramChip : styles.jsonChip}
+                    >
+                      {fileType === 'instagram' ? 'Instagram Export' : 'JSON'}
+                    </Chip>
+                  </View>
                   <Text variant="bodySmall" style={styles.fileSize}>
                     {formatFileSize(selectedFile.size)}
                   </Text>
                 </View>
               ) : (
-                <Text variant="bodyMedium" style={styles.noFileText}>
-                  No file selected - please upload a chat file to continue
-                </Text>
+                <View>
+                  <Text variant="bodyMedium" style={styles.noFileText}>
+                    No file selected
+                  </Text>
+                  <Text variant="bodySmall" style={styles.helpText}>
+                    Supported formats: Instagram data export (.zip) or JSON chat files
+                  </Text>
+                </View>
               )}
             </Card.Content>
           </Card>
@@ -95,7 +136,7 @@ const OnboardingStep3_ChatUpload = ({ navigation, route }) => {
             mode="outlined"
             onPress={pickFile}
             style={styles.pickButton}
-            icon="file-upload"
+            icon={fileType === 'instagram' ? 'instagram' : 'file-upload'}
           >
             {selectedFile ? 'Change File' : 'Select File'}
           </Button>
@@ -135,13 +176,17 @@ const styles = StyleSheet.create({
   title: { textAlign: 'center', marginBottom: 8, fontWeight: 'bold' },
   subtitle: { textAlign: 'center', marginBottom: 32, color: '#666' },
   card: { marginBottom: 16 },
-  fileName: { fontWeight: 'bold', marginBottom: 4 },
+  fileHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
+  fileName: { fontWeight: 'bold', flex: 1, marginRight: 8 },
   fileSize: { color: '#666' },
-  noFileText: { color: '#999', textAlign: 'center' },
+  noFileText: { color: '#999', textAlign: 'center', marginBottom: 8 },
+  helpText: { color: '#999', textAlign: 'center', fontSize: 12 },
   pickButton: { marginBottom: 16 },
   buttonRow: { flexDirection: 'row', marginTop: 8, gap: 12 },
   backButton: { flex: 1 },
   nextButton: { flex: 1 },
+  instagramChip: { backgroundColor: '#fce4ec' },
+  jsonChip: { backgroundColor: '#e3f2fd' },
 });
 
 export default OnboardingStep3_ChatUpload;

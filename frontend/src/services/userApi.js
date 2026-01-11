@@ -61,29 +61,57 @@ export const updateProfile = async (uid, profileData) => {
 };
 
 /**
+ * Detect file type from filename or MIME type
+ * @param {Object} file - File object
+ * @returns {Object} Object with mimeType and isZip flag
+ */
+const detectFileType = (file) => {
+  const name = file.name?.toLowerCase() || '';
+  const mimeType = file.mimeType?.toLowerCase() || '';
+  
+  const isZip = name.endsWith('.zip') || 
+                mimeType === 'application/zip' || 
+                mimeType === 'application/x-zip-compressed';
+  
+  return {
+    isZip,
+    mimeType: isZip ? 'application/zip' : (mimeType || 'application/json'),
+    defaultName: isZip ? 'instagram_export.zip' : 'chat.json',
+  };
+};
+
+/**
  * Upload chat data and vectorize
+ * Supports JSON chat files and Instagram ZIP exports
  * @param {string} uid - User UID
  * @param {Object} file - File object (from DocumentPicker)
  * @returns {Promise} Upload result with vector_id
  */
 export const uploadChatData = async (uid, file) => {
   try {
+    const { isZip, mimeType, defaultName } = detectFileType(file);
+    
+    // Longer timeout for ZIP files (they can be large and require more processing)
+    const timeout = isZip ? 300000 : 120000; // 5 minutes for ZIP, 2 minutes for JSON
+    
     const formData = new FormData();
     formData.append('file', {
       uri: file.uri,
-      type: file.mimeType || 'application/json',
-      name: file.name || 'chat.json',
+      type: mimeType,
+      name: file.name || defaultName,
     });
+
+    console.log(`[userApi] Uploading ${isZip ? 'Instagram ZIP' : 'JSON'} file: ${file.name}`);
 
     const response = await api.post(`/api/users/${uid}/upload-chat`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-      timeout: 120000,
+      timeout,
     });
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.error || error.message || 'Failed to upload chat data');
+    throw new Error(error.response?.data?.detail || error.response?.data?.error || error.message || 'Failed to upload chat data');
   }
 };
 

@@ -1,5 +1,10 @@
 import React, { createContext, useState, useEffect, useCallback, useRef } from 'react';
 import * as authApi from '../services/authApi';
+import { getUser as getUserFromBackend } from '../services/userApi';
+import axios from 'axios';
+import Constants from 'expo-constants';
+
+const API_BASE_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
 
 export const AuthContext = createContext();
 
@@ -39,6 +44,39 @@ export const AuthProvider = ({ children }) => {
   };
 
   /**
+   * Sync user to MongoDB if they don't exist (fallback for failed syncs during signup)
+   */
+  const ensureUserInMongoDB = async (supabaseUser) => {
+    const uid = supabaseUser.id;
+    const email = supabaseUser.email;
+    const supabaseProfile = supabaseUser.user_metadata || {};
+    
+    try {
+      // Try to fetch user from MongoDB
+      const backendUser = await getUserFromBackend(uid);
+      console.log('[AUTH] User found in MongoDB:', backendUser?.profile);
+      return backendUser?.profile || supabaseProfile;
+    } catch (err) {
+      // User doesn't exist in MongoDB - need to sync
+      console.log('[AUTH] User not found in MongoDB, syncing...', err.message);
+      
+      try {
+        const syncResponse = await axios.post(`${API_BASE_URL}/api/users/sync`, {
+          uid,
+          email,
+          profile: supabaseProfile,
+        });
+        console.log('[AUTH] User synced to MongoDB:', syncResponse.data);
+        return syncResponse.data?.profile || supabaseProfile;
+      } catch (syncErr) {
+        console.warn('[AUTH] Failed to sync user to MongoDB:', syncErr.message);
+        // Return Supabase profile as fallback
+        return supabaseProfile;
+      }
+    }
+  };
+
+  /**
    * Initialize auth state from existing Supabase session
    */
   const initializeAuth = async () => {
@@ -52,7 +90,17 @@ export const AuthProvider = ({ children }) => {
         
         // Only authenticate if email is verified
         if (emailVerified) {
-          const userData = mapSupabaseUser(currentSession.user);
+          // Ensure user exists in MongoDB and get profile
+          const profile = await ensureUserInMongoDB(currentSession.user);
+          
+          const userData = {
+            uid: currentSession.user.id,
+            email: currentSession.user.email,
+            profile: profile,
+            emailVerified: true,
+            createdAt: currentSession.user.created_at,
+          };
+          
           setUser(userData);
           setSession(currentSession);
           setIsAuthenticated(true);
@@ -208,12 +256,21 @@ export const AuthProvider = ({ children }) => {
         throw new Error('Email not confirmed. Please check your inbox and verify your email.');
       }
       
+      // Ensure user exists in MongoDB and get profile
+      // This handles cases where signup sync failed
+      let profile = result.user_profile?.profile || {};
+      
+      if (result.user && Object.keys(profile).length === 0) {
+        console.log('[AUTH] Empty profile from backend, trying to sync...');
+        profile = await ensureUserInMongoDB(result.user);
+      }
+      
       // User state will be updated via onAuthStateChange
       // But we also set it here for immediate feedback
       const userData = {
         uid: result.uid,
         email: result.email,
-        profile: result.user_profile?.profile || {},
+        profile: profile,
         emailVerified: true,
       };
       
@@ -221,7 +278,7 @@ export const AuthProvider = ({ children }) => {
       setSession(result.session);
       setIsAuthenticated(true);
       
-      console.log('[AUTH] Login successful');
+      console.log('[AUTH] Login successful with profile:', profile);
       return { success: true, user: userData };
     } catch (err) {
       console.log('[AUTH] Login error:', err.message);

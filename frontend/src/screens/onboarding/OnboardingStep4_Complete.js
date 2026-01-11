@@ -3,7 +3,7 @@ import { View, StyleSheet, ScrollView } from 'react-native';
 import { Button, Text, ProgressBar, Card, Avatar, ActivityIndicator } from 'react-native-paper';
 import { AuthContext } from '../../context/AuthContext';
 import { uploadChatData } from '../../services/userApi';
-import { formatLocationDisplay, formatHeightDisplay } from '../../constants/profileOptions';
+import { formatHeightDisplay } from '../../constants/profileOptions';
 
 const OnboardingStep4_Complete = ({ navigation, route }) => {
   const { signup } = useContext(AuthContext);
@@ -192,10 +192,14 @@ const OnboardingStep4_Complete = ({ navigation, route }) => {
               </View>
             )}
 
-            {(profileData.city || profileData.state) && (
+            {(profileData.city || profileData.country) && (
               <View style={styles.row}>
                 <Text variant="bodySmall" style={styles.label}>Location:</Text>
-                <Text variant="bodyMedium">{formatLocationDisplay(profileData.city, profileData.state)}</Text>
+                <Text variant="bodyMedium">
+                  {profileData.city && profileData.country 
+                    ? `${profileData.city}, ${profileData.country}`
+                    : profileData.city || profileData.country}
+                </Text>
               </View>
             )}
 
