@@ -199,6 +199,7 @@ class EcosystemCompatibilityRequest(BaseModel):
 class SignupRequest(BaseModel):
     email: str
     password: str
+    profile: Optional[Dict[str, Any]] = None
 
 
 class LoginRequest(BaseModel):
@@ -211,20 +212,33 @@ class ProfileUpdateRequest(BaseModel):
     instagram_handle: Optional[str] = None
     bio: Optional[str] = None
     interests: Optional[List[str]] = None
+    location: Optional[str] = None
+    ethnicity: Optional[str] = None
+    height: Optional[str] = None
+    height_unit: Optional[str] = None
 
 
 # ============== Health Check ==============
 
+@app.get("/")
+async def root():
+    """Root endpoint"""
+    print("[SERVER] Root endpoint accessed - server is running!")
+    return {"message": "IGB AI Backend Running", "docs": "/docs"}
+
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
+    mongodb_ok = user_service is not None and user_service.client is not None
+    print(f"[HEALTH] MongoDB: {mongodb_ok}")
     return {
         "status": "healthy",
         "service": "IGB-AI Unified API",
         "version": "2.1.0",
         "feature_count": feature_extractor.get_feature_count() if feature_extractor else 0,
         "stored_vectors": vector_store.count() if vector_store else 0,
-        "mongodb_available": user_service is not None and user_service.client is not None
+        "mongodb_available": mongodb_ok
     }
 
 
@@ -232,12 +246,29 @@ async def health_check():
 
 @app.post("/api/users/signup")
 async def signup(request: SignupRequest):
-    """Create a new user account"""
+    """Create a new user account with profile data"""
+    print(f"\n{'='*60}")
+    print(f"[SIGNUP] === REQUEST RECEIVED ===")
+    print(f"[SIGNUP] Email: {request.email}")
+    print(f"[SIGNUP] Profile: {request.profile}")
+    print(f"{'='*60}")
+    
     if not user_service:
+        print("[SIGNUP] ERROR: MongoDB not connected!")
         raise HTTPException(status_code=503, detail="User service not available (MongoDB not connected)")
     
     try:
+        print(f"[SIGNUP] Creating user in database...")
         user = user_service.create_user(request.email, request.password)
+        print(f"[SIGNUP] User created: uid={user['uid']}")
+        
+        # Save profile if provided
+        if request.profile:
+            print(f"[SIGNUP] Saving profile data...")
+            user_service.update_user_profile(user['uid'], request.profile)
+            print(f"[SIGNUP] Profile saved!")
+        
+        print(f"[SIGNUP] SUCCESS - Account created!")
         return {
             "success": True,
             "uid": user['uid'],
@@ -245,8 +276,10 @@ async def signup(request: SignupRequest):
             "message": "Account created successfully"
         }
     except ValueError as e:
+        print(f"[SIGNUP] VALIDATION ERROR: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
+        print(f"[SIGNUP] ERROR: {str(e)}")
         logger.error(f"Signup error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Signup failed: {str(e)}")
 
@@ -254,29 +287,62 @@ async def signup(request: SignupRequest):
 @app.post("/api/users/login")
 async def login(request: LoginRequest):
     """Authenticate user and return profile"""
+    print(f"\n{'='*60}")
+    print(f"[LOGIN] === REQUEST RECEIVED ===")
+    print(f"[LOGIN] Email: {request.email}")
+    print(f"{'='*60}")
+    
     if not user_service:
+        print("[LOGIN] ERROR: MongoDB not connected!")
         raise HTTPException(status_code=503, detail="User service not available (MongoDB not connected)")
     
     try:
+        print(f"[LOGIN] Authenticating user...")
         user = user_service.authenticate_user(request.email, request.password)
         
         if not user:
+            print(f"[LOGIN] FAILED: Invalid credentials")
             raise HTTPException(status_code=401, detail="Invalid email or password")
         
+        print(f"[LOGIN] SUCCESS - uid={user['uid']}")
+        print(f"[LOGIN] Profile: {user.get('profile', {})}")
         return {
             "success": True,
             "uid": user['uid'],
             "email": user['email'],
             "user_profile": {
                 "profile": user.get('profile', {}),
-                "onboarding_complete": user.get('onboarding_complete', False)
             }
         }
     except HTTPException:
         raise
     except Exception as e:
+        print(f"[LOGIN] ERROR: {str(e)}")
         logger.error(f"Login error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Login failed: {str(e)}")
+
+
+@app.get("/api/users")
+async def list_all_users(limit: int = 100, skip: int = 0):
+    """List all users with pagination"""
+    if not user_service:
+        raise HTTPException(status_code=503, detail="User service not available")
+    
+    try:
+        users = user_service.list_users(limit=limit, skip=skip)
+        total_count = user_service.count_users()
+        
+        return {
+            "success": True,
+            "users": users,
+            "count": len(users),
+            "total": total_count,
+            "limit": limit,
+            "skip": skip
+        }
+    except Exception as e:
+        logger.error(f"List users error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to list users: {str(e)}")
 
 
 @app.get("/api/users/{uid}")

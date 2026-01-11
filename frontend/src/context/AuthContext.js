@@ -1,246 +1,283 @@
-// #region agent log
-console.log('[AUTH] AuthContext.js module loading');
-// #endregion
-
-import React, { createContext, useState, useEffect, useCallback } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useState, useEffect, useCallback, useRef } from 'react';
 import * as authApi from '../services/authApi';
-import * as userApi from '../services/userApi';
-
-// #region agent log
-console.log('[AUTH] AuthContext imports complete');
-// #endregion
 
 export const AuthContext = createContext();
 
-const AUTH_STORAGE_KEY = '@igb_ai:auth';
-
 export const AuthProvider = ({ children }) => {
-  // #region agent log
-  console.log('[AUTH] AuthProvider rendering');
-  // #endregion
-
   const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Flag to prevent auto-auth after signup
+  const justSignedUp = useRef(false);
 
-  // Load auth state from storage on mount
+  console.log('[AUTH] Rendering, isAuthenticated:', isAuthenticated, 'isLoading:', isLoading);
+
   useEffect(() => {
-    // #region agent log
-    console.log('[AUTH] useEffect mounting, calling loadAuthState');
-    // #endregion
-    loadAuthState();
+    // Initialize auth state from Supabase session
+    initializeAuth();
+
+    // Subscribe to auth state changes
+    const subscription = authApi.onAuthStateChange((event, session) => {
+      console.log('[AUTH] Auth state changed:', event);
+      handleAuthStateChange(event, session);
+    });
+
+    // Cleanup subscription on unmount
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, []);
 
-  const loadAuthState = async () => {
-    // #region agent log
-    console.log('[AUTH] loadAuthState starting');
-    // #endregion
+  /**
+   * Check if user's email is verified
+   */
+  const isEmailVerified = (supabaseUser) => {
+    return supabaseUser?.email_confirmed_at != null;
+  };
+
+  /**
+   * Initialize auth state from existing Supabase session
+   */
+  const initializeAuth = async () => {
+    console.log('[AUTH] Initializing auth state...');
     try {
-      const storagePromise = AsyncStorage.getItem(AUTH_STORAGE_KEY);
-      const timeoutPromise = new Promise((resolve) => 
-        setTimeout(() => resolve(null), 2000)
-      );
+      const currentSession = await authApi.getSession();
       
-      // #region agent log
-      console.log('[AUTH] Waiting for AsyncStorage with timeout');
-      // #endregion
-      
-      const storedAuth = await Promise.race([storagePromise, timeoutPromise]);
-      
-      // #region agent log
-      console.log('[AUTH] AsyncStorage result:', storedAuth ? 'has data' : 'no data');
-      // #endregion
-      
-      if (storedAuth) {
-        try {
-          const authData = JSON.parse(storedAuth);
-          setUser(authData);
+      if (currentSession && currentSession.user) {
+        const emailVerified = isEmailVerified(currentSession.user);
+        console.log('[AUTH] Found existing session for:', currentSession.user?.email, 'verified:', emailVerified);
+        
+        // Only authenticate if email is verified
+        if (emailVerified) {
+          const userData = mapSupabaseUser(currentSession.user);
+          setUser(userData);
+          setSession(currentSession);
           setIsAuthenticated(true);
-          // #region agent log
-          console.log('[AUTH] User restored from storage');
-          // #endregion
-        } catch (parseError) {
-          console.warn('Error parsing auth data:', parseError);
+        } else {
+          console.log('[AUTH] Email not verified, not authenticating');
+          // Sign out unverified user
+          await authApi.logout();
+          setUser(null);
+          setSession(null);
+          setIsAuthenticated(false);
         }
+      } else {
+        console.log('[AUTH] No existing session found');
+        setUser(null);
+        setSession(null);
+        setIsAuthenticated(false);
       }
-    } catch (error) {
-      console.warn('Error loading auth state:', error.message);
+    } catch (err) {
+      console.log('[AUTH] Error initializing auth:', err.message);
+      setUser(null);
+      setSession(null);
+      setIsAuthenticated(false);
     } finally {
-      // #region agent log
-      console.log('[AUTH] loadAuthState complete, setting isLoading=false');
-      // #endregion
       setIsLoading(false);
     }
   };
 
-  const saveAuthState = async (userData) => {
-    try {
-      await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userData));
-    } catch (error) {
-      console.error('Error saving auth state:', error);
+  /**
+   * Handle Supabase auth state changes
+   */
+  const handleAuthStateChange = (event, newSession) => {
+    console.log('[AUTH] Handling auth state change:', event, 'justSignedUp:', justSignedUp.current);
+    
+    // Skip auto-auth if user just signed up (need email verification)
+    if (justSignedUp.current && event === 'SIGNED_IN') {
+      console.log('[AUTH] Skipping auto-auth after signup');
+      justSignedUp.current = false;
+      return;
+    }
+    
+    switch (event) {
+      case 'SIGNED_IN':
+        if (newSession?.user) {
+          const emailVerified = isEmailVerified(newSession.user);
+          console.log('[AUTH] SIGNED_IN - email verified:', emailVerified);
+          
+          // Only authenticate if email is verified
+          if (emailVerified) {
+            const userData = mapSupabaseUser(newSession.user);
+            setUser(userData);
+            setSession(newSession);
+            setIsAuthenticated(true);
+          } else {
+            console.log('[AUTH] Email not verified, staying on auth flow');
+          }
+        }
+        break;
+      
+      case 'SIGNED_OUT':
+        setUser(null);
+        setSession(null);
+        setIsAuthenticated(false);
+        break;
+      
+      case 'TOKEN_REFRESHED':
+        console.log('[AUTH] Token refreshed');
+        if (newSession?.user && isEmailVerified(newSession.user)) {
+          setSession(newSession);
+        }
+        break;
+      
+      case 'USER_UPDATED':
+        if (newSession?.user && isEmailVerified(newSession.user)) {
+          const userData = mapSupabaseUser(newSession.user);
+          setUser(userData);
+        }
+        break;
+      
+      default:
+        console.log('[AUTH] Unhandled auth event:', event);
     }
   };
 
-  const clearAuthState = async () => {
-    try {
-      await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
-    } catch (error) {
-      console.error('Error clearing auth state:', error);
-    }
+  /**
+   * Map Supabase user object to app user structure
+   */
+  const mapSupabaseUser = (supabaseUser) => {
+    if (!supabaseUser) return null;
+    
+    return {
+      uid: supabaseUser.id,
+      email: supabaseUser.email,
+      profile: supabaseUser.user_metadata || {},
+      emailVerified: supabaseUser.email_confirmed_at != null,
+      createdAt: supabaseUser.created_at,
+    };
   };
 
-  const signup = useCallback(async (email, password) => {
+  /**
+   * Sign up a new user
+   * Does NOT auto-authenticate - user must verify email first
+   */
+  const signup = useCallback(async (email, password, profileData = {}) => {
+    console.log('[AUTH] Signup called for:', email);
+    console.log('[AUTH] Profile data:', profileData);
+    
     try {
       setError(null);
-      setIsLoading(true);
       
-      const result = await authApi.signup(email, password);
+      // Set flag to prevent auto-auth from onAuthStateChange
+      justSignedUp.current = true;
       
-      const userData = {
-        uid: result.uid,
-        email: email,
-        profile: {},
-        onboarding_complete: false,
-      };
+      const result = await authApi.signup(email, password, profileData);
+      console.log('[AUTH] Signup API result:', result);
       
-      setUser(userData);
-      setIsAuthenticated(true);
-      await saveAuthState(userData);
+      // Sign out immediately - user needs to verify email first
+      // This prevents auto-login after signup
+      try {
+        await authApi.logout();
+      } catch (logoutErr) {
+        console.log('[AUTH] Post-signup logout (expected):', logoutErr.message);
+      }
       
-      return { success: true, user: userData };
-    } catch (error) {
-      setError(error.message);
-      return { success: false, error: error.message };
-    } finally {
-      setIsLoading(false);
+      // Do NOT set authenticated - user must verify email and login
+      console.log('[AUTH] Signup successful, awaiting email verification');
+      return { success: true, email: email };
+    } catch (err) {
+      console.log('[AUTH] Signup error:', err.message);
+      justSignedUp.current = false;
+      setError(err.message);
+      return { success: false, error: err.message };
     }
   }, []);
 
+  /**
+   * Log in an existing user
+   * Will fail if email not verified (Supabase default behavior)
+   */
   const login = useCallback(async (email, password) => {
+    console.log('[AUTH] Login called for:', email);
+    
     try {
       setError(null);
       setIsLoading(true);
       
       const result = await authApi.login(email, password);
+      console.log('[AUTH] Login API result:', result);
       
+      // Check if email is verified
+      if (result.user && !isEmailVerified(result.user)) {
+        console.log('[AUTH] Login failed - email not verified');
+        await authApi.logout();
+        throw new Error('Email not confirmed. Please check your inbox and verify your email.');
+      }
+      
+      // User state will be updated via onAuthStateChange
+      // But we also set it here for immediate feedback
       const userData = {
         uid: result.uid,
-        email: email,
+        email: result.email,
         profile: result.user_profile?.profile || {},
-        onboarding_complete: result.user_profile?.onboarding_complete || false,
+        emailVerified: true,
       };
       
       setUser(userData);
+      setSession(result.session);
       setIsAuthenticated(true);
-      await saveAuthState(userData);
       
+      console.log('[AUTH] Login successful');
       return { success: true, user: userData };
-    } catch (error) {
-      setError(error.message);
-      return { success: false, error: error.message };
+    } catch (err) {
+      console.log('[AUTH] Login error:', err.message);
+      setError(err.message);
+      return { success: false, error: err.message };
     } finally {
       setIsLoading(false);
     }
   }, []);
 
+  /**
+   * Log out the current user
+   */
   const logout = useCallback(async () => {
+    console.log('[AUTH] Logout called');
+    
     try {
+      await authApi.logout();
+      // State will be cleared via onAuthStateChange
+      // But we also clear it here for immediate feedback
       setUser(null);
+      setSession(null);
       setIsAuthenticated(false);
-      await clearAuthState();
-    } catch (error) {
-      console.error('Error logging out:', error);
+      console.log('[AUTH] Logout successful');
+    } catch (err) {
+      console.log('[AUTH] Logout error:', err.message);
+      // Still clear local state even if API call fails
+      setUser(null);
+      setSession(null);
+      setIsAuthenticated(false);
     }
   }, []);
 
-  const updateProfile = useCallback(async (profileData) => {
-    try {
-      if (!user?.uid) {
-        throw new Error('User not authenticated');
-      }
-      
-      setError(null);
-      const result = await userApi.updateProfile(user.uid, profileData);
-      
-      const updatedUser = {
-        ...user,
-        profile: result.profile,
-      };
-      
-      setUser(updatedUser);
-      await saveAuthState(updatedUser);
-      
-      return { success: true, profile: result.profile };
-    } catch (error) {
-      setError(error.message);
-      return { success: false, error: error.message };
-    }
-  }, [user]);
-
-  const refreshUser = useCallback(async () => {
-    try {
-      if (!user?.uid) {
-        return;
-      }
-      
-      const result = await userApi.getUser(user.uid);
-      
-      const updatedUser = {
-        uid: result.metadata.uid,
-        email: result.metadata.email,
-        profile: result.profile,
-        onboarding_complete: result.metadata.onboarding_complete,
-      };
-      
-      setUser(updatedUser);
-      await saveAuthState(updatedUser);
-    } catch (error) {
-      console.error('Error refreshing user:', error);
-    }
-  }, [user]);
-
-  const completeOnboarding = useCallback(async () => {
-    try {
-      if (!user?.uid) {
-        throw new Error('User not authenticated');
-      }
-      
-      await userApi.completeOnboarding(user.uid);
-      
-      const updatedUser = {
-        ...user,
-        onboarding_complete: true,
-      };
-      
-      setUser(updatedUser);
-      await saveAuthState(updatedUser);
-      
-      return { success: true };
-    } catch (error) {
-      setError(error.message);
-      return { success: false, error: error.message };
-    }
-  }, [user]);
+  /**
+   * Update the user's profile data locally
+   * (Used after profile sync with backend)
+   */
+  const updateUserProfile = useCallback((profileData) => {
+    setUser((prevUser) => ({
+      ...prevUser,
+      profile: { ...prevUser?.profile, ...profileData },
+    }));
+  }, []);
 
   const value = {
     user,
+    session,
     isAuthenticated,
     isLoading,
     error,
     signup,
     login,
     logout,
-    updateProfile,
-    refreshUser,
-    completeOnboarding,
     setError,
+    updateUserProfile,
   };
-
-  // #region agent log
-  console.log('[AUTH] AuthProvider returning, isLoading:', isLoading);
-  // #endregion
 
   return (
     <AuthContext.Provider value={value}>

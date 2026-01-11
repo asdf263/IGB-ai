@@ -1,7 +1,3 @@
-// #region agent log
-console.log('[NAV] AppNavigator.js module loading');
-// #endregion
-
 import React, { useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -10,29 +6,23 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import { AuthContext } from '../context/AuthContext';
 import AuthNavigator from './AuthNavigator';
-import OnboardingNavigator from './OnboardingNavigator';
 
-// #region agent log
-console.log('[NAV] AppNavigator imports complete');
+// #region agent log - debug import fix
+console.log('[DEBUG-H1] About to import screens');
 // #endregion
 
-// Lazy load screens - only import when needed
-const createLazyScreen = (importFn) => {
-  let Component = null;
-  return (props) => {
-    if (!Component) {
-      Component = importFn();
-    }
-    return <Component {...props} />;
-  };
-};
+// Import screens directly (they use export default)
+const AnalysisScreen = require('../screens/AnalysisScreen').default;
+const VectorDetailScreen = require('../screens/VectorDetailScreen').default;
+const ProfileScreen = require('../screens/ProfileScreen').default;
+const BrowseUsersScreen = require('../screens/BrowseUsersScreen').default;
 
-// Lazy screen factories
-const UploadScreen = createLazyScreen(() => require('../screens/UploadScreen').UploadScreen);
-const AnalysisScreen = createLazyScreen(() => require('../screens/AnalysisScreen').AnalysisScreen);
-const VectorDetailScreen = createLazyScreen(() => require('../screens/VectorDetailScreen').VectorDetailScreen);
-const ClusterGraphScreen = createLazyScreen(() => require('../screens/ClusterGraphScreen').ClusterGraphScreen);
-const SyntheticScreen = createLazyScreen(() => require('../screens/SyntheticScreen').SyntheticScreen);
+// #region agent log - debug import validation
+console.log('[DEBUG-H1] AnalysisScreen type:', typeof AnalysisScreen);
+console.log('[DEBUG-H1] VectorDetailScreen type:', typeof VectorDetailScreen);
+console.log('[DEBUG-H1] ProfileScreen type:', typeof ProfileScreen);
+console.log('[DEBUG-H1] BrowseUsersScreen type:', typeof BrowseUsersScreen);
+// #endregion
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -41,103 +31,54 @@ const TabIcon = ({ name, color, size }) => (
   <IconButton icon={name} iconColor={color} size={size} />
 );
 
-const MainTabs = () => {
-  return (
-    <Tab.Navigator
-      screenOptions={{
-        tabBarActiveTintColor: '#6200ee',
-        tabBarInactiveTintColor: '#999',
-        headerShown: false,
+const MainTabs = () => (
+  <Tab.Navigator
+    screenOptions={{
+      tabBarActiveTintColor: '#6200ee',
+      tabBarInactiveTintColor: '#999',
+      headerShown: false,
+    }}
+  >
+    <Tab.Screen
+      name="Browse"
+      component={BrowseUsersScreen}
+      options={{
+        tabBarLabel: 'Browse',
+        tabBarIcon: ({ color, size }) => <TabIcon name="account-search" color={color} size={size} />,
       }}
-      lazy={true}
-    >
-      <Tab.Screen
-        name="Upload"
-        component={UploadScreen}
-        options={{
-          tabBarLabel: 'Upload',
-          tabBarIcon: ({ color, size }) => (
-            <TabIcon name="cloud-upload" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Clusters"
-        component={ClusterGraphScreen}
-        options={{
-          tabBarLabel: 'Clusters',
-          tabBarIcon: ({ color, size }) => (
-            <TabIcon name="graph" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Synthetic"
-        component={SyntheticScreen}
-        options={{
-          tabBarLabel: 'Synthetic',
-          tabBarIcon: ({ color, size }) => (
-            <TabIcon name="creation" color={color} size={size} />
-          ),
-        }}
-      />
-    </Tab.Navigator>
-  );
-};
+    />
+    <Tab.Screen
+      name="Profile"
+      component={ProfileScreen}
+      options={{
+        tabBarLabel: 'Profile',
+        tabBarIcon: ({ color, size }) => <TabIcon name="account" color={color} size={size} />,
+      }}
+    />
+  </Tab.Navigator>
+);
 
-const MainAppNavigator = () => {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: '#6200ee',
-        },
-        headerTintColor: '#fff',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
-      }}
-    >
-      <Stack.Screen
-        name="Main"
-        component={MainTabs}
-        options={{ title: 'IGB AI - Behavior Vectors' }}
-      />
-      <Stack.Screen
-        name="Analysis"
-        component={AnalysisScreen}
-        options={{ title: 'Analysis Results' }}
-      />
-      <Stack.Screen
-        name="VectorDetail"
-        component={VectorDetailScreen}
-        options={{ title: 'Vector Details' }}
-      />
-      <Stack.Screen
-        name="ClusterGraph"
-        component={ClusterGraphScreen}
-        options={{ title: 'Cluster Visualization' }}
-      />
-    </Stack.Navigator>
-  );
-};
+const MainAppNavigator = () => (
+  <Stack.Navigator
+    screenOptions={{
+      headerStyle: { backgroundColor: '#6200ee' },
+      headerTintColor: '#fff',
+      headerTitleStyle: { fontWeight: 'bold' },
+    }}
+  >
+    <Stack.Screen name="Main" component={MainTabs} options={{ title: 'IGB AI' }} />
+    <Stack.Screen name="Analysis" component={AnalysisScreen} options={{ title: 'Analysis' }} />
+    <Stack.Screen name="VectorDetail" component={VectorDetailScreen} options={{ title: 'Vector Details' }} />
+    <Stack.Screen name="UserProfile" component={ProfileScreen} options={{ title: 'User Profile' }} />
+  </Stack.Navigator>
+);
 
 const AppNavigator = () => {
-  // #region agent log
-  console.log('[NAV] AppNavigator function called');
-  // #endregion
-  
-  const contextValue = useContext(AuthContext);
-  const { isAuthenticated, isLoading, user } = contextValue || {};
+  const { isAuthenticated, isLoading } = useContext(AuthContext) || {};
 
-  // #region agent log
-  console.log('[NAV] Auth state:', { isAuthenticated, isLoading, hasUser: !!user });
-  // #endregion
+  console.log('[NAV] AppNavigator render - isAuthenticated:', isAuthenticated, 'isLoading:', isLoading);
 
   if (isLoading) {
-    // #region agent log
-    console.log('[NAV] Showing loading indicator because isLoading=true');
-    // #endregion
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#6200ee" />
@@ -145,19 +86,9 @@ const AppNavigator = () => {
     );
   }
 
-  // #region agent log
-  console.log('[NAV] Rendering NavigationContainer, isAuthenticated:', isAuthenticated);
-  // #endregion
-
   return (
     <NavigationContainer>
-      {!isAuthenticated ? (
-        <AuthNavigator />
-      ) : !user?.onboarding_complete ? (
-        <OnboardingNavigator />
-      ) : (
-        <MainAppNavigator />
-      )}
+      {isAuthenticated ? <MainAppNavigator /> : <AuthNavigator />}
     </NavigationContainer>
   );
 };

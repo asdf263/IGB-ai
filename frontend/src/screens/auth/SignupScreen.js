@@ -11,9 +11,19 @@ const SignupScreen = ({ navigation }) => {
   const [showError, setShowError] = useState(false);
   const [validationError, setValidationError] = useState('');
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const validateForm = () => {
     if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
       setValidationError('Please fill in all fields');
+      return false;
+    }
+
+    if (!validateEmail(email.trim())) {
+      setValidationError('Please enter a valid email address');
       return false;
     }
 
@@ -32,40 +42,17 @@ const SignupScreen = ({ navigation }) => {
   };
 
   const handleSignup = async () => {
-    // #region agent log
-    console.log('[SIGNUP] handleSignup called', {email: email.trim(), passwordLength: password.length});
-    fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'SignupScreen.js:34',message:'handleSignup entry',data:{email:email.trim(),password_length:password.length,has_confirm:!!confirmPassword},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch((e)=>console.log('[LOG] Fetch error:',e));
-    // #endregion
     if (!validateForm()) {
-      // #region agent log
-      console.log('[SIGNUP] Validation failed', {validationError});
-      fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'SignupScreen.js:36',message:'validation failed',data:{validationError},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch((e)=>console.log('[LOG] Fetch error:',e));
-      // #endregion
       setShowError(true);
       return;
     }
 
-    // #region agent log
-    console.log('[SIGNUP] Validation passed, calling signup function', {email: email.trim()});
-    fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'SignupScreen.js:40',message:'before signup call',data:{email:email.trim(),password_length:password.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch((e)=>console.log('[LOG] Fetch error:',e));
-    // #endregion
     const result = await signup(email.trim(), password);
-    // #region agent log
-    console.log('[SIGNUP] signup result received', {success: result?.success, error: result?.error, hasUser: !!result?.user, uid: result?.user?.uid});
-    fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'SignupScreen.js:42',message:'after signup call',data:{result_success:result?.success,result_error:result?.error,has_user:!!result?.user},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch((e)=>console.log('[LOG] Fetch error:',e));
-    // #endregion
     
     if (result.success) {
-      // #region agent log
-      console.log('[SIGNUP] Success! User created', {uid: result?.user?.uid});
-      fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'SignupScreen.js:44',message:'signup success',data:{uid:result?.user?.uid},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch((e)=>console.log('[LOG] Fetch error:',e));
-      // #endregion
-      // Navigation will be handled by the navigator
+      // Navigate to email verification screen
+      navigation.replace('EmailVerification', { email: email.trim() });
     } else {
-      // #region agent log
-      console.log('[SIGNUP] Failed', {error: result?.error});
-      fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'SignupScreen.js:47',message:'signup failed',data:{error:result?.error},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch((e)=>console.log('[LOG] Fetch error:',e));
-      // #endregion
       setShowError(true);
     }
   };
@@ -81,11 +68,11 @@ const SignupScreen = ({ navigation }) => {
             Create Account
           </Text>
           <Text variant="bodyMedium" style={styles.subtitle}>
-            Sign up to get started
+            Sign up with your email to get started
           </Text>
 
           <TextInput
-            label="Email or Username"
+            label="Email"
             value={email}
             onChangeText={setEmail}
             mode="outlined"
@@ -93,6 +80,7 @@ const SignupScreen = ({ navigation }) => {
             autoCapitalize="none"
             keyboardType="email-address"
             disabled={isLoading}
+            left={<TextInput.Icon icon="email" />}
           />
 
           <TextInput
@@ -103,6 +91,7 @@ const SignupScreen = ({ navigation }) => {
             style={styles.input}
             secureTextEntry
             disabled={isLoading}
+            left={<TextInput.Icon icon="lock" />}
           />
 
           <TextInput
@@ -113,7 +102,12 @@ const SignupScreen = ({ navigation }) => {
             style={styles.input}
             secureTextEntry
             disabled={isLoading}
+            left={<TextInput.Icon icon="lock-check" />}
           />
+
+          <Text variant="bodySmall" style={styles.hint}>
+            A confirmation email will be sent to verify your account
+          </Text>
 
           <Button
             mode="contained"
@@ -139,7 +133,7 @@ const SignupScreen = ({ navigation }) => {
       <Snackbar
         visible={showError}
         onDismiss={() => setShowError(false)}
-        duration={3000}
+        duration={4000}
       >
         {validationError || error || 'Please check your input'}
       </Snackbar>
@@ -175,6 +169,11 @@ const styles = StyleSheet.create({
   input: {
     marginBottom: 16,
   },
+  hint: {
+    textAlign: 'center',
+    color: '#888',
+    marginBottom: 8,
+  },
   button: {
     marginTop: 8,
     paddingVertical: 4,
@@ -185,4 +184,3 @@ const styles = StyleSheet.create({
 });
 
 export default SignupScreen;
-

@@ -1,20 +1,18 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import { Button, Text, Snackbar, ProgressBar, Card, ActivityIndicator } from 'react-native-paper';
+import { Button, Text, Snackbar, ProgressBar, Card } from 'react-native-paper';
 import * as DocumentPicker from 'expo-document-picker';
-import { AuthContext } from '../../context/AuthContext';
-import * as userApi from '../../services/userApi';
 
 const OnboardingStep3_ChatUpload = ({ navigation, route }) => {
-  const { user } = useContext(AuthContext);
+  const accountData = route.params?.accountData || {};
+  const profileData = route.params?.profileData || {};
+  
   const [selectedFile, setSelectedFile] = useState(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [vectorId, setVectorId] = useState(null);
 
-  const uid = route.params?.uid || user?.uid;
+  console.log('[ONBOARD-3] Rendering Step 3 - Chat Upload');
+  console.log('[ONBOARD-3] Data received:', { email: accountData.email, name: profileData.name });
 
   const pickFile = async () => {
     try {
@@ -25,26 +23,13 @@ const OnboardingStep3_ChatUpload = ({ navigation, route }) => {
 
       if (!result.canceled && result.assets[0]) {
         const file = result.assets[0];
-        
-        // Validate file size (max 50MB)
         if (file.size > 50 * 1024 * 1024) {
           setErrorMessage('File size must be less than 50MB');
           setShowError(true);
           return;
         }
-
-        // Validate file type
-        const validExtensions = ['.json', '.txt'];
-        const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
-        
-        if (!validExtensions.includes(fileExtension)) {
-          setErrorMessage('Please select a JSON or TXT file');
-          setShowError(true);
-          return;
-        }
-
+        console.log('[ONBOARD-3] File selected:', file.name);
         setSelectedFile(file);
-        setErrorMessage('');
       }
     } catch (error) {
       setErrorMessage('Failed to pick file');
@@ -58,49 +43,17 @@ const OnboardingStep3_ChatUpload = ({ navigation, route }) => {
     return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
   };
 
-  const handleUploadAndVectorize = async () => {
-    if (!selectedFile) {
-      setErrorMessage('Please select a file first');
-      setShowError(true);
-      return;
-    }
+  const handleNext = () => {
+    console.log('[ONBOARD-3] Proceeding to Step 4 (account creation)');
+    navigation.navigate('OnboardingStep4', {
+      accountData,
+      profileData,
+      chatFile: selectedFile,
+    });
+  };
 
-    setIsUploading(true);
-    setUploadProgress(0);
-    setErrorMessage('');
-
-    try {
-      // Simulate progress
-      const progressInterval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90;
-          }
-          return prev + 10;
-        });
-      }, 200);
-
-      const result = await userApi.uploadChatData(uid, selectedFile);
-      
-      clearInterval(progressInterval);
-      setUploadProgress(100);
-      setVectorId(result.vector_id);
-
-      // Wait a moment to show completion
-      setTimeout(() => {
-        navigation.navigate('OnboardingStep4', {
-          uid,
-          vectorId: result.vector_id,
-        });
-      }, 500);
-    } catch (error) {
-      setErrorMessage(error.message || 'Failed to upload and vectorize chat data');
-      setShowError(true);
-      setUploadProgress(0);
-    } finally {
-      setIsUploading(false);
-    }
+  const handleBack = () => {
+    navigation.goBack();
   };
 
   return (
@@ -113,10 +66,10 @@ const OnboardingStep3_ChatUpload = ({ navigation, route }) => {
           <ProgressBar progress={0.75} color="#6200ee" style={styles.progressBar} />
           
           <Text variant="headlineSmall" style={styles.title}>
-            Step 3 of 4: Upload Chat Data
+            Step 3 of 4: Chat Data
           </Text>
           <Text variant="bodyMedium" style={styles.subtitle}>
-            Upload your chat logs to create your behavior vector
+            Upload your chat logs to create your behavior vector (required)
           </Text>
 
           <Card style={styles.card}>
@@ -132,7 +85,7 @@ const OnboardingStep3_ChatUpload = ({ navigation, route }) => {
                 </View>
               ) : (
                 <Text variant="bodyMedium" style={styles.noFileText}>
-                  No file selected
+                  No file selected - please upload a chat file to continue
                 </Text>
               )}
             </Card.Content>
@@ -143,48 +96,21 @@ const OnboardingStep3_ChatUpload = ({ navigation, route }) => {
             onPress={pickFile}
             style={styles.pickButton}
             icon="file-upload"
-            disabled={isUploading}
           >
             {selectedFile ? 'Change File' : 'Select File'}
           </Button>
 
-          {isUploading && (
-            <View style={styles.uploadContainer}>
-              <ActivityIndicator size="small" style={styles.loader} />
-              <Text variant="bodySmall" style={styles.uploadText}>
-                Uploading and processing... {Math.round(uploadProgress)}%
-              </Text>
-              <ProgressBar progress={uploadProgress / 100} color="#6200ee" style={styles.uploadProgress} />
-            </View>
-          )}
-
-          {vectorId && (
-            <Card style={[styles.card, styles.successCard]}>
-              <Card.Content>
-                <Text variant="bodyMedium" style={styles.successText}>
-                  ✓ Chat data processed and vectorized successfully!
-                </Text>
-              </Card.Content>
-            </Card>
-          )}
-
           <View style={styles.buttonRow}>
-            <Button
-              mode="outlined"
-              onPress={() => navigation.goBack()}
-              style={styles.backButton}
-              disabled={isUploading}
-            >
+            <Button mode="outlined" onPress={handleBack} style={styles.backButton}>
               Back
             </Button>
-            <Button
-              mode="contained"
-              onPress={handleUploadAndVectorize}
+            <Button 
+              mode="contained" 
+              onPress={handleNext} 
               style={styles.nextButton}
-              loading={isUploading}
-              disabled={isUploading || !selectedFile || vectorId !== null}
+              disabled={!selectedFile}
             >
-              {vectorId ? 'Continue' : 'Upload & Vectorize'}
+              Next
             </Button>
           </View>
         </View>
@@ -202,88 +128,20 @@ const OnboardingStep3_ChatUpload = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 20,
-  },
-  content: {
-    width: '100%',
-    maxWidth: 400,
-    alignSelf: 'center',
-    marginTop: 20,
-  },
-  progressBar: {
-    marginBottom: 24,
-    height: 4,
-    borderRadius: 2,
-  },
-  title: {
-    textAlign: 'center',
-    marginBottom: 8,
-    fontWeight: 'bold',
-  },
-  subtitle: {
-    textAlign: 'center',
-    marginBottom: 32,
-    color: '#666',
-  },
-  card: {
-    marginBottom: 16,
-  },
-  successCard: {
-    backgroundColor: '#e8f5e9',
-    marginTop: 16,
-  },
-  fileName: {
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  fileSize: {
-    color: '#666',
-  },
-  noFileText: {
-    color: '#999',
-    textAlign: 'center',
-  },
-  pickButton: {
-    marginBottom: 16,
-  },
-  uploadContainer: {
-    marginTop: 16,
-    marginBottom: 16,
-  },
-  loader: {
-    marginBottom: 8,
-  },
-  uploadText: {
-    textAlign: 'center',
-    marginBottom: 8,
-    color: '#666',
-  },
-  uploadProgress: {
-    height: 4,
-    borderRadius: 2,
-  },
-  successText: {
-    color: '#2e7d32',
-    textAlign: 'center',
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    marginTop: 8,
-    gap: 12,
-  },
-  backButton: {
-    flex: 1,
-  },
-  nextButton: {
-    flex: 1,
-  },
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  scrollContent: { flexGrow: 1, padding: 20 },
+  content: { width: '100%', maxWidth: 400, alignSelf: 'center', marginTop: 20 },
+  progressBar: { marginBottom: 24, height: 4, borderRadius: 2 },
+  title: { textAlign: 'center', marginBottom: 8, fontWeight: 'bold' },
+  subtitle: { textAlign: 'center', marginBottom: 32, color: '#666' },
+  card: { marginBottom: 16 },
+  fileName: { fontWeight: 'bold', marginBottom: 4 },
+  fileSize: { color: '#666' },
+  noFileText: { color: '#999', textAlign: 'center' },
+  pickButton: { marginBottom: 16 },
+  buttonRow: { flexDirection: 'row', marginTop: 8, gap: 12 },
+  backButton: { flex: 1 },
+  nextButton: { flex: 1 },
 });
 
 export default OnboardingStep3_ChatUpload;
-

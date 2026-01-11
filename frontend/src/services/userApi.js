@@ -17,6 +17,21 @@ const api = axios.create({
 });
 
 /**
+ * Get all users with pagination
+ * @param {number} limit - Maximum number of users to return
+ * @param {number} skip - Number of users to skip
+ * @returns {Promise} List of users
+ */
+export const getAllUsers = async (limit = 100, skip = 0) => {
+  try {
+    const response = await api.get(`/api/users?limit=${limit}&skip=${skip}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || error.message || 'Failed to get users');
+  }
+};
+
+/**
  * Get user data by UID
  * @param {string} uid - User UID
  * @returns {Promise} User data

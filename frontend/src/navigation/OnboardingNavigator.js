@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import OnboardingStep1_Account from '../screens/onboarding/OnboardingStep1_Account';
+import { TouchableOpacity } from 'react-native';
+import { Text } from 'react-native-paper';
+import { AuthContext } from '../context/AuthContext';
 import OnboardingStep2_Profile from '../screens/onboarding/OnboardingStep2_Profile';
 import OnboardingStep3_ChatUpload from '../screens/onboarding/OnboardingStep3_ChatUpload';
 import OnboardingStep4_Complete from '../screens/onboarding/OnboardingStep4_Complete';
@@ -8,6 +10,14 @@ import OnboardingStep4_Complete from '../screens/onboarding/OnboardingStep4_Comp
 const Stack = createStackNavigator();
 
 const OnboardingNavigator = () => {
+  const { user, logout } = useContext(AuthContext);
+  
+  const LogoutButton = () => (
+    <TouchableOpacity onPress={logout} style={{ marginLeft: 15 }}>
+      <Text style={{ color: '#fff', fontSize: 14 }}>Logout</Text>
+    </TouchableOpacity>
+  );
+  
   return (
     <Stack.Navigator
       screenOptions={{
@@ -21,14 +31,13 @@ const OnboardingNavigator = () => {
       }}
     >
       <Stack.Screen
-        name="OnboardingStep1"
-        component={OnboardingStep1_Account}
-        options={{ title: 'Create Account', headerLeft: null }}
-      />
-      <Stack.Screen
         name="OnboardingStep2"
         component={OnboardingStep2_Profile}
-        options={{ title: 'Your Profile' }}
+        options={{ 
+          title: 'Your Profile', 
+          headerLeft: () => <LogoutButton />
+        }}
+        initialParams={{ uid: user?.uid, email: user?.email }}
       />
       <Stack.Screen
         name="OnboardingStep3"
