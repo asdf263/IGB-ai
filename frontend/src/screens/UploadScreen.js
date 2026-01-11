@@ -1,7 +1,8 @@
 import React, { useState, useContext } from 'react';
 import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Card, Button, Text, ProgressBar, Chip, TextInput } from 'react-native-paper';
-import DocumentPicker from 'react-native-document-picker';
+import * as DocumentPicker from 'expo-document-picker';
+import * as FileSystem from 'expo-file-system';
 import { AppContext } from '../context/AppContext';
 import { extractFeatures } from '../services/vectorApi';
 
@@ -16,12 +17,16 @@ const UploadScreen = ({ navigation }) => {
 
   const handleFilePick = async () => {
     try {
-      const result = await DocumentPicker.pick({
-        type: [DocumentPicker.types.allFiles],
-        copyTo: 'cachesDirectory',
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ['application/json'],
+        copyToCacheDirectory: true,
       });
 
-      const file = result[0];
+      if (result.canceled) {
+        return;
+      }
+
+      const file = result.assets[0];
       if (!file.name.endsWith('.json')) {
         Alert.alert('Invalid File', 'Please select a JSON file');
         return;
@@ -30,9 +35,7 @@ const UploadScreen = ({ navigation }) => {
       setSelectedFile(file);
       setValidationStatus('valid');
     } catch (err) {
-      if (!DocumentPicker.isCancel(err)) {
-        Alert.alert('Error', 'Failed to pick document');
-      }
+      Alert.alert('Error', 'Failed to pick document: ' + err.message);
     }
   };
 
@@ -68,8 +71,8 @@ const UploadScreen = ({ navigation }) => {
       let messages;
 
       if (inputMode === 'file' && selectedFile) {
-        const response = await fetch(selectedFile.fileCopyUri || selectedFile.uri);
-        const text = await response.text();
+        const fileUri = selectedFile.uri;
+        const text = await FileSystem.readAsStringAsync(fileUri);
         const parsed = JSON.parse(text);
         messages = parsed.messages;
       } else if (inputMode === 'text' && jsonText) {
