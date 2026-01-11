@@ -1,16 +1,24 @@
 import React from 'react'
 import { Routes, Route, NavLink } from 'react-router-dom'
-import { Upload, BarChart3, Network, Sparkles } from 'lucide-react'
+import { Upload, BarChart3, Network, Sparkles, User, Heart, History, MessageCircle, Globe } from 'lucide-react'
 import UploadPage from './pages/UploadPage'
 import AnalysisPage from './pages/AnalysisPage'
 import ClusterPage from './pages/ClusterPage'
 import SyntheticPage from './pages/SyntheticPage'
+import UserProfilePage from './pages/UserProfilePage'
+import CompatibilityPage from './pages/CompatibilityPage'
+import HistoryPage from './pages/HistoryPage'
+import ChatPage from './pages/ChatPage'
+import EcosystemPage from './pages/EcosystemPage'
 
 const navItems = [
   { path: '/', label: 'Upload', icon: Upload },
   { path: '/analysis', label: 'Analysis', icon: BarChart3 },
-  { path: '/clusters', label: 'Clusters', icon: Network },
-  { path: '/synthetic', label: 'Synthetic', icon: Sparkles },
+  { path: '/users', label: 'Users', icon: User },
+  { path: '/compatibility', label: 'Compatibility', icon: Heart },
+  { path: '/ecosystem', label: 'Ecosystem', icon: Globe },
+  { path: '/chat', label: 'Chat', icon: MessageCircle },
+  { path: '/history', label: 'History', icon: History },
 ]
 
 function App() {
@@ -49,6 +57,11 @@ function App() {
         <Routes>
           <Route path="/" element={<UploadPage />} />
           <Route path="/analysis" element={<AnalysisPage />} />
+          <Route path="/users" element={<UserProfilePage />} />
+          <Route path="/compatibility" element={<CompatibilityPage />} />
+          <Route path="/ecosystem" element={<EcosystemPage />} />
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/history" element={<HistoryPage />} />
           <Route path="/clusters" element={<ClusterPage />} />
           <Route path="/synthetic" element={<SyntheticPage />} />
         </Routes>

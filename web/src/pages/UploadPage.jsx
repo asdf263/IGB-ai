@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { useDropzone } from 'react-dropzone'
 import { Upload, FileJson, AlertCircle, CheckCircle, Loader2 } from 'lucide-react'
 import useStore from '../store/useStore'
-import { extractFeatures } from '../services/api'
+import { extractFeatures, extractUserFeatures, saveAnalysis } from '../services/api'
 
 function UploadPage() {
   const navigate = useNavigate()
-  const { setCurrentVector, setFeatureLabels, setCategories, addVector } = useStore()
+  const { setCurrentVector, setFeatureLabels, setCategories, addVector, setUserFeatures, setCurrentMessages } = useStore()
   const [jsonText, setJsonText] = useState('')
   const [inputMode, setInputMode] = useState('file')
   const [validationStatus, setValidationStatus] = useState(null)
@@ -70,7 +70,11 @@ function UploadPage() {
         return
       }
 
+      // Extract standard features
       const result = await extractFeatures(parsed.messages, true)
+
+      // Also extract user-based features
+      const userResult = await extractUserFeatures(parsed.messages)
 
       if (result.success) {
         setCurrentVector(result.vector)
@@ -83,6 +87,30 @@ function UploadPage() {
           categories: result.categories,
           timestamp: new Date().toISOString(),
         })
+
+        // Store user features and messages for user profile and compatibility pages
+        if (userResult.success) {
+          setUserFeatures(userResult)
+          setCurrentMessages(parsed.messages)
+          
+          // Save analysis to local storage (creates new file each time)
+          try {
+            const saveResult = await saveAnalysis(
+              parsed.messages,
+              userResult.users,
+              null,
+              {
+                vector: result.vector,
+                labels: result.feature_labels,
+                categories: result.categories,
+              }
+            )
+            console.log('Analysis saved:', saveResult.analysis_id)
+          } catch (saveErr) {
+            console.warn('Failed to save analysis:', saveErr)
+          }
+        }
+
         navigate('/analysis')
       } else {
         setError(result.error || 'Extraction failed')
