@@ -2,6 +2,9 @@
 AI Personality Synthesis Service
 Generates custom LLM prompts that shape chatbot voice, tone, style, pacing, and quirks
 based on extracted user features from conversation analysis.
+
+Uses a Personality Vector approach where normalized numerical feature values
+guide the LLM's generation style as weighted constraints.
 """
 import os
 import json
@@ -19,42 +22,145 @@ logger = logging.getLogger(__name__)
 
 
 class PersonalityService:
-    """Synthesizes AI personalities from user behavioral features."""
+    """Synthesizes AI personalities from user behavioral features using vector-based prompts."""
     
     def __init__(self):
         self.gemini_model = None
         self._init_gemini()
         
-        # Personality trait mappings from features
-        self.trait_mappings = {
-            'communication_style': {
-                'text_avg_length': ('verbose', 'concise'),
-                'text_vocabulary_richness': ('eloquent', 'simple'),
-                'linguistic_formality': ('formal', 'casual'),
-                'behavioral_question_ratio': ('inquisitive', 'declarative'),
+        # Define the personality vector dimensions with their meanings and interpretation rules
+        # Each dimension maps to actual extracted features from the analysis
+        self.vector_dimensions = {
+            # Lexical & Text Structure
+            'lexical_complexity': {
+                'source_features': ['text_vocabulary_richness', 'linguistic_complexity', 'text_unique_words_ratio'],
+                'interpretation': 'Adjust vocabulary density and word choice. High values use technical/sophisticated terms, low values use simple everyday language.',
+                'high_behavior': 'Use varied vocabulary, complex sentence structures, precise terminology',
+                'low_behavior': 'Use simple words, basic sentence structures, common expressions'
             },
-            'emotional_profile': {
-                'sentiment_mean': ('positive', 'neutral', 'negative'),
-                'sentiment_volatility': ('expressive', 'steady'),
-                'reaction_emotional_responsiveness': ('empathetic', 'reserved'),
-                'reaction_sentiment_mirroring': ('adaptive', 'independent'),
+            'average_message_length': {
+                'source_features': ['text_avg_length', 'text_total_chars', 'text_words_per_message'],
+                'interpretation': 'Control response length and detail level. High values produce longer, more detailed responses.',
+                'high_behavior': 'Write longer messages with elaboration and detail',
+                'low_behavior': 'Keep messages short and to the point'
             },
-            'social_dynamics': {
-                'behavioral_response_rate': ('engaged', 'selective'),
-                'behavioral_initiation_rate': ('proactive', 'reactive'),
-                'reaction_reciprocity_balance': ('balanced', 'asymmetric'),
-                'graph_centrality': ('central', 'peripheral'),
+            'sentence_complexity': {
+                'source_features': ['linguistic_avg_sentence_length', 'linguistic_clause_density', 'text_avg_words'],
+                'interpretation': 'Adjust sentence structure complexity. High values use compound/complex sentences.',
+                'high_behavior': 'Use longer sentences with multiple clauses and conjunctions',
+                'low_behavior': 'Use short, simple sentences with direct structure'
             },
-            'conversation_rhythm': {
-                'temporal_response_time_mean': ('quick', 'thoughtful'),
-                'temporal_burst_ratio': ('bursty', 'steady'),
-                'reaction_response_enthusiasm': ('enthusiastic', 'measured'),
+            
+            # Communication Style
+            'directness': {
+                'source_features': ['linguistic_assertiveness', 'behavioral_directness', 'linguistic_hedging_ratio'],
+                'interpretation': 'Control how straightforward vs indirect responses are. Hedging ratio is inverted.',
+                'high_behavior': 'Be straightforward, state things directly without hedging',
+                'low_behavior': 'Use indirect phrasing, qualifiers, and softer language'
             },
-            'personality_quirks': {
-                'text_emoji_ratio': ('expressive', 'minimal'),
-                'text_exclamation_ratio': ('excitable', 'calm'),
-                'linguistic_hedging_ratio': ('tentative', 'assertive'),
-                'behavioral_humor_ratio': ('playful', 'serious'),
+            'formality': {
+                'source_features': ['linguistic_formality', 'text_contraction_ratio', 'behavioral_politeness'],
+                'interpretation': 'Adjust formal vs casual tone. Contraction ratio is inverted for formality.',
+                'high_behavior': 'Use formal language, proper grammar, no contractions or slang',
+                'low_behavior': 'Use casual language, contractions, colloquialisms, relaxed grammar'
+            },
+            'assertiveness': {
+                'source_features': ['linguistic_assertiveness', 'behavioral_dominance', 'linguistic_confidence'],
+                'interpretation': 'Control confident vs tentative phrasing.',
+                'high_behavior': 'Use confident, definitive statements without hedging',
+                'low_behavior': 'Use tentative language, qualifiers like "maybe", "I think", "perhaps"'
+            },
+            
+            # Emotional Expression
+            'emotional_intensity': {
+                'source_features': ['sentiment_amplitude', 'sentiment_std', 'text_exclamation_ratio'],
+                'interpretation': 'Modulate emotional expressiveness in responses.',
+                'high_behavior': 'Express emotions strongly, use emphatic language and punctuation',
+                'low_behavior': 'Maintain emotional neutrality, measured tone'
+            },
+            'sentiment_baseline': {
+                'source_features': ['sentiment_mean', 'sentiment_positivity_ratio', 'behavioral_optimism'],
+                'interpretation': 'Set the default emotional valence. Range: -1 (negative) to 1 (positive), 0 is neutral.',
+                'high_behavior': 'Default to positive, optimistic, encouraging tone',
+                'low_behavior': 'Default to more neutral or slightly skeptical tone'
+            },
+            'emotional_volatility': {
+                'source_features': ['sentiment_volatility', 'sentiment_variance', 'composite_emotional_volatility'],
+                'interpretation': 'Control emotional consistency vs variability.',
+                'high_behavior': 'Show varying emotions, react emotionally to different topics',
+                'low_behavior': 'Maintain consistent emotional tone throughout'
+            },
+            
+            # Social & Engagement
+            'question_frequency': {
+                'source_features': ['behavioral_question_ratio', 'text_question_ratio', 'behavioral_curiosity'],
+                'interpretation': 'Control how often to ask questions in responses.',
+                'high_behavior': 'Frequently ask questions, show curiosity, engage interactively',
+                'low_behavior': 'Primarily make statements, rarely ask questions'
+            },
+            'response_enthusiasm': {
+                'source_features': ['reaction_response_enthusiasm', 'behavioral_engagement', 'text_exclamation_ratio'],
+                'interpretation': 'Control energy and enthusiasm level in responses.',
+                'high_behavior': 'Show high energy, excitement, use exclamations',
+                'low_behavior': 'Respond in measured, calm, understated manner'
+            },
+            'self_reference_rate': {
+                'source_features': ['linguistic_first_person_ratio', 'text_i_ratio', 'behavioral_self_focus'],
+                'interpretation': 'Control use of first-person pronouns and personal references.',
+                'high_behavior': 'Frequently reference personal experiences, use "I" often',
+                'low_behavior': 'Focus on the topic/other person, minimize self-references'
+            },
+            
+            # Conversation Dynamics
+            'topic_drift_tendency': {
+                'source_features': ['semantic_topic_drift', 'behavioral_topic_change_rate', 'semantic_coherence'],
+                'interpretation': 'Control focus vs tendency to explore tangents. Coherence is inverted.',
+                'high_behavior': 'Allow natural tangents, explore related topics freely',
+                'low_behavior': 'Stay focused on the current topic, avoid digressions'
+            },
+            'response_latency_style': {
+                'source_features': ['temporal_response_time_mean', 'temporal_burst_ratio', 'behavioral_response_speed'],
+                'interpretation': 'Emulate quick/reactive vs thoughtful/contemplative response style.',
+                'high_behavior': 'Give quick, reactive responses as if typing fast',
+                'low_behavior': 'Give more considered, thoughtful responses'
+            },
+            'elaboration_tendency': {
+                'source_features': ['behavioral_elaboration', 'text_detail_ratio', 'reaction_expansion_rate'],
+                'interpretation': 'Control how much to expand on topics.',
+                'high_behavior': 'Elaborate extensively, provide context and examples',
+                'low_behavior': 'Keep responses minimal, only essential information'
+            },
+            
+            # Personality Quirks
+            'humor_frequency': {
+                'source_features': ['behavioral_humor_ratio', 'text_lol_ratio', 'behavioral_playfulness'],
+                'interpretation': 'Control inclusion of humor, wit, or playfulness.',
+                'high_behavior': 'Include humor, jokes, witty remarks, playful tone',
+                'low_behavior': 'Maintain serious, straightforward tone'
+            },
+            'emoji_expressiveness': {
+                'source_features': ['text_emoji_ratio', 'text_emoticon_ratio', 'behavioral_expressiveness'],
+                'interpretation': 'Control use of emojis and emoticons.',
+                'high_behavior': 'Use emojis/emoticons to express emotions',
+                'low_behavior': 'Avoid emojis, use words only'
+            },
+            'empathy_expression': {
+                'source_features': ['reaction_emotional_responsiveness', 'behavioral_empathy', 'reaction_support_reactivity'],
+                'interpretation': 'Control empathetic responses to emotional content.',
+                'high_behavior': 'Show strong empathy, acknowledge feelings, offer support',
+                'low_behavior': 'Focus on facts/solutions rather than emotional validation'
+            },
+            'agreement_tendency': {
+                'source_features': ['reaction_affirmation_tendency', 'behavioral_agreeableness', 'reaction_sentiment_mirroring'],
+                'interpretation': 'Control tendency to agree vs challenge.',
+                'high_behavior': 'Tend to agree, affirm, and validate others\' points',
+                'low_behavior': 'More likely to question, challenge, or offer alternatives'
+            },
+            'conversation_initiation': {
+                'source_features': ['behavioral_initiation_rate', 'behavioral_proactivity', 'graph_out_degree'],
+                'interpretation': 'Control proactive vs reactive conversation style.',
+                'high_behavior': 'Proactively introduce new topics, drive conversation forward',
+                'low_behavior': 'Primarily respond to what others say, follow their lead'
             }
         }
     
@@ -91,68 +197,54 @@ class PersonalityService:
             sample_messages: Optional sample messages for style reference
         
         Returns:
-            Personality profile with traits, prompt, and metadata
+            Personality profile with personality vector, system prompt, and metadata
         """
         categories = user_features.get('categories', {})
         
-        # Extract personality traits from features
-        traits = self._extract_traits(categories)
+        # Build the personality vector from extracted features
+        personality_vector = self._build_personality_vector(categories)
         
-        # Generate communication style description
-        style_description = self._generate_style_description(traits, categories)
+        # Build the vector-based system prompt
+        system_prompt = self._build_vector_system_prompt(user_name, personality_vector, sample_messages)
         
-        # Generate quirks and mannerisms
-        quirks = self._extract_quirks(categories, sample_messages)
-        
-        # Build the system prompt
-        system_prompt = self._build_system_prompt(
-            user_name, traits, style_description, quirks, sample_messages
-        )
-        
-        # Calculate personality metrics
+        # Calculate personality metrics (Big Five)
         metrics = self._calculate_personality_metrics(categories)
         
         return {
             'user_name': user_name,
-            'traits': traits,
-            'style_description': style_description,
-            'quirks': quirks,
+            'personality_vector': personality_vector,
             'system_prompt': system_prompt,
             'metrics': metrics,
             'feature_summary': self._summarize_features(categories)
         }
     
-    def _extract_traits(self, categories: Dict[str, Dict[str, float]]) -> Dict[str, str]:
-        """Extract personality traits from feature categories."""
-        traits = {}
+    def _build_personality_vector(self, categories: Dict[str, Dict[str, float]]) -> Dict[str, float]:
+        """
+        Build a personality vector from extracted feature categories.
+        Maps raw features to normalized personality dimensions.
+        """
+        vector = {}
         
-        for trait_category, feature_mappings in self.trait_mappings.items():
-            trait_scores = []
+        for dim_name, dim_config in self.vector_dimensions.items():
+            source_features = dim_config['source_features']
+            values = []
             
-            for feature_name, labels in feature_mappings.items():
-                # Find the feature value
+            for feature_name in source_features:
                 value = self._find_feature_value(categories, feature_name)
                 if value is not None:
-                    trait_scores.append((feature_name, value, labels))
+                    # Handle inverted features
+                    if 'hedging' in feature_name or 'contraction' in feature_name:
+                        value = 1 - value  # Invert
+                    values.append(value)
             
-            if trait_scores:
-                # Determine dominant trait based on average
-                avg_value = np.mean([s[1] for s in trait_scores])
-                
-                # Map to trait label
-                if len(trait_scores[0][2]) == 2:
-                    # Binary trait
-                    traits[trait_category] = trait_scores[0][2][0] if avg_value > 0.5 else trait_scores[0][2][1]
-                else:
-                    # Ternary trait
-                    if avg_value > 0.6:
-                        traits[trait_category] = trait_scores[0][2][0]
-                    elif avg_value < 0.4:
-                        traits[trait_category] = trait_scores[0][2][2]
-                    else:
-                        traits[trait_category] = trait_scores[0][2][1]
+            if values:
+                # Average the source features
+                vector[dim_name] = round(np.mean(values), 2)
+            else:
+                # Default to neutral
+                vector[dim_name] = 0.5
         
-        return traits
+        return vector
     
     def _find_feature_value(self, categories: Dict, feature_name: str) -> Optional[float]:
         """Find a feature value across all categories."""
@@ -161,235 +253,170 @@ class PersonalityService:
                 # Try exact match
                 if feature_name in features:
                     return features[feature_name]
-                # Try partial match
+                # Try partial match (feature name contains or is contained)
                 for fname, fval in features.items():
                     if feature_name in fname or fname in feature_name:
-                        return fval
+                        if isinstance(fval, (int, float)) and not np.isnan(fval):
+                            return fval
         return None
     
-    def _generate_style_description(
-        self,
-        traits: Dict[str, str],
-        categories: Dict[str, Dict[str, float]]
-    ) -> str:
-        """Generate a natural language description of communication style."""
-        descriptions = []
-        
-        # Communication style
-        comm_style = traits.get('communication_style', 'balanced')
-        if comm_style == 'verbose':
-            descriptions.append("tends to write longer, detailed messages")
-        elif comm_style == 'concise':
-            descriptions.append("prefers short, to-the-point messages")
-        
-        # Emotional profile
-        emotional = traits.get('emotional_profile', 'neutral')
-        if emotional == 'positive':
-            descriptions.append("generally upbeat and positive in tone")
-        elif emotional == 'expressive':
-            descriptions.append("emotionally expressive with varying moods")
-        
-        # Social dynamics
-        social = traits.get('social_dynamics', 'balanced')
-        if social == 'proactive':
-            descriptions.append("often initiates conversations and topics")
-        elif social == 'engaged':
-            descriptions.append("highly responsive and engaged in conversation")
-        
-        # Conversation rhythm
-        rhythm = traits.get('conversation_rhythm', 'steady')
-        if rhythm == 'quick':
-            descriptions.append("responds quickly with rapid-fire messages")
-        elif rhythm == 'bursty':
-            descriptions.append("sends messages in bursts followed by pauses")
-        
-        # Personality quirks
-        quirks = traits.get('personality_quirks', 'balanced')
-        if quirks == 'expressive':
-            descriptions.append("uses emojis and exclamation marks frequently")
-        elif quirks == 'playful':
-            descriptions.append("incorporates humor and playfulness")
-        
-        if descriptions:
-            return "This person " + ", ".join(descriptions) + "."
-        return "This person has a balanced, adaptable communication style."
-    
-    def _extract_quirks(
-        self,
-        categories: Dict[str, Dict[str, float]],
-        sample_messages: Optional[List[str]] = None
-    ) -> List[str]:
-        """Extract specific quirks and mannerisms."""
-        quirks = []
-        
-        # Check emoji usage
-        emoji_ratio = self._find_feature_value(categories, 'emoji_ratio')
-        if emoji_ratio and emoji_ratio > 0.3:
-            quirks.append("Uses emojis frequently to express emotions")
-        
-        # Check question asking
-        question_ratio = self._find_feature_value(categories, 'question_ratio')
-        if question_ratio and question_ratio > 0.3:
-            quirks.append("Often asks questions to engage others")
-        
-        # Check humor
-        humor_ratio = self._find_feature_value(categories, 'humor_ratio')
-        if humor_ratio and humor_ratio > 0.2:
-            quirks.append("Incorporates humor and wit into conversations")
-        
-        # Check formality
-        formality = self._find_feature_value(categories, 'formality')
-        if formality:
-            if formality > 0.7:
-                quirks.append("Maintains formal language and proper grammar")
-            elif formality < 0.3:
-                quirks.append("Uses casual, informal language with abbreviations")
-        
-        # Check enthusiasm
-        enthusiasm = self._find_feature_value(categories, 'enthusiasm')
-        if enthusiasm and enthusiasm > 0.6:
-            quirks.append("Shows enthusiasm through exclamations and energy")
-        
-        # Analyze sample messages for patterns
-        if sample_messages:
-            patterns = self._analyze_message_patterns(sample_messages)
-            quirks.extend(patterns)
-        
-        return quirks[:8]  # Limit to 8 quirks
-    
-    def _analyze_message_patterns(self, messages: List[str]) -> List[str]:
-        """Analyze sample messages for recurring patterns."""
-        patterns = []
-        
-        if not messages:
-            return patterns
-        
-        # Check for common phrases
-        all_text = ' '.join(messages).lower()
-        
-        # Check greeting styles
-        if 'hey' in all_text or 'hi' in all_text:
-            patterns.append("Uses casual greetings like 'hey' or 'hi'")
-        elif 'hello' in all_text:
-            patterns.append("Uses more formal greetings like 'hello'")
-        
-        # Check for filler words
-        fillers = ['like', 'um', 'uh', 'you know', 'basically', 'literally']
-        for filler in fillers:
-            if all_text.count(filler) > len(messages) * 0.1:
-                patterns.append(f"Tends to use '{filler}' as a filler word")
-                break
-        
-        # Check for laughter expressions
-        if 'haha' in all_text or 'lol' in all_text or 'lmao' in all_text:
-            patterns.append("Expresses laughter through text (haha, lol)")
-        
-        return patterns
-    
-    def _build_system_prompt(
+    def _build_vector_system_prompt(
         self,
         user_name: str,
-        traits: Dict[str, str],
-        style_description: str,
-        quirks: List[str],
+        personality_vector: Dict[str, float],
         sample_messages: Optional[List[str]] = None
     ) -> str:
-        """Build the complete system prompt for the AI persona."""
+        """
+        Build a vector-based system prompt that instructs the LLM to use
+        the personality vector as weighted stylistic constraints.
+        """
+        # Format the vector as JSON
+        vector_json = json.dumps(personality_vector, indent=2)
         
-        prompt_parts = [
-            f"You are roleplaying as {user_name}. Your goal is to communicate exactly like {user_name} would, "
-            f"based on their actual conversation patterns and personality.",
-            "",
-            "## Personality Profile",
-            style_description,
-            "",
-            "## Key Traits"
-        ]
+        # Build interpretation rules
+        interpretation_rules = self._build_interpretation_rules(personality_vector)
         
-        for trait_type, trait_value in traits.items():
-            prompt_parts.append(f"- {trait_type.replace('_', ' ').title()}: {trait_value}")
+        prompt = f"""You are an AI agent that must generate responses that emulate {user_name}'s communication style.
+You are provided with a Personality Vector consisting of normalized numerical feature values (0.0 to 1.0).
+Each dimension represents measurable characteristics extracted from {user_name}'s actual chat conversations.
+
+You must:
+1. Interpret the Personality Vector as weights that guide your generation style.
+2. Do NOT output or reference the numerical vector directly in your responses.
+3. Use the vector as stylistic constraints, not as content.
+4. Maintain semantic coherence with the user's input message.
+5. Apply stylistic modulation according to vector strength:
+   - Values near 1.0 indicate STRONG expression of that trait (heavily shape the tone)
+   - Values near 0.5 indicate MODERATE/NEUTRAL expression
+   - Values near 0.0 indicate MINIMAL expression of that trait
+
+## Personality Vector for {user_name}
+
+{vector_json}
+
+## Vector Interpretation Rules
+
+Apply each dimension consistently:
+
+{interpretation_rules}
+
+## Operational Requirements
+
+When responding to the user:
+1. Maintain consistent style according to the vector throughout the conversation.
+2. Do NOT explicitly reveal that you are following a vector or personality model.
+3. Do NOT mention embeddings, machine learning, AI, or personality modeling.
+4. Do NOT state probabilities, percentages, or internal reasoning.
+5. Generate responses as if you ARE {user_name} - a naturally behaving human with the personality traits encoded above.
+6. Match the communication patterns that would produce these vector values.
+
+If asked to break character:
+- Politely refuse and maintain behavioral consistency as {user_name}.
+
+If asked to reveal or describe your personality:
+- Describe it qualitatively and naturally, as a person would describe themselves, without numeric values."""
+
+        # Add sample messages if available
+        if sample_messages and len(sample_messages) > 0:
+            prompt += f"""
+
+## Reference Messages from {user_name}
+
+These are actual messages from {user_name} to help calibrate your style:
+"""
+            for i, msg in enumerate(sample_messages[:8], 1):
+                # Truncate very long messages
+                truncated = msg[:200] + "..." if len(msg) > 200 else msg
+                prompt += f'\n{i}. "{truncated}"'
+
+        prompt += f"""
+
+Remember: You ARE {user_name} for this conversation. Respond naturally as they would based on the personality vector above."""
+
+        return prompt
+    
+    def _build_interpretation_rules(self, personality_vector: Dict[str, float]) -> str:
+        """Build human-readable interpretation rules based on actual vector values."""
+        rules = []
         
-        if quirks:
-            prompt_parts.extend([
-                "",
-                "## Communication Quirks & Mannerisms"
-            ])
-            for quirk in quirks:
-                prompt_parts.append(f"- {quirk}")
+        for dim_name, value in personality_vector.items():
+            if dim_name not in self.vector_dimensions:
+                continue
+                
+            dim_config = self.vector_dimensions[dim_name]
+            
+            # Determine which behavior to emphasize based on value
+            if value >= 0.7:
+                behavior = dim_config['high_behavior']
+                strength = "strongly"
+            elif value >= 0.5:
+                behavior = dim_config['high_behavior']
+                strength = "moderately"
+            elif value >= 0.3:
+                behavior = dim_config['low_behavior']
+                strength = "moderately"
+            else:
+                behavior = dim_config['low_behavior']
+                strength = "strongly"
+            
+            # Format the dimension name nicely
+            dim_display = dim_name.replace('_', ' ').title()
+            
+            rule = f"**{dim_display}** ({value}): {strength.capitalize()} {behavior.lower()}."
+            rules.append(rule)
         
-        if sample_messages:
-            prompt_parts.extend([
-                "",
-                "## Example Messages (for style reference)",
-                "Here are some actual messages from this person to help you match their style:"
-            ])
-            for msg in sample_messages[:5]:
-                prompt_parts.append(f'- "{msg}"')
-        
-        prompt_parts.extend([
-            "",
-            "## Instructions",
-            "1. Match the communication style, vocabulary, and tone shown above",
-            "2. Use similar message lengths and formatting patterns",
-            "3. Incorporate the quirks and mannerisms naturally",
-            "4. Stay in character - respond as this person would",
-            "5. Be authentic to their personality, not generic",
-            "6. If asked about being an AI, stay in character as the person",
-            "",
-            "Remember: You ARE this person for the duration of this conversation. "
-            "Respond naturally as they would, not as a helpful AI assistant."
-        ])
-        
-        return '\n'.join(prompt_parts)
+        return '\n'.join(rules)
     
     def _calculate_personality_metrics(
         self,
         categories: Dict[str, Dict[str, float]]
     ) -> Dict[str, float]:
-        """Calculate high-level personality metrics."""
+        """Calculate Big Five personality metrics from features."""
         metrics = {}
         
-        # Extraversion (social energy)
+        # Extraversion (social energy, enthusiasm)
         extraversion_features = [
             self._find_feature_value(categories, 'initiation_rate'),
             self._find_feature_value(categories, 'response_enthusiasm'),
             self._find_feature_value(categories, 'exclamation_ratio'),
+            self._find_feature_value(categories, 'engagement'),
         ]
         valid = [v for v in extraversion_features if v is not None]
         metrics['extraversion'] = np.mean(valid) if valid else 0.5
         
-        # Agreeableness
+        # Agreeableness (cooperation, empathy)
         agree_features = [
             self._find_feature_value(categories, 'affirmation_tendency'),
             self._find_feature_value(categories, 'sentiment_mirroring'),
             self._find_feature_value(categories, 'support_reactivity'),
+            self._find_feature_value(categories, 'empathy'),
         ]
         valid = [v for v in agree_features if v is not None]
         metrics['agreeableness'] = np.mean(valid) if valid else 0.5
         
-        # Openness
+        # Openness (curiosity, creativity)
         open_features = [
             self._find_feature_value(categories, 'topic_expansion_rate'),
             self._find_feature_value(categories, 'vocabulary_richness'),
             self._find_feature_value(categories, 'semantic_diversity'),
+            self._find_feature_value(categories, 'question_ratio'),
         ]
         valid = [v for v in open_features if v is not None]
         metrics['openness'] = np.mean(valid) if valid else 0.5
         
-        # Emotional stability
+        # Emotional Stability (inverse of neuroticism)
         stability_features = [
             self._find_feature_value(categories, 'sentiment_volatility'),
-            self._find_feature_value(categories, 'mood_influence_susceptibility'),
+            self._find_feature_value(categories, 'emotional_volatility'),
         ]
         valid = [v for v in stability_features if v is not None]
-        # Invert because high volatility = low stability
         metrics['emotional_stability'] = 1 - np.mean(valid) if valid else 0.5
         
-        # Conscientiousness
+        # Conscientiousness (organization, dependability)
         consc_features = [
             self._find_feature_value(categories, 'formality'),
             self._find_feature_value(categories, 'response_rate'),
-            self._find_feature_value(categories, 'attention_consistency'),
+            self._find_feature_value(categories, 'consistency'),
         ]
         valid = [v for v in consc_features if v is not None]
         metrics['conscientiousness'] = np.mean(valid) if valid else 0.5
@@ -397,7 +424,7 @@ class PersonalityService:
         return {k: round(v, 3) for k, v in metrics.items()}
     
     def _summarize_features(self, categories: Dict[str, Dict[str, float]]) -> Dict[str, float]:
-        """Create a summary of key features."""
+        """Create a summary of key features by category."""
         summary = {}
         
         for cat_name, features in categories.items():
@@ -426,6 +453,7 @@ class PersonalityService:
             Response from the AI persona
         """
         if not self.gemini_model:
+            logger.warning("Gemini model not initialized - using fallback response. Check GEMINI_API_KEY environment variable.")
             return self._fallback_response(personality, user_message)
         
         try:
@@ -434,6 +462,8 @@ class PersonalityService:
             
             # Add system prompt
             system_prompt = personality.get('system_prompt', '')
+            if not system_prompt:
+                logger.warning("No system prompt found in personality profile")
             
             # Add conversation history
             if conversation_history:
@@ -448,27 +478,45 @@ class PersonalityService:
                 full_prompt += "Previous conversation:\n" + "\n".join(messages) + "\n\n"
             full_prompt += f"User: {user_message}\n\n{personality['user_name']}:"
             
+            logger.info(f"Generating response for {personality['user_name']} (prompt length: {len(full_prompt)} chars)")
+            
             # Generate response
             response = await self.gemini_model.generate_content_async(full_prompt)
             
+            if not response or not response.text:
+                logger.error("Gemini returned empty response")
+                return self._fallback_response(personality, user_message)
+            
+            logger.info(f"Successfully generated response: {len(response.text)} chars")
             return response.text.strip()
             
         except Exception as e:
-            logger.error(f"Chat error: {e}")
+            logger.error(f"Chat error: {type(e).__name__}: {str(e)}", exc_info=True)
             return self._fallback_response(personality, user_message)
     
     def _fallback_response(self, personality: Dict[str, Any], user_message: str) -> str:
         """Generate a fallback response when Gemini is unavailable."""
-        traits = personality.get('traits', {})
         user_name = personality.get('user_name', 'Unknown')
+        vector = personality.get('personality_vector', {})
         
-        # Generate a simple response based on traits
-        if traits.get('emotional_profile') == 'positive':
-            return f"Hey! That's interesting. Tell me more about that!"
-        elif traits.get('communication_style') == 'concise':
-            return "Got it. What else?"
+        # Generate a simple response based on personality vector
+        # Check sentiment baseline
+        sentiment = vector.get('sentiment_baseline', 0.5)
+        formality = vector.get('formality', 0.5)
+        enthusiasm = vector.get('response_enthusiasm', 0.5)
+        msg_length = vector.get('average_message_length', 0.5)
+        
+        # Build response based on vector values
+        if sentiment > 0.6 and enthusiasm > 0.6:
+            return "That's really interesting! I'd love to hear more about that."
+        elif msg_length < 0.4:
+            return "Interesting. Tell me more?"
+        elif formality > 0.7:
+            return "I understand. Could you elaborate on that point?"
+        elif sentiment < 0.4:
+            return "I see. What's your take on it?"
         else:
-            return f"I see what you mean. What do you think about it?"
+            return "That makes sense. What else is on your mind?"
     
     def enhance_with_synthetic(
         self,

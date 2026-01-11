@@ -10,6 +10,18 @@ import os
 import logging
 from datetime import datetime
 from contextlib import asynccontextmanager
+from pathlib import Path
+
+# Load environment variables from .env file in backend directory
+try:
+    from dotenv import load_dotenv
+    env_path = Path(__file__).parent / '.env'
+    load_dotenv(dotenv_path=env_path)
+    logging.info(f"Loaded environment variables from {env_path}")
+except ImportError:
+    logging.warning("python-dotenv not installed, environment variables must be set manually")
+except Exception as e:
+    logging.warning(f"Could not load .env file: {e}")
 
 from services.feature_extractor import FeatureExtractor
 from services.synthetic_generator import SyntheticGenerator
