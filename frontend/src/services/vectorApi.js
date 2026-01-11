@@ -1,8 +1,13 @@
 import axios from 'axios';
+import Constants from 'expo-constants';
 
-const API_BASE_URL = __DEV__
-  ? 'http://localhost:5000'
-  : 'https://your-production-api.com';
+// Check if we're in development mode
+const isDev = typeof __DEV__ !== 'undefined' ? __DEV__ : process.env.NODE_ENV === 'development';
+
+const API_BASE_URL = Constants.expoConfig?.extra?.apiUrl || 
+  (isDev
+    ? 'http://localhost:5000'
+    : 'https://your-production-api.com');
 
 const api = axios.create({
   baseURL: API_BASE_URL,

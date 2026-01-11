@@ -1,7 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { View, StyleSheet, ScrollView, FlatList } from 'react-native';
-import { Card, Text, Button, Chip, SegmentedButtons, DataTable, ActivityIndicator } from 'react-native-paper';
-import Slider from '@react-native-community/slider';
+import { Card, Text, Button, Chip, SegmentedButtons, DataTable, ActivityIndicator, TextInput, IconButton } from 'react-native-paper';
 import { AppContext } from '../context/AppContext';
 import { generateSynthetic, listVectors } from '../services/vectorApi';
 
@@ -212,16 +211,33 @@ const SyntheticScreen = ({ navigation }) => {
           />
 
           <Text style={styles.label}>Number of Vectors: {count}</Text>
-          <Slider
-            style={styles.slider}
-            minimumValue={1}
-            maximumValue={50}
-            step={1}
-            value={count}
-            onValueChange={setCount}
-            minimumTrackTintColor="#6200ee"
-            maximumTrackTintColor="#ccc"
-          />
+          <View style={styles.sliderContainer}>
+            <IconButton
+              icon="minus"
+              size={24}
+              onPress={() => setCount(Math.max(1, count - 1))}
+              disabled={count <= 1}
+            />
+            <TextInput
+              mode="outlined"
+              value={count.toString()}
+              onChangeText={(text) => {
+                const num = parseInt(text, 10);
+                if (!isNaN(num) && num >= 1 && num <= 50) {
+                  setCount(num);
+                }
+              }}
+              keyboardType="numeric"
+              style={styles.sliderInput}
+              dense
+            />
+            <IconButton
+              icon="plus"
+              size={24}
+              onPress={() => setCount(Math.min(50, count + 1))}
+              disabled={count >= 50}
+            />
+          </View>
 
           <Button
             mode="contained"
@@ -315,9 +331,16 @@ const styles = StyleSheet.create({
   segmented: {
     marginBottom: 8,
   },
-  slider: {
-    width: '100%',
-    height: 40,
+  sliderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 8,
+  },
+  sliderInput: {
+    width: 80,
+    textAlign: 'center',
+    marginHorizontal: 8,
   },
   generateButton: {
     marginTop: 16,
