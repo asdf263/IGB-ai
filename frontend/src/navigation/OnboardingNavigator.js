@@ -22,7 +22,7 @@ const OnboardingNavigator = () => {
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#6200ee',
+          backgroundColor: '#E07A5F',
         },
         headerTintColor: '#fff',
         headerTitleStyle: {

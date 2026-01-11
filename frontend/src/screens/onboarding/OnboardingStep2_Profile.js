@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { TextInput, Button, Text, Snackbar, ProgressBar, Menu, List, TouchableRipple } from 'react-native-paper';
-import { ETHNICITIES, HEIGHT_CONSTRAINTS, validateHeight, AGE_CONSTRAINTS, validateAge } from '../../constants/profileOptions';
+import { ETHNICITIES, HEIGHT_CONSTRAINTS, validateHeight, AGE_CONSTRAINTS, validateAge, US_STATES } from '../../constants/profileOptions';
 
 const OnboardingStep2_Profile = ({ navigation, route }) => {
   const accountData = route.params?.accountData || {};
@@ -11,7 +11,8 @@ const OnboardingStep2_Profile = ({ navigation, route }) => {
   const [ageError, setAgeError] = useState('');
   const [instagramHandle, setInstagramHandle] = useState('');
   const [city, setCity] = useState('');
-  const [country, setCountry] = useState('');
+  const [state, setState] = useState('');
+  const [showStateMenu, setShowStateMenu] = useState(false);
   const [ethnicity, setEthnicity] = useState('');
   const [showEthnicityMenu, setShowEthnicityMenu] = useState(false);
   const [height, setHeight] = useState('');
@@ -92,7 +93,7 @@ const OnboardingStep2_Profile = ({ navigation, route }) => {
       age: age ? parseInt(age, 10) : null,
       instagram_handle: instagramHandle.trim().replace(/^@+/, ''),
       city: city.trim(),
-      country: country.trim(),
+      state: state,
       ethnicity: ethnicity,
       height: height.trim(),
     };
@@ -106,6 +107,16 @@ const OnboardingStep2_Profile = ({ navigation, route }) => {
 
   const handleBack = () => {
     navigation.goBack();
+  };
+
+  const handleStateSelect = (st) => {
+    setState(st.value);
+    setShowStateMenu(false);
+  };
+
+  const getStateLabel = () => {
+    const selected = US_STATES.find(s => s.value === state);
+    return selected ? `${selected.label} (${selected.value})` : 'Select state';
   };
 
   const handleEthnicitySelect = (eth) => {
@@ -125,7 +136,7 @@ const OnboardingStep2_Profile = ({ navigation, route }) => {
     >
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         <View style={styles.content}>
-          <ProgressBar progress={0.5} color="#6200ee" style={styles.progressBar} />
+          <ProgressBar progress={0.5} color="#E07A5F" style={styles.progressBar} />
           
           <Text variant="headlineSmall" style={styles.title}>
             Step 2 of 4: Your Profile
@@ -176,15 +187,40 @@ const OnboardingStep2_Profile = ({ navigation, route }) => {
             placeholder="e.g. Los Angeles"
           />
 
-          {/* Country Input */}
-          <TextInput
-            label="Country"
-            value={country}
-            onChangeText={setCountry}
-            mode="outlined"
-            style={styles.input}
-            placeholder="e.g. United States"
-          />
+          {/* State Dropdown */}
+          <View style={styles.dropdownContainer}>
+            <Text variant="bodySmall" style={styles.fieldLabel}>State</Text>
+            <Menu
+              visible={showStateMenu}
+              onDismiss={() => setShowStateMenu(false)}
+              anchor={
+                <TouchableRipple
+                  onPress={() => setShowStateMenu(true)}
+                  style={styles.dropdownButton}
+                >
+                  <View style={styles.dropdownButtonContent}>
+                    <Text style={state ? styles.dropdownText : styles.dropdownPlaceholder}>
+                      {getStateLabel()}
+                    </Text>
+                    <List.Icon icon="menu-down" />
+                  </View>
+                </TouchableRipple>
+              }
+              style={styles.menu}
+              contentStyle={styles.menuContent}
+            >
+              <ScrollView style={styles.menuScroll} nestedScrollEnabled>
+                {US_STATES.map((st) => (
+                  <Menu.Item
+                    key={st.value}
+                    onPress={() => handleStateSelect(st)}
+                    title={`${st.label} (${st.value})`}
+                    style={state === st.value ? styles.selectedMenuItem : null}
+                  />
+                ))}
+              </ScrollView>
+            </Menu>
+          </View>
 
           {/* Ethnicity Dropdown */}
           <View style={styles.dropdownContainer}>
@@ -312,13 +348,13 @@ const styles = StyleSheet.create({
     maxHeight: 300,
   },
   selectedMenuItem: {
-    backgroundColor: '#E8DEF8',
+    backgroundColor: '#FFEEE8',
   },
   heightSection: {
     marginBottom: 16,
   },
   heightHint: {
-    color: '#6200ee',
+    color: '#E07A5F',
     marginTop: 4,
     marginLeft: 4,
     fontWeight: '500',

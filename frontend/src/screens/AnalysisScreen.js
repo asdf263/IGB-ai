@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
   },
   headerCard: {
     margin: 10,
-    backgroundColor: '#6200ee',
+    backgroundColor: '#E07A5F',
   },
   headerTitle: {
     fontSize: 24,

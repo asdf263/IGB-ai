@@ -1,10 +1,12 @@
 """
 Instagram Data Export Parser
-Parses Instagram ZIP exports and extracts messages from HTML files
+Parses Instagram ZIP exports and extracts messages from HTML or JSON files.
+Supports both export formats that Instagram provides.
 """
 import zipfile
 import io
 import re
+import json
 import logging
 from typing import List, Dict, Any, Optional, Tuple, BinaryIO
 from datetime import datetime
@@ -15,12 +17,18 @@ logger = logging.getLogger(__name__)
 
 
 class InstagramParser:
-    """Parser for Instagram data export ZIP files"""
+    """Parser for Instagram data export ZIP files (supports both HTML and JSON formats)"""
     
-    # Regex pattern for Instagram message HTML files
-    MESSAGE_FILE_PATTERN = re.compile(
+    # Regex patterns for Instagram message files
+    MESSAGE_FILE_PATTERN_HTML = re.compile(
         r'your_instagram_activity/messages/inbox/[^/]+/message_\d+\.html$'
     )
+    MESSAGE_FILE_PATTERN_JSON = re.compile(
+        r'your_instagram_activity/messages/inbox/[^/]+/message_\d+\.json$'
+    )
+    
+    # Legacy pattern for backwards compatibility
+    MESSAGE_FILE_PATTERN = MESSAGE_FILE_PATTERN_HTML
     
     # Date formats Instagram uses
     DATE_FORMATS = [
@@ -36,6 +44,7 @@ class InstagramParser:
     def parse_zip(self, file_content: bytes) -> Tuple[List[Dict[str, Any]], str]:
         """
         Parse Instagram ZIP export and extract all messages.
+        Supports both HTML and JSON export formats.
         
         Args:
             file_content: Raw bytes of the ZIP file
@@ -50,24 +59,40 @@ class InstagramParser:
         
         try:
             with zipfile.ZipFile(io.BytesIO(file_content), 'r') as zf:
-                # Find all message HTML files
-                message_files = [
+                # Find all message files (both HTML and JSON formats)
+                html_files = [
                     name for name in zf.namelist()
-                    if self.MESSAGE_FILE_PATTERN.match(name)
+                    if self.MESSAGE_FILE_PATTERN_HTML.match(name)
+                ]
+                json_files = [
+                    name for name in zf.namelist()
+                    if self.MESSAGE_FILE_PATTERN_JSON.match(name)
                 ]
                 
-                if not message_files:
+                # Determine which format to use
+                if json_files:
+                    message_files = json_files
+                    file_format = 'json'
+                    logger.info(f"Detected JSON format export with {len(json_files)} message files")
+                elif html_files:
+                    message_files = html_files
+                    file_format = 'html'
+                    logger.info(f"Detected HTML format export with {len(html_files)} message files")
+                else:
                     logger.warning("No message files found in ZIP")
-                    raise ValueError("No Instagram message files found in the ZIP archive")
-                
-                logger.info(f"Found {len(message_files)} message files in ZIP")
+                    raise ValueError("No Instagram message files found in the ZIP archive. Expected message_X.html or message_X.json files in your_instagram_activity/messages/inbox/")
                 
                 # Parse each message file
                 for file_path in message_files:
                     try:
                         with zf.open(file_path) as f:
-                            html_content = f.read().decode('utf-8')
-                            messages = self._parse_html_messages(html_content)
+                            content = f.read().decode('utf-8')
+                            
+                            if file_format == 'json':
+                                messages = self._parse_json_messages(content)
+                            else:
+                                messages = self._parse_html_messages(content)
+                            
                             all_messages.extend(messages)
                             
                             # Count senders
@@ -164,6 +189,95 @@ class InstagramParser:
                 continue
         
         return messages
+    
+    def _parse_json_messages(self, json_content: str) -> List[Dict[str, Any]]:
+        """
+        Parse messages from Instagram JSON content.
+        
+        Args:
+            json_content: Raw JSON string
+            
+        Returns:
+            List of message dicts
+        """
+        messages = []
+        
+        try:
+            data = json.loads(json_content)
+        except json.JSONDecodeError as e:
+            logger.warning(f"Invalid JSON content: {e}")
+            return messages
+        
+        # Get messages array from JSON
+        raw_messages = data.get('messages', [])
+        
+        for msg in raw_messages:
+            try:
+                # Extract sender name
+                sender = msg.get('sender_name', '')
+                if not sender:
+                    continue
+                
+                # Fix encoding issues (Instagram uses latin-1 encoded UTF-8)
+                sender = self._fix_instagram_encoding(sender)
+                
+                # Extract message content
+                content = msg.get('content', '')
+                if content:
+                    content = self._fix_instagram_encoding(content)
+                
+                # Skip empty messages, reactions, or system messages
+                if not content:
+                    # Check if it's a share/link/photo - skip these for text analysis
+                    if msg.get('share') or msg.get('photos') or msg.get('videos') or msg.get('audio_files'):
+                        continue
+                    continue
+                
+                # Skip "Reacted X to your message" notifications
+                if content.startswith('Reacted ') and ' to your message' in content:
+                    continue
+                
+                # Skip "Liked a message" notifications
+                if content == 'Liked a message':
+                    continue
+                
+                # Extract timestamp (in milliseconds)
+                timestamp_ms = msg.get('timestamp_ms', 0)
+                if not timestamp_ms:
+                    continue
+                
+                # Convert to seconds
+                timestamp = timestamp_ms // 1000
+                
+                messages.append({
+                    'sender': sender,
+                    'text': content,
+                    'timestamp': timestamp
+                })
+                
+            except Exception as e:
+                logger.debug(f"Error parsing JSON message: {e}")
+                continue
+        
+        return messages
+    
+    def _fix_instagram_encoding(self, text: str) -> str:
+        """
+        Fix Instagram's encoding issues where UTF-8 is stored as latin-1.
+        Instagram exports sometimes have mojibake (UTF-8 bytes interpreted as latin-1).
+        
+        Args:
+            text: Text string that may have encoding issues
+            
+        Returns:
+            Properly decoded text
+        """
+        try:
+            # Try to fix mojibake by encoding as latin-1 and decoding as UTF-8
+            return text.encode('latin-1').decode('utf-8')
+        except (UnicodeDecodeError, UnicodeEncodeError):
+            # If that fails, return original text
+            return text
     
     def _extract_message_text(self, text_elem) -> str:
         """

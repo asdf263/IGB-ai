@@ -2,79 +2,59 @@
  * Profile options constants for dropdowns and selectors
  */
 
-// US States and major countries
-export const LOCATIONS = [
-  // US States
-  { label: 'Alabama', value: 'Alabama, USA' },
-  { label: 'Alaska', value: 'Alaska, USA' },
-  { label: 'Arizona', value: 'Arizona, USA' },
-  { label: 'Arkansas', value: 'Arkansas, USA' },
-  { label: 'California', value: 'California, USA' },
-  { label: 'Colorado', value: 'Colorado, USA' },
-  { label: 'Connecticut', value: 'Connecticut, USA' },
-  { label: 'Delaware', value: 'Delaware, USA' },
-  { label: 'Florida', value: 'Florida, USA' },
-  { label: 'Georgia', value: 'Georgia, USA' },
-  { label: 'Hawaii', value: 'Hawaii, USA' },
-  { label: 'Idaho', value: 'Idaho, USA' },
-  { label: 'Illinois', value: 'Illinois, USA' },
-  { label: 'Indiana', value: 'Indiana, USA' },
-  { label: 'Iowa', value: 'Iowa, USA' },
-  { label: 'Kansas', value: 'Kansas, USA' },
-  { label: 'Kentucky', value: 'Kentucky, USA' },
-  { label: 'Louisiana', value: 'Louisiana, USA' },
-  { label: 'Maine', value: 'Maine, USA' },
-  { label: 'Maryland', value: 'Maryland, USA' },
-  { label: 'Massachusetts', value: 'Massachusetts, USA' },
-  { label: 'Michigan', value: 'Michigan, USA' },
-  { label: 'Minnesota', value: 'Minnesota, USA' },
-  { label: 'Mississippi', value: 'Mississippi, USA' },
-  { label: 'Missouri', value: 'Missouri, USA' },
-  { label: 'Montana', value: 'Montana, USA' },
-  { label: 'Nebraska', value: 'Nebraska, USA' },
-  { label: 'Nevada', value: 'Nevada, USA' },
-  { label: 'New Hampshire', value: 'New Hampshire, USA' },
-  { label: 'New Jersey', value: 'New Jersey, USA' },
-  { label: 'New Mexico', value: 'New Mexico, USA' },
-  { label: 'New York', value: 'New York, USA' },
-  { label: 'North Carolina', value: 'North Carolina, USA' },
-  { label: 'North Dakota', value: 'North Dakota, USA' },
-  { label: 'Ohio', value: 'Ohio, USA' },
-  { label: 'Oklahoma', value: 'Oklahoma, USA' },
-  { label: 'Oregon', value: 'Oregon, USA' },
-  { label: 'Pennsylvania', value: 'Pennsylvania, USA' },
-  { label: 'Rhode Island', value: 'Rhode Island, USA' },
-  { label: 'South Carolina', value: 'South Carolina, USA' },
-  { label: 'South Dakota', value: 'South Dakota, USA' },
-  { label: 'Tennessee', value: 'Tennessee, USA' },
-  { label: 'Texas', value: 'Texas, USA' },
-  { label: 'Utah', value: 'Utah, USA' },
-  { label: 'Vermont', value: 'Vermont, USA' },
-  { label: 'Virginia', value: 'Virginia, USA' },
-  { label: 'Washington', value: 'Washington, USA' },
-  { label: 'West Virginia', value: 'West Virginia, USA' },
-  { label: 'Wisconsin', value: 'Wisconsin, USA' },
-  { label: 'Wyoming', value: 'Wyoming, USA' },
-  { label: 'Washington D.C.', value: 'Washington D.C., USA' },
-  // International
-  { label: '──── International ────', value: '', disabled: true },
-  { label: 'Canada', value: 'Canada' },
-  { label: 'United Kingdom', value: 'United Kingdom' },
-  { label: 'Australia', value: 'Australia' },
-  { label: 'Germany', value: 'Germany' },
-  { label: 'France', value: 'France' },
-  { label: 'Japan', value: 'Japan' },
-  { label: 'South Korea', value: 'South Korea' },
-  { label: 'China', value: 'China' },
-  { label: 'India', value: 'India' },
-  { label: 'Brazil', value: 'Brazil' },
-  { label: 'Mexico', value: 'Mexico' },
-  { label: 'Spain', value: 'Spain' },
-  { label: 'Italy', value: 'Italy' },
-  { label: 'Netherlands', value: 'Netherlands' },
-  { label: 'Sweden', value: 'Sweden' },
-  { label: 'Singapore', value: 'Singapore' },
-  { label: 'Other', value: 'Other' },
+// US States with abbreviations
+export const US_STATES = [
+  { label: 'Alabama', value: 'AL' },
+  { label: 'Alaska', value: 'AK' },
+  { label: 'Arizona', value: 'AZ' },
+  { label: 'Arkansas', value: 'AR' },
+  { label: 'California', value: 'CA' },
+  { label: 'Colorado', value: 'CO' },
+  { label: 'Connecticut', value: 'CT' },
+  { label: 'Delaware', value: 'DE' },
+  { label: 'Florida', value: 'FL' },
+  { label: 'Georgia', value: 'GA' },
+  { label: 'Hawaii', value: 'HI' },
+  { label: 'Idaho', value: 'ID' },
+  { label: 'Illinois', value: 'IL' },
+  { label: 'Indiana', value: 'IN' },
+  { label: 'Iowa', value: 'IA' },
+  { label: 'Kansas', value: 'KS' },
+  { label: 'Kentucky', value: 'KY' },
+  { label: 'Louisiana', value: 'LA' },
+  { label: 'Maine', value: 'ME' },
+  { label: 'Maryland', value: 'MD' },
+  { label: 'Massachusetts', value: 'MA' },
+  { label: 'Michigan', value: 'MI' },
+  { label: 'Minnesota', value: 'MN' },
+  { label: 'Mississippi', value: 'MS' },
+  { label: 'Missouri', value: 'MO' },
+  { label: 'Montana', value: 'MT' },
+  { label: 'Nebraska', value: 'NE' },
+  { label: 'Nevada', value: 'NV' },
+  { label: 'New Hampshire', value: 'NH' },
+  { label: 'New Jersey', value: 'NJ' },
+  { label: 'New Mexico', value: 'NM' },
+  { label: 'New York', value: 'NY' },
+  { label: 'North Carolina', value: 'NC' },
+  { label: 'North Dakota', value: 'ND' },
+  { label: 'Ohio', value: 'OH' },
+  { label: 'Oklahoma', value: 'OK' },
+  { label: 'Oregon', value: 'OR' },
+  { label: 'Pennsylvania', value: 'PA' },
+  { label: 'Rhode Island', value: 'RI' },
+  { label: 'South Carolina', value: 'SC' },
+  { label: 'South Dakota', value: 'SD' },
+  { label: 'Tennessee', value: 'TN' },
+  { label: 'Texas', value: 'TX' },
+  { label: 'Utah', value: 'UT' },
+  { label: 'Vermont', value: 'VT' },
+  { label: 'Virginia', value: 'VA' },
+  { label: 'Washington', value: 'WA' },
+  { label: 'West Virginia', value: 'WV' },
+  { label: 'Wisconsin', value: 'WI' },
+  { label: 'Wyoming', value: 'WY' },
+  { label: 'Washington D.C.', value: 'DC' },
 ];
 
 // Ethnicity options based on US Census categories with additional options
@@ -206,10 +186,16 @@ export const formatHeightDisplay = (value, unit) => {
   return `${numValue} ${effectiveUnit || ''}`.trim();
 };
 
-// Format location for display (city, state)
+// Format location for display (city, state abbreviation)
 export const formatLocationDisplay = (city, state) => {
   if (!city && !state) return '';
   if (city && state) return `${city}, ${state}`;
   return city || state || '';
+};
+
+// Get full state name from abbreviation
+export const getStateName = (abbrev) => {
+  const state = US_STATES.find(s => s.value === abbrev);
+  return state ? state.label : abbrev;
 };
 

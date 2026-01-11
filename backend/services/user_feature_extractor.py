@@ -4,6 +4,7 @@ Extracts behavior vectors for individual users within a conversation,
 focusing on how they react to and interact with the other person.
 """
 import numpy as np
+import logging
 from typing import List, Dict, Any, Tuple, Optional
 
 from .features.temporal_features import TemporalFeatureExtractor
@@ -17,6 +18,13 @@ from .features.llm_synthetic_features import LLMSyntheticFeatureExtractor
 from .features.emotion_transformer import EmotionTransformerExtractor
 from .features.conversation_context_features import ConversationContextExtractor
 from .calibrated_normalizer import CalibratedNormalizer
+
+logger = logging.getLogger(__name__)
+
+# Minimum message thresholds for reliable feature extraction
+MIN_MESSAGES_WARNING = 50  # Warn if below this
+MIN_MESSAGES_RECOMMENDED = 100  # Recommended minimum for reliable results
+MIN_MESSAGES_OPTIMAL = 200  # Optimal for high-quality personality modeling
 
 
 class UserFeatureExtractor:
@@ -57,6 +65,20 @@ class UserFeatureExtractor:
         
         if not user_messages:
             return [], []
+        
+        # Log warnings for small datasets
+        msg_count = len(user_messages)
+        if msg_count < MIN_MESSAGES_WARNING:
+            logger.warning(
+                f"Low message count for {target_user}: {msg_count} messages. "
+                f"Recommend at least {MIN_MESSAGES_RECOMMENDED} messages for reliable personality modeling. "
+                f"Features may be unreliable with small datasets."
+            )
+        elif msg_count < MIN_MESSAGES_RECOMMENDED:
+            logger.info(
+                f"Message count for {target_user}: {msg_count}. "
+                f"Consider {MIN_MESSAGES_OPTIMAL}+ messages for optimal results."
+            )
         
         # Extract standard features from user's messages only
         temporal_features = self.temporal_extractor.extract(user_messages)
@@ -125,7 +147,13 @@ class UserFeatureExtractor:
         Extract features for all users in the conversation.
         
         Returns:
-            Dictionary mapping user names to their feature data
+            Dictionary mapping user names to their feature data, including:
+            - vector: the feature vector
+            - labels: feature names
+            - categories: features grouped by category
+            - message_count: number of messages from this user
+            - confidence: reliability score based on data quantity (0-1)
+            - data_quality: human-readable quality assessment
         """
         participants = self.get_participants(messages)
         results = {}
@@ -133,14 +161,46 @@ class UserFeatureExtractor:
         for user in participants:
             vector, labels = self.extract_for_user(messages, user)
             if vector:
+                msg_count = len([m for m in messages if m.get('sender') == user])
+                confidence, quality = self._calculate_confidence(msg_count)
+                
                 results[user] = {
                     'vector': vector,
                     'labels': labels,
                     'categories': self._group_by_category(labels, vector),
-                    'message_count': len([m for m in messages if m.get('sender') == user])
+                    'message_count': msg_count,
+                    'confidence': confidence,
+                    'data_quality': quality
                 }
         
         return results
+    
+    def _calculate_confidence(self, message_count: int) -> Tuple[float, str]:
+        """
+        Calculate confidence score based on message count.
+        
+        Returns:
+            Tuple of (confidence_score, quality_description)
+            confidence_score: 0.0-1.0 indicating reliability
+            quality_description: human-readable quality level
+        """
+        if message_count >= MIN_MESSAGES_OPTIMAL:
+            return 1.0, "excellent"
+        elif message_count >= MIN_MESSAGES_RECOMMENDED:
+            # Linear interpolation from 0.7 to 1.0
+            score = 0.7 + 0.3 * (message_count - MIN_MESSAGES_RECOMMENDED) / (MIN_MESSAGES_OPTIMAL - MIN_MESSAGES_RECOMMENDED)
+            return round(score, 2), "good"
+        elif message_count >= MIN_MESSAGES_WARNING:
+            # Linear interpolation from 0.4 to 0.7
+            score = 0.4 + 0.3 * (message_count - MIN_MESSAGES_WARNING) / (MIN_MESSAGES_RECOMMENDED - MIN_MESSAGES_WARNING)
+            return round(score, 2), "moderate"
+        elif message_count >= 20:
+            # Linear interpolation from 0.2 to 0.4
+            score = 0.2 + 0.2 * (message_count - 20) / (MIN_MESSAGES_WARNING - 20)
+            return round(score, 2), "low"
+        else:
+            # Very low confidence
+            return round(max(0.1, message_count / 100), 2), "very_low"
     
     def _group_by_category(self, labels: List[str], vector: List[float]) -> Dict[str, Dict[str, float]]:
         """Group features by category."""

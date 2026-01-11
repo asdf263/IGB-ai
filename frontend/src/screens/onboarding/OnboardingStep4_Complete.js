@@ -39,7 +39,8 @@ const OnboardingStep4_Complete = ({ navigation, route }) => {
         return;
       }
 
-      const uid = result.user?.uid;
+      // Fix: uid is at result.uid, not result.user.uid (Supabase user has .id not .uid)
+      const uid = result.uid || result.user?.id;
       setUserId(uid);
       console.log('[ONBOARD-4] Account created successfully! UID:', uid);
 
@@ -48,9 +49,17 @@ const OnboardingStep4_Complete = ({ navigation, route }) => {
         setCurrentStep('uploading');
         console.log('[ONBOARD-4] Uploading chat file...');
         
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'OnboardingStep4_Complete.js:51',message:'Before uploadChatData call',data:{uid:uid,chatFileName:chatFile?.name,chatFileSize:chatFile?.size,chatFileType:chatFile?.mimeType},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H1'})}).catch(()=>{});
+        // #endregion
+        
         try {
           const uploadResult = await uploadChatData(uid, chatFile);
           console.log('[ONBOARD-4] Chat upload result:', uploadResult);
+          
+          // #region agent log
+          fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'OnboardingStep4_Complete.js:58',message:'After uploadChatData call',data:{uploadResult:uploadResult,hasVectorId:!!uploadResult?.vector_id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H1'})}).catch(()=>{});
+          // #endregion
           
           if (uploadResult.success || uploadResult.vector_id) {
             console.log('[ONBOARD-4] Chat file uploaded successfully!');
@@ -99,7 +108,7 @@ const OnboardingStep4_Complete = ({ navigation, route }) => {
   if (currentStep === 'creating' && !error) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#6200ee" />
+        <ActivityIndicator size="large" color="#E07A5F" />
         <Text variant="titleMedium" style={styles.loadingText}>
           Creating your account...
         </Text>
@@ -113,7 +122,7 @@ const OnboardingStep4_Complete = ({ navigation, route }) => {
   if (currentStep === 'uploading' && !error) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#6200ee" />
+        <ActivityIndicator size="large" color="#E07A5F" />
         <Text variant="titleMedium" style={styles.loadingText}>
           Processing your chat data...
         </Text>
@@ -192,13 +201,13 @@ const OnboardingStep4_Complete = ({ navigation, route }) => {
               </View>
             )}
 
-            {(profileData.city || profileData.country) && (
+            {(profileData.city || profileData.state) && (
               <View style={styles.row}>
                 <Text variant="bodySmall" style={styles.label}>Location:</Text>
                 <Text variant="bodyMedium">
-                  {profileData.city && profileData.country 
-                    ? `${profileData.city}, ${profileData.country}`
-                    : profileData.city || profileData.country}
+                  {profileData.city && profileData.state 
+                    ? `${profileData.city}, ${profileData.state}`
+                    : profileData.city || profileData.state}
                 </Text>
               </View>
             )}
@@ -230,7 +239,7 @@ const OnboardingStep4_Complete = ({ navigation, route }) => {
         </Card>
 
         <View style={styles.redirectContainer}>
-          <ActivityIndicator size="small" color="#6200ee" />
+          <ActivityIndicator size="small" color="#E07A5F" />
           <Text variant="bodySmall" style={styles.redirectText}>
             Redirecting to email verification...
           </Text>

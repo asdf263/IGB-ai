@@ -51,14 +51,24 @@ export const AuthProvider = ({ children }) => {
     const email = supabaseUser.email;
     const supabaseProfile = supabaseUser.user_metadata || {};
     
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.js:ensureUserInMongoDB',message:'Starting MongoDB sync',data:{uid,email,apiUrl:API_BASE_URL},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1-H2'})}).catch(()=>{});
+    // #endregion
+    
     try {
       // Try to fetch user from MongoDB
       const backendUser = await getUserFromBackend(uid);
       console.log('[AUTH] User found in MongoDB:', backendUser?.profile);
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.js:ensureUserInMongoDB',message:'User found in MongoDB',data:{uid,profile:backendUser?.profile},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
+      // #endregion
       return backendUser?.profile || supabaseProfile;
     } catch (err) {
       // User doesn't exist in MongoDB - need to sync
       console.log('[AUTH] User not found in MongoDB, syncing...', err.message);
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.js:ensureUserInMongoDB',message:'User not in MongoDB - attempting sync',data:{uid,errorMsg:err.message,apiUrl:API_BASE_URL},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
+      // #endregion
       
       try {
         const syncResponse = await axios.post(`${API_BASE_URL}/api/users/sync`, {
@@ -67,9 +77,15 @@ export const AuthProvider = ({ children }) => {
           profile: supabaseProfile,
         });
         console.log('[AUTH] User synced to MongoDB:', syncResponse.data);
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.js:ensureUserInMongoDB',message:'Sync SUCCESS',data:{uid,response:syncResponse.data},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
+        // #endregion
         return syncResponse.data?.profile || supabaseProfile;
       } catch (syncErr) {
         console.warn('[AUTH] Failed to sync user to MongoDB:', syncErr.message);
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AuthContext.js:ensureUserInMongoDB',message:'Sync FAILED',data:{uid,errorMsg:syncErr.message,errorCode:syncErr.response?.status,apiUrl:API_BASE_URL},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1-H3'})}).catch(()=>{});
+        // #endregion
         // Return Supabase profile as fallback
         return supabaseProfile;
       }
@@ -226,7 +242,8 @@ export const AuthProvider = ({ children }) => {
       
       // Do NOT set authenticated - user must verify email and login
       console.log('[AUTH] Signup successful, awaiting email verification');
-      return { success: true, email: email };
+      // Return the uid so caller can upload chat data for this user
+      return { success: true, email: email, uid: result.uid };
     } catch (err) {
       console.log('[AUTH] Signup error:', err.message);
       justSignedUp.current = false;

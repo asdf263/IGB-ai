@@ -90,7 +90,7 @@ const OnboardingStep3_ChatUpload = ({ navigation, route }) => {
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.content}>
-          <ProgressBar progress={0.75} color="#6200ee" style={styles.progressBar} />
+          <ProgressBar progress={0.75} color="#E07A5F" style={styles.progressBar} />
           
           <Text variant="headlineSmall" style={styles.title}>
             Step 3 of 4: Chat Data

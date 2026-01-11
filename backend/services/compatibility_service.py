@@ -2,13 +2,20 @@
 Compatibility Score Service
 Uses Google's Gemini API to calculate compatibility scores between users
 based on their extracted behavior features.
+
+Fallback chain: Gemini -> Ollama (local) -> Algorithmic
 """
 import os
 import json
 import logging
 from typing import Dict, Any, List, Optional
+import httpx
 
 logger = logging.getLogger(__name__)
+
+# Ollama configuration for local LLM fallback
+OLLAMA_BASE_URL = os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434')
+OLLAMA_MODEL = os.getenv('OLLAMA_MODEL', 'llama3.2')
 
 
 class CompatibilityService:
@@ -50,6 +57,8 @@ class CompatibilityService:
         """
         Calculate compatibility score between two users based on their features.
         
+        Fallback chain: Gemini -> Ollama (local) -> Algorithmic
+        
         Args:
             user1_features: Feature dictionary for user 1
             user2_features: Feature dictionary for user 2
@@ -60,14 +69,23 @@ class CompatibilityService:
         Returns:
             Dictionary with compatibility score and analysis
         """
-        if self.client is None or self.model is None:
-            return self._fallback_compatibility(user1_features, user2_features, user1_name, user2_name)
+        # === STEP 1: Try Gemini API ===
+        if self.client is not None and self.model is not None:
+            try:
+                result = await self._gemini_compatibility(user1_features, user2_features, user1_name, user2_name, messages)
+                return result
+            except Exception as e:
+                logger.warning(f"Gemini compatibility failed: {e}, trying Ollama...")
         
-        try:
-            return await self._gemini_compatibility(user1_features, user2_features, user1_name, user2_name, messages)
-        except Exception as e:
-            logger.error(f"Gemini compatibility calculation failed: {e}")
-            return self._fallback_compatibility(user1_features, user2_features, user1_name, user2_name)
+        # === STEP 2: Fallback to Ollama (local LLM) ===
+        logger.info(f"Falling back to Ollama ({OLLAMA_MODEL}) for compatibility...")
+        ollama_result = await self._ollama_compatibility(user1_features, user2_features, user1_name, user2_name, messages)
+        if ollama_result:
+            return ollama_result
+        
+        # === STEP 3: Algorithmic fallback ===
+        logger.warning("All LLMs unavailable - using algorithmic fallback")
+        return self._fallback_compatibility(user1_features, user2_features, user1_name, user2_name)
     
     async def _gemini_compatibility(
         self,
@@ -78,25 +96,50 @@ class CompatibilityService:
         messages: Optional[List[Dict[str, Any]]] = None
     ) -> Dict[str, Any]:
         """Calculate compatibility using Gemini."""
-        # Prepare feature summaries for the prompt
+        prompt = self._build_compatibility_prompt(user1_features, user2_features, user1_name, user2_name, messages)
+
+        try:
+            response = self.client.models.generate_content(model=self.model, contents=prompt)
+            result_text = response.text.strip()
+            
+            parsed = self._parse_llm_response(result_text, user1_name, user2_name, 'gemini')
+            if parsed:
+                return parsed
+            else:
+                raise ValueError("Failed to parse Gemini response as JSON")
+            
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse Gemini response: {e}")
+            raise  # Re-raise to trigger fallback chain
+        except Exception as e:
+            logger.error(f"Gemini compatibility calculation failed: {e}")
+            raise  # Re-raise to trigger fallback chain
+    
+    def _build_compatibility_prompt(
+        self,
+        user1_features: Dict[str, Any],
+        user2_features: Dict[str, Any],
+        user1_name: str,
+        user2_name: str,
+        messages: Optional[List[Dict[str, Any]]] = None
+    ) -> str:
+        """Build the compatibility analysis prompt for LLMs."""
         user1_summary = self._prepare_feature_summary(user1_features, user1_name)
         user2_summary = self._prepare_feature_summary(user2_features, user2_name)
         
         # Prepare message snippet (~100 messages)
         message_snippet = ""
         if messages and len(messages) > 0:
-            # Take up to 100 messages, prioritizing recent ones
             snippet_messages = messages[-100:] if len(messages) > 100 else messages
             message_snippet = "\n\n## Conversation Sample (~100 messages)\n\n"
             for msg in snippet_messages:
                 sender = msg.get('sender', 'Unknown')
                 text = msg.get('text', '')
-                # Truncate very long messages
                 if len(text) > 200:
                     text = text[:200] + "..."
                 message_snippet += f"{sender}: {text}\n"
         
-        prompt = f"""Analyze the communication compatibility between two people based on their conversation behavior profiles and actual conversation examples.
+        return f"""Analyze the communication compatibility between two people based on their conversation behavior profiles and actual conversation examples.
 
 {user1_name}'s Communication Profile:
 {user1_summary}
@@ -125,45 +168,163 @@ Consider factors like:
 - Adaptive behaviors and synchrony
 
 Return ONLY the JSON object, no additional text."""
-
+    
+    def _parse_llm_response(self, result_text: str, user1_name: str, user2_name: str, method: str) -> Optional[Dict[str, Any]]:
+        """Parse LLM response and return compatibility result.
+        
+        Attempts multiple parsing strategies to handle varied LLM output formats.
+        """
+        import re
+        
+        # Clean up response if needed
+        result_text = result_text.strip()
+        
+        # Remove markdown code blocks
+        if result_text.startswith('```json'):
+            result_text = result_text[7:]
+        if result_text.startswith('```'):
+            result_text = result_text[3:]
+        if result_text.endswith('```'):
+            result_text = result_text[:-3]
+        result_text = result_text.strip()
+        
+        # Strategy 1: Try direct JSON parse
         try:
-            response = self.client.models.generate_content(model=self.model, contents=prompt)
-            result_text = response.text.strip()
-            
-            # Clean up response if needed
-            if result_text.startswith('```json'):
-                result_text = result_text[7:]
-            if result_text.startswith('```'):
-                result_text = result_text[3:]
-            if result_text.endswith('```'):
-                result_text = result_text[:-3]
-            
-            result = json.loads(result_text.strip())
-            result['method'] = 'gemini'
+            result = json.loads(result_text)
+            result['method'] = method
             result['user1'] = user1_name
             result['user2'] = user2_name
-            
             return result
+        except json.JSONDecodeError:
+            pass
+        
+        # Strategy 2: Try to find JSON object in the text using regex
+        json_match = re.search(r'\{[\s\S]*"overall_score"[\s\S]*\}', result_text)
+        if json_match:
+            try:
+                result = json.loads(json_match.group())
+                result['method'] = method
+                result['user1'] = user1_name
+                result['user2'] = user2_name
+                return result
+            except json.JSONDecodeError:
+                pass
+        
+        # Strategy 3: Try to extract key values manually for a partial result
+        try:
+            # Extract overall_score
+            score_match = re.search(r'"overall_score"\s*:\s*(\d+)', result_text)
+            style_match = re.search(r'"communication_style_match"\s*:\s*(\d+)', result_text)
+            emotional_match = re.search(r'"emotional_compatibility"\s*:\s*(\d+)', result_text)
+            engagement_match = re.search(r'"engagement_balance"\s*:\s*(\d+)', result_text)
+            summary_match = re.search(r'"summary"\s*:\s*"([^"]*)"', result_text)
             
-        except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse Gemini response: {e}")
-            return self._fallback_compatibility(user1_features, user2_features, user1_name, user2_name)
+            if score_match:
+                result = {
+                    'overall_score': int(score_match.group(1)),
+                    'communication_style_match': int(style_match.group(1)) if style_match else 50,
+                    'emotional_compatibility': int(emotional_match.group(1)) if emotional_match else 50,
+                    'engagement_balance': int(engagement_match.group(1)) if engagement_match else 50,
+                    'strengths': ['LLM analysis available'],
+                    'challenges': ['Partial analysis due to parsing'],
+                    'recommendations': ['Consider retrying for full analysis'],
+                    'summary': summary_match.group(1) if summary_match else 'Compatibility analysis completed.',
+                    'method': f'{method}_partial',
+                    'user1': user1_name,
+                    'user2': user2_name
+                }
+                logger.info(f"Used partial parsing for {method} response")
+                return result
         except Exception as e:
-            logger.error(f"Gemini compatibility calculation failed: {e}")
-            return self._fallback_compatibility(user1_features, user2_features, user1_name, user2_name)
+            logger.warning(f"Partial parsing failed for {method}: {e}")
+        
+        logger.error(f"Failed to parse {method} response after all strategies")
+        return None
+    
+    async def _ollama_compatibility(
+        self,
+        user1_features: Dict[str, Any],
+        user2_features: Dict[str, Any],
+        user1_name: str,
+        user2_name: str,
+        messages: Optional[List[Dict[str, Any]]] = None
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Calculate compatibility using local Ollama as fallback.
+        
+        Args:
+            user1_features: Feature dictionary for user 1
+            user2_features: Feature dictionary for user 2
+            user1_name: Display name for user 1
+            user2_name: Display name for user 2
+            messages: Optional list of conversation messages for context
+            
+        Returns:
+            Compatibility result dict, or None if Ollama is unavailable
+        """
+        prompt = self._build_compatibility_prompt(user1_features, user2_features, user1_name, user2_name, messages)
+        
+        try:
+            async with httpx.AsyncClient(timeout=90.0) as client:
+                response = await client.post(
+                    f"{OLLAMA_BASE_URL}/api/generate",
+                    json={
+                        "model": OLLAMA_MODEL,
+                        "prompt": prompt,
+                        "stream": False,
+                        "options": {
+                            "temperature": 0.7,
+                            "num_predict": 1024
+                        }
+                    }
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    ollama_response = result.get("response", "").strip()
+                    
+                    if ollama_response:
+                        logger.info(f"Ollama compatibility response: {len(ollama_response)} chars")
+                        parsed = self._parse_llm_response(ollama_response, user1_name, user2_name, 'ollama')
+                        if parsed:
+                            return parsed
+                        else:
+                            logger.warning("Failed to parse Ollama response as JSON")
+                else:
+                    logger.warning(f"Ollama returned status {response.status_code}")
+                    
+        except httpx.ConnectError:
+            logger.warning("Ollama not available (connection refused) - is Ollama running?")
+        except httpx.TimeoutException:
+            logger.warning("Ollama request timed out (90s)")
+        except Exception as e:
+            logger.warning(f"Ollama compatibility failed: {type(e).__name__}: {e}")
+        
+        return None
     
     def _prepare_feature_summary(self, features: Dict[str, Any], user_name: str) -> str:
         """Prepare a human-readable summary of user features for the prompt."""
         categories = features.get('categories', {})
+        
+        # Helper to safely get numeric value (handles numpy types)
+        def safe_float(val, default=0):
+            if val is None:
+                return default
+            if hasattr(val, 'item'):
+                return float(val.item())
+            try:
+                return float(val)
+            except (TypeError, ValueError):
+                return default
         
         summary_parts = []
         
         # Sentiment profile
         if 'sentiment' in categories:
             sent = categories['sentiment']
-            sentiment_mean = sent.get('mean', sent.get('sentiment_mean', 0))
-            positive_ratio = sent.get('positive_ratio', 0)
-            volatility = sent.get('volatility', sent.get('sentiment_volatility', 0))
+            sentiment_mean = safe_float(sent.get('mean', sent.get('sentiment_mean', 0)))
+            positive_ratio = safe_float(sent.get('positive_ratio', 0))
+            volatility = safe_float(sent.get('volatility', sent.get('sentiment_volatility', 0)))
             
             mood = "positive" if sentiment_mean > 0.1 else "negative" if sentiment_mean < -0.1 else "neutral"
             summary_parts.append(f"- Emotional tone: Generally {mood} (positivity: {positive_ratio:.0%})")
@@ -172,9 +333,9 @@ Return ONLY the JSON object, no additional text."""
         # Communication style
         if 'behavioral' in categories:
             beh = categories['behavioral']
-            formality = beh.get('formality_score', 0.5)
-            directness = beh.get('directness_score', 0.5)
-            assertiveness = beh.get('assertiveness_score', 0.5)
+            formality = safe_float(beh.get('formality_score', 0.5), 0.5)
+            directness = safe_float(beh.get('directness_score', 0.5), 0.5)
+            assertiveness = safe_float(beh.get('assertiveness_score', 0.5), 0.5)
             
             style = "formal" if formality > 0.6 else "casual" if formality < 0.4 else "balanced"
             summary_parts.append(f"- Communication style: {style.capitalize()}")
@@ -184,8 +345,8 @@ Return ONLY the JSON object, no additional text."""
         # Engagement patterns
         if 'behavioral' in categories:
             beh = categories['behavioral']
-            engagement = beh.get('engagement_level', 0.5)
-            response_rate = beh.get('response_rate', 0.5)
+            engagement = safe_float(beh.get('engagement_level', 0.5), 0.5)
+            response_rate = safe_float(beh.get('response_rate', 0.5), 0.5)
             
             summary_parts.append(f"- Engagement level: {'High' if engagement > 0.6 else 'Low' if engagement < 0.4 else 'Moderate'}")
             summary_parts.append(f"- Responsiveness: {response_rate:.0%}")
@@ -193,9 +354,9 @@ Return ONLY the JSON object, no additional text."""
         # Reaction patterns
         if 'reaction' in categories:
             react = categories['reaction']
-            mirroring = react.get('sentiment_mirroring', 0.5)
-            support = react.get('support_reactivity', 0)
-            adaptation = react.get('style_adaptation', 0.5)
+            mirroring = safe_float(react.get('sentiment_mirroring', 0.5), 0.5)
+            support = safe_float(react.get('support_reactivity', 0), 0)
+            adaptation = safe_float(react.get('style_adaptation', 0.5), 0.5)
             
             summary_parts.append(f"- Emotional mirroring: {'High' if mirroring > 0.6 else 'Low' if mirroring < 0.4 else 'Moderate'}")
             summary_parts.append(f"- Supportiveness: {'High' if support > 0.3 else 'Low' if support < 0.1 else 'Moderate'}")
@@ -204,8 +365,8 @@ Return ONLY the JSON object, no additional text."""
         # Composite scores
         if 'composite' in categories:
             comp = categories['composite']
-            eq = comp.get('emotional_intelligence_proxy', 0.5)
-            coherence = comp.get('topic_coherence_score', 0.5)
+            eq = safe_float(comp.get('emotional_intelligence_proxy', 0.5), 0.5)
+            coherence = safe_float(comp.get('topic_coherence_score', 0.5), 0.5)
             
             summary_parts.append(f"- Emotional intelligence: {'High' if eq > 0.6 else 'Low' if eq < 0.4 else 'Moderate'}")
             summary_parts.append(f"- Topic coherence: {'High' if coherence > 0.6 else 'Low' if coherence < 0.4 else 'Moderate'}")
@@ -222,11 +383,18 @@ Return ONLY the JSON object, no additional text."""
         """Calculate compatibility using algorithmic fallback when Gemini is unavailable."""
         import numpy as np
         
-        # Extract vectors
+        # Extract vectors and convert to Python lists if needed
         vec1 = user1_features.get('vector', [])
         vec2 = user2_features.get('vector', [])
         
-        if not vec1 or not vec2:
+        # Convert to list if numpy array
+        if hasattr(vec1, 'tolist'):
+            vec1 = vec1.tolist()
+        if hasattr(vec2, 'tolist'):
+            vec2 = vec2.tolist()
+        
+        # Check for empty or invalid vectors
+        if not vec1 or not vec2 or (hasattr(vec1, '__len__') and len(vec1) == 0):
             return {
                 'overall_score': 50,
                 'communication_style_match': 50,
@@ -301,13 +469,24 @@ Return ONLY the JSON object, no additional text."""
             'user2': user2_name
         }
     
+    def _safe_float(self, val, default=0.5):
+        """Safely convert a value to float, handling numpy types."""
+        if val is None:
+            return default
+        if hasattr(val, 'item'):
+            return float(val.item())
+        try:
+            return float(val)
+        except (TypeError, ValueError):
+            return default
+    
     def _calculate_style_match(self, cat1: Dict, cat2: Dict) -> float:
         """Calculate communication style match."""
         beh1 = cat1.get('behavioral', {})
         beh2 = cat2.get('behavioral', {})
         
-        formality_diff = abs(beh1.get('formality_score', 0.5) - beh2.get('formality_score', 0.5))
-        directness_diff = abs(beh1.get('directness_score', 0.5) - beh2.get('directness_score', 0.5))
+        formality_diff = abs(self._safe_float(beh1.get('formality_score', 0.5)) - self._safe_float(beh2.get('formality_score', 0.5)))
+        directness_diff = abs(self._safe_float(beh1.get('directness_score', 0.5)) - self._safe_float(beh2.get('directness_score', 0.5)))
         
         return 1 - (formality_diff + directness_diff) / 2
     
@@ -319,16 +498,16 @@ Return ONLY the JSON object, no additional text."""
         react2 = cat2.get('reaction', {})
         
         # Similar positivity levels
-        pos_diff = abs(sent1.get('positive_ratio', 0.5) - sent2.get('positive_ratio', 0.5))
+        pos_diff = abs(self._safe_float(sent1.get('positive_ratio', 0.5)) - self._safe_float(sent2.get('positive_ratio', 0.5)))
         
         # Emotional responsiveness
-        resp1 = react1.get('emotional_responsiveness', 0.5)
-        resp2 = react2.get('emotional_responsiveness', 0.5)
+        resp1 = self._safe_float(react1.get('emotional_responsiveness', 0.5))
+        resp2 = self._safe_float(react2.get('emotional_responsiveness', 0.5))
         avg_responsiveness = (resp1 + resp2) / 2
         
         # Support reactivity
-        support1 = react1.get('support_reactivity', 0)
-        support2 = react2.get('support_reactivity', 0)
+        support1 = self._safe_float(react1.get('support_reactivity', 0), 0)
+        support2 = self._safe_float(react2.get('support_reactivity', 0), 0)
         avg_support = (support1 + support2) / 2
         
         return (1 - pos_diff) * 0.4 + avg_responsiveness * 0.3 + avg_support * 0.3
@@ -341,12 +520,12 @@ Return ONLY the JSON object, no additional text."""
         react2 = cat2.get('reaction', {})
         
         # Reciprocity
-        recip1 = react1.get('reciprocity_balance', 0.5)
-        recip2 = react2.get('reciprocity_balance', 0.5)
+        recip1 = self._safe_float(react1.get('reciprocity_balance', 0.5))
+        recip2 = self._safe_float(react2.get('reciprocity_balance', 0.5))
         
         # Engagement levels
-        eng1 = beh1.get('engagement_level', 0.5)
-        eng2 = beh2.get('engagement_level', 0.5)
+        eng1 = self._safe_float(beh1.get('engagement_level', 0.5))
+        eng2 = self._safe_float(beh2.get('engagement_level', 0.5))
         eng_diff = abs(eng1 - eng2)
         
         return ((recip1 + recip2) / 2) * 0.5 + (1 - eng_diff) * 0.5

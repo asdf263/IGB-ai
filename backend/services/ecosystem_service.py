@@ -67,7 +67,8 @@ class EcosystemService:
         user_name: str,
         personality: Dict[str, Any],
         vector: List[float],
-        source_analysis_id: Optional[str] = None
+        source_analysis_id: Optional[str] = None,
+        sample_messages: Optional[List[str]] = None
     ) -> Dict[str, Any]:
         """
         Add a persona to the ecosystem.
@@ -78,16 +79,23 @@ class EcosystemService:
             personality: Synthesized personality profile
             vector: Feature vector
             source_analysis_id: ID of the source analysis
+            sample_messages: Representative sample messages for style mimicry (up to 50)
         
         Returns:
             The added persona entry
         """
+        # Store up to 50 sample messages for style reference
+        stored_samples = []
+        if sample_messages:
+            stored_samples = sample_messages[:50]
+        
         persona_entry = {
             'persona_id': persona_id,
             'user_name': user_name,
             'personality': personality,
             'vector': vector,
             'source_analysis_id': source_analysis_id,
+            'sample_messages': stored_samples,
             'added_at': np.datetime64('now').astype(str),
             'interaction_count': 0,
         }

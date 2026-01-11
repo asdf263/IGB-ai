@@ -183,6 +183,7 @@ class AddPersonaRequest(BaseModel):
     personality: Dict[str, Any]
     vector: List[float]
     source_analysis_id: Optional[str] = None
+    sample_messages: Optional[List[str]] = None
 
 
 class ChatWithPersonaRequest(BaseModel):
@@ -216,8 +217,7 @@ class ProfileUpdateRequest(BaseModel):
     interests: Optional[List[str]] = None
     location: Optional[str] = None
     city: Optional[str] = None
-    country: Optional[str] = None
-    state: Optional[str] = None
+    state: Optional[str] = None  # US state abbreviation (e.g., 'CA', 'NY')
     ethnicity: Optional[str] = None
     height: Optional[str] = None
     height_unit: Optional[str] = None
@@ -242,6 +242,9 @@ async def root():
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
+    # #region agent log
+    import json as _json; open('/home/ethanzheng/Documents/Projects/Hackathons/SBHACKS2026/IGB-ai/.cursor/debug.log','a').write(_json.dumps({"location":"main.py:health_check","message":"HEALTH endpoint HIT","data":{},"timestamp":__import__('time').time()*1000,"sessionId":"debug-session","hypothesisId":"H1"})+'\n')
+    # #endregion
     mongodb_ok = user_service is not None and user_service.client is not None
     print(f"[HEALTH] MongoDB: {mongodb_ok}")
     return {
@@ -303,6 +306,9 @@ async def sync_user(request: UserSyncRequest):
     This endpoint is called after Supabase authentication to ensure
     the user exists in MongoDB with their profile data.
     """
+    # #region agent log
+    import json as _json; open('/home/ethanzheng/Documents/Projects/Hackathons/SBHACKS2026/IGB-ai/.cursor/debug.log','a').write(_json.dumps({"location":"main.py:sync_user","message":"SYNC endpoint HIT","data":{"uid":request.uid,"email":request.email},"timestamp":__import__('time').time()*1000,"sessionId":"debug-session","hypothesisId":"H1-H4"})+'\n')
+    # #endregion
     print(f"\n{'='*60}")
     print(f"[SYNC] === USER SYNC REQUEST ===")
     print(f"[SYNC] UID: {request.uid}")
@@ -467,6 +473,25 @@ async def update_profile(uid: str, request: ProfileUpdateRequest):
         raise HTTPException(status_code=500, detail=f"Failed to update profile: {str(e)}")
 
 
+def _debug_log(location: str, message: str, data: dict, hypothesis_id: str):
+    """Write debug log to NDJSON file"""
+    import time
+    log_entry = {
+        "location": location,
+        "message": message,
+        "data": data,
+        "timestamp": int(time.time() * 1000),
+        "sessionId": "debug-session",
+        "runId": "run1",
+        "hypothesisId": hypothesis_id
+    }
+    try:
+        with open("/home/ethanzheng/Documents/Projects/Hackathons/SBHACKS2026/IGB-ai/.cursor/debug.log", "a") as f:
+            f.write(json.dumps(log_entry) + "\n")
+    except Exception:
+        pass
+
+
 @app.post("/api/users/{uid}/upload-chat")
 async def upload_chat(uid: str, file: UploadFile = File(...)):
     """Upload chat data and extract behavior vector for user.
@@ -475,7 +500,14 @@ async def upload_chat(uid: str, file: UploadFile = File(...)):
     - JSON files: Standard chat format {messages: [{sender, text, timestamp}, ...]}
     - ZIP files: Instagram data export archives
     """
+    # #region agent log
+    _debug_log("main.py:upload_chat:entry", "Upload endpoint called", {"uid": uid, "filename": file.filename if file else None}, "H2")
+    # #endregion
+    
     if not user_service:
+        # #region agent log
+        _debug_log("main.py:upload_chat:no_user_service", "User service not available", {}, "H5")
+        # #endregion
         raise HTTPException(status_code=503, detail="User service not available")
     
     try:
@@ -483,6 +515,10 @@ async def upload_chat(uid: str, file: UploadFile = File(...)):
         content = await file.read()
         filename = file.filename or ""
         content_type = file.content_type or ""
+        
+        # #region agent log
+        _debug_log("main.py:upload_chat:file_read", "File read complete", {"filename": filename, "content_type": content_type, "content_size": len(content)}, "H2")
+        # #endregion
         
         logger.info(f"[UPLOAD] Processing file: {filename}, type: {content_type}, size: {len(content)} bytes")
         
@@ -529,13 +565,24 @@ async def upload_chat(uid: str, file: UploadFile = File(...)):
                 raise HTTPException(status_code=400, detail="Invalid file format. Expected JSON or Instagram ZIP export.")
         
         if not messages:
+            # #region agent log
+            _debug_log("main.py:upload_chat:no_messages", "No messages found after parsing", {"file_type": file_type}, "H3")
+            # #endregion
             raise HTTPException(status_code=400, detail="No messages from user found in uploaded file")
+        
+        # #region agent log
+        _debug_log("main.py:upload_chat:messages_parsed", "Messages parsed successfully", {"message_count": len(messages), "file_type": file_type, "owner_name": owner_name}, "H3")
+        # #endregion
         
         logger.info(f"[UPLOAD] Processing {len(messages)} user messages for vectorization")
         
         # Extract behavior vector
         vector, labels = feature_extractor.extract(messages)
         categories = feature_extractor.extract_by_category(messages)
+        
+        # #region agent log
+        _debug_log("main.py:upload_chat:vector_extracted", "Vector extraction complete", {"vector_length": len(vector), "labels_count": len(labels)}, "H3")
+        # #endregion
         
         # Store vector with metadata
         metadata = {
@@ -551,8 +598,16 @@ async def upload_chat(uid: str, file: UploadFile = File(...)):
         
         vector_id = vector_store.add(vector, metadata)
         
+        # #region agent log
+        _debug_log("main.py:upload_chat:vector_stored", "Vector stored in ChromaDB", {"vector_id": vector_id, "uid": uid}, "H4")
+        # #endregion
+        
         # Link vector to user
         user_service.link_vector_to_user(uid, vector_id)
+        
+        # #region agent log
+        _debug_log("main.py:upload_chat:vector_linked", "Vector linked to user", {"uid": uid, "vector_id": vector_id}, "H4")
+        # #endregion
         
         logger.info(f"[UPLOAD] Vector stored with ID: {vector_id}")
         
@@ -574,6 +629,9 @@ async def upload_chat(uid: str, file: UploadFile = File(...)):
     except HTTPException:
         raise
     except Exception as e:
+        # #region agent log
+        _debug_log("main.py:upload_chat:exception", "Unhandled exception in upload", {"error": str(e), "error_type": type(e).__name__}, "H3")
+        # #endregion
         logger.error(f"Upload chat error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to process chat data: {str(e)}")
 
@@ -594,6 +652,281 @@ async def complete_onboarding(uid: str):
     except Exception as e:
         logger.error(f"Complete onboarding error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to complete onboarding: {str(e)}")
+
+
+@app.get("/api/users/{uid1}/compatibility/{uid2}")
+async def get_user_compatibility(uid1: str, uid2: str):
+    """Calculate compatibility between two users based on their stored vectors.
+    
+    This endpoint retrieves the behavior vectors for both users and computes
+    a compatibility score with insights, strengths, and challenges.
+    """
+    if not user_service:
+        raise HTTPException(status_code=503, detail="User service not available")
+    
+    try:
+        # Get both users
+        user1 = user_service.get_user_by_uid(uid1)
+        user2 = user_service.get_user_by_uid(uid2)
+        
+        if not user1:
+            raise HTTPException(status_code=404, detail=f"User {uid1} not found")
+        if not user2:
+            raise HTTPException(status_code=404, detail=f"User {uid2} not found")
+        
+        # Get vector IDs
+        vector_id1 = user1.get('vector_id')
+        vector_id2 = user2.get('vector_id')
+        
+        if not vector_id1:
+            raise HTTPException(status_code=400, detail=f"User {uid1} has no behavior vector. They need to upload chat data first.")
+        if not vector_id2:
+            raise HTTPException(status_code=400, detail=f"User {uid2} has no behavior vector. They need to upload chat data first.")
+        
+        # Retrieve vectors from store
+        vector_data1 = vector_store.get(vector_id1)
+        vector_data2 = vector_store.get(vector_id2)
+        
+        if not vector_data1:
+            raise HTTPException(status_code=404, detail=f"Vector {vector_id1} not found in store")
+        if not vector_data2:
+            raise HTTPException(status_code=404, detail=f"Vector {vector_id2} not found in store")
+        
+        vec1 = vector_data1['vector']
+        vec2 = vector_data2['vector']
+        
+        # Get feature labels to build category structure
+        labels = feature_extractor.get_feature_names()
+        
+        # Build feature dictionaries with categories
+        def build_feature_dict(vector, labels):
+            import numpy as np
+            categories = {}
+            # Convert vector to list of Python floats to avoid numpy array comparison issues
+            vector_list = [float(v) if isinstance(v, (np.floating, np.integer)) else v for v in vector]
+            for label, value in zip(labels, vector_list):
+                # Parse category from label (e.g., "sentiment_mean" -> "sentiment")
+                parts = label.split('_')
+                category = parts[0] if parts else 'other'
+                if category not in categories:
+                    categories[category] = {}
+                # Use the part after category as feature name
+                feature_name = '_'.join(parts[1:]) if len(parts) > 1 else label
+                # Ensure value is a Python float, not numpy type
+                categories[category][feature_name] = float(value) if hasattr(value, 'item') else value
+            return {'vector': list(vector_list), 'labels': labels, 'categories': categories}
+        
+        user1_features = build_feature_dict(vec1, labels)
+        user2_features = build_feature_dict(vec2, labels)
+        
+        # Get user names for display
+        user1_name = user1.get('profile', {}).get('name') or user1.get('email', '').split('@')[0] or 'User 1'
+        user2_name = user2.get('profile', {}).get('name') or user2.get('email', '').split('@')[0] or 'User 2'
+        
+        # Calculate compatibility
+        compatibility = await compatibility_service.calculate_compatibility(
+            user1_features, user2_features, user1_name, user2_name
+        )
+        
+        return {
+            "success": True,
+            "compatibility": compatibility,
+            "user1": {
+                "uid": uid1,
+                "name": user1_name,
+                "has_vector": True
+            },
+            "user2": {
+                "uid": uid2,
+                "name": user2_name,
+                "has_vector": True
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"User compatibility error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to calculate compatibility: {str(e)}")
+
+
+@app.post("/api/users/{uid}/persona")
+async def create_user_persona(uid: str):
+    """Create or retrieve an AI persona for a user based on their behavior vector.
+    
+    This synthesizes a personality profile from the user's chat patterns
+    and adds it to the ecosystem for chatting.
+    """
+    if not user_service:
+        raise HTTPException(status_code=503, detail="User service not available")
+    
+    try:
+        # Get user
+        user = user_service.get_user_by_uid(uid)
+        if not user:
+            raise HTTPException(status_code=404, detail=f"User {uid} not found")
+        
+        # Check if persona already exists
+        persona_id = f"user_{uid}"
+        existing_persona = ecosystem_service.get_persona(persona_id)
+        if existing_persona:
+            return {
+                "success": True,
+                "persona": {
+                    "persona_id": existing_persona['persona_id'],
+                    "user_name": existing_persona['user_name'],
+                    "created": False  # Already existed
+                }
+            }
+        
+        # Get vector
+        vector_id = user.get('vector_id')
+        if not vector_id:
+            raise HTTPException(status_code=400, detail="User has no behavior vector. Upload chat data first.")
+        
+        vector_data = vector_store.get(vector_id)
+        if not vector_data:
+            raise HTTPException(status_code=404, detail=f"Vector {vector_id} not found")
+        
+        vector = vector_data['vector']
+        labels = feature_extractor.get_feature_names()
+        
+        # Build categories for personality synthesis
+        categories = {}
+        for label, value in zip(labels, vector):
+            parts = label.split('_')
+            category = parts[0] if parts else 'other'
+            if category not in categories:
+                categories[category] = {}
+            feature_name = '_'.join(parts[1:]) if len(parts) > 1 else label
+            categories[category][feature_name] = value
+        
+        user_features = {'categories': categories}
+        user_name = user.get('profile', {}).get('name') or user.get('email', '').split('@')[0] or 'User'
+        
+        # Synthesize personality
+        personality = personality_service.synthesize_personality(
+            user_name=user_name,
+            user_features=user_features,
+            sample_messages=None  # We don't have raw messages stored
+        )
+        
+        # Add to ecosystem
+        persona = ecosystem_service.add_persona(
+            persona_id=persona_id,
+            user_name=user_name,
+            personality=personality,
+            vector=vector,
+            source_analysis_id=None
+        )
+        
+        logger.info(f"Created persona for user {uid}: {persona_id}")
+        
+        return {
+            "success": True,
+            "persona": {
+                "persona_id": persona['persona_id'],
+                "user_name": persona['user_name'],
+                "created": True
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Create persona error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to create persona: {str(e)}")
+
+
+class ChatWithUserRequest(BaseModel):
+    message: str
+    conversation_history: Optional[List[Dict[str, str]]] = None
+
+
+@app.post("/api/users/{uid}/chat")
+async def chat_with_user(uid: str, request: ChatWithUserRequest):
+    """Chat with an AI persona simulating the specified user.
+    
+    This auto-creates the persona if it doesn't exist, then generates
+    a response in the user's communication style.
+    """
+    if not user_service:
+        raise HTTPException(status_code=503, detail="User service not available")
+    
+    try:
+        # Ensure persona exists (creates if not)
+        persona_id = f"user_{uid}"
+        persona = ecosystem_service.get_persona(persona_id)
+        
+        if not persona:
+            # Auto-create persona
+            user = user_service.get_user_by_uid(uid)
+            if not user:
+                raise HTTPException(status_code=404, detail=f"User {uid} not found")
+            
+            vector_id = user.get('vector_id')
+            if not vector_id:
+                raise HTTPException(status_code=400, detail="User has no behavior vector. They need to upload chat data first.")
+            
+            vector_data = vector_store.get(vector_id)
+            if not vector_data:
+                raise HTTPException(status_code=404, detail=f"Vector not found")
+            
+            vector = vector_data['vector']
+            labels = feature_extractor.get_feature_names()
+            
+            categories = {}
+            for label, value in zip(labels, vector):
+                parts = label.split('_')
+                category = parts[0] if parts else 'other'
+                if category not in categories:
+                    categories[category] = {}
+                feature_name = '_'.join(parts[1:]) if len(parts) > 1 else label
+                categories[category][feature_name] = value
+            
+            user_features = {'categories': categories}
+            user_name = user.get('profile', {}).get('name') or user.get('email', '').split('@')[0] or 'User'
+            
+            personality = personality_service.synthesize_personality(
+                user_name=user_name,
+                user_features=user_features
+            )
+            
+            persona = ecosystem_service.add_persona(
+                persona_id=persona_id,
+                user_name=user_name,
+                personality=personality,
+                vector=vector
+            )
+            logger.info(f"Auto-created persona for chat: {persona_id}")
+        
+        # Get personality and sample messages for chat
+        personality = persona.get('personality', {})
+        sample_messages = persona.get('sample_messages', [])
+        
+        # Generate response with sample messages for style reference
+        response = await personality_service.chat_as_persona(
+            personality=personality,
+            user_message=request.message,
+            conversation_history=request.conversation_history,
+            sample_messages=sample_messages
+        )
+        
+        # Increment interaction count
+        ecosystem_service.increment_interaction(persona_id)
+        
+        return {
+            "success": True,
+            "response": response,
+            "persona_name": persona.get('user_name'),
+            "persona_id": persona_id
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Chat with user error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Chat failed: {str(e)}")
 
 
 # ============== Feature Extraction Endpoints ==============
@@ -1253,11 +1586,13 @@ async def chat_with_persona(request: ChatWithPersonaRequest):
             raise HTTPException(status_code=404, detail=f"Persona '{request.persona_id}' not found")
         
         personality = persona.get('personality', {})
+        sample_messages = persona.get('sample_messages', [])
         
         response = await personality_service.chat_as_persona(
             personality=personality,
             user_message=request.message,
-            conversation_history=request.conversation_history
+            conversation_history=request.conversation_history,
+            sample_messages=sample_messages
         )
         
         ecosystem_service.increment_interaction(request.persona_id)
@@ -1286,7 +1621,8 @@ async def add_persona_to_ecosystem(request: AddPersonaRequest):
             user_name=request.user_name,
             personality=request.personality,
             vector=request.vector,
-            source_analysis_id=request.source_analysis_id
+            source_analysis_id=request.source_analysis_id,
+            sample_messages=request.sample_messages
         )
         
         return {
@@ -1431,11 +1767,12 @@ async def create_personas_from_analysis(analysis_id: str):
         created_personas = []
         
         for user_name, user_data in analysis.get('user_features', {}).items():
+            # Extract up to 50 sample messages for this user
             sample_messages = [
-                msg.get('content', '')
+                msg.get('text', msg.get('content', ''))
                 for msg in analysis.get('messages', [])
-                if msg.get('sender') == user_name
-            ][:10]
+                if msg.get('sender') == user_name and msg.get('text', msg.get('content', ''))
+            ][:50]
             
             personality = personality_service.synthesize_personality(
                 user_name=user_name,
@@ -1451,7 +1788,8 @@ async def create_personas_from_analysis(analysis_id: str):
                 user_name=user_name,
                 personality=personality,
                 vector=vector,
-                source_analysis_id=analysis_id
+                source_analysis_id=analysis_id,
+                sample_messages=sample_messages
             )
             
             created_personas.append({

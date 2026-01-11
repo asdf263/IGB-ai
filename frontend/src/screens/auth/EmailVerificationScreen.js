@@ -44,7 +44,7 @@ const EmailVerificationScreen = ({ navigation, route }) => {
               <View style={styles.iconContainer}>
                 <IconButton
                   icon="email-check-outline"
-                  iconColor="#6200ee"
+                  iconColor="#E07A5F"
                   size={72}
                 />
               </View>
@@ -69,19 +69,19 @@ const EmailVerificationScreen = ({ navigation, route }) => {
               {/* Instructions */}
               <View style={styles.instructionsContainer}>
                 <View style={styles.instructionRow}>
-                  <IconButton icon="numeric-1-circle" iconColor="#6200ee" size={24} />
+                  <IconButton icon="numeric-1-circle" iconColor="#E07A5F" size={24} />
                   <Text style={styles.instructionText}>
                     Open your email inbox
                   </Text>
                 </View>
                 <View style={styles.instructionRow}>
-                  <IconButton icon="numeric-2-circle" iconColor="#6200ee" size={24} />
+                  <IconButton icon="numeric-2-circle" iconColor="#E07A5F" size={24} />
                   <Text style={styles.instructionText}>
                     Find the email from IGB AI
                   </Text>
                 </View>
                 <View style={styles.instructionRow}>
-                  <IconButton icon="numeric-3-circle" iconColor="#6200ee" size={24} />
+                  <IconButton icon="numeric-3-circle" iconColor="#E07A5F" size={24} />
                   <Text style={styles.instructionText}>
                     Click the confirmation link
                   </Text>
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   iconContainer: {
-    backgroundColor: '#EDE7F6',
+    backgroundColor: '#FFF0EB',
     borderRadius: 50,
     marginBottom: 16,
   },

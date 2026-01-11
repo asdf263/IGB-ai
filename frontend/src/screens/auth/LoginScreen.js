@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
   emailText: {
     textAlign: 'center',
     fontWeight: 'bold',
-    color: '#6200ee',
+    color: '#E07A5F',
     marginBottom: 16,
   },
   confirmationSubtext: {

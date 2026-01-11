@@ -1,21 +1,27 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Animated } from 'react-native';
-import { Text, Avatar, Divider, ActivityIndicator } from 'react-native-paper';
+import { Text, Avatar, Divider, ActivityIndicator, Button } from 'react-native-paper';
 import { AuthContext } from '../context/AuthContext';
-import { getAllUsers } from '../services/userApi';
+import { getAllUsers, getUserCompatibility } from '../services/userApi';
 import { formatHeightDisplay } from '../constants/profileOptions';
 
 const { width: screenWidth } = Dimensions.get('window');
 
 /**
  * BrowseUsersScreen - Browse through all user profiles with arrow navigation
+ * Shows compatibility scores and enables AI chat with users
  */
-const BrowseUsersScreen = () => {
+const BrowseUsersScreen = ({ navigation }) => {
   const { user } = useContext(AuthContext);
   const [users, setUsers] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Compatibility state
+  const [compatibility, setCompatibility] = useState(null);
+  const [compatLoading, setCompatLoading] = useState(false);
+  const [compatError, setCompatError] = useState(null);
   
   // Animation values
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -25,6 +31,13 @@ const BrowseUsersScreen = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
+  
+  // Fetch compatibility when user changes
+  useEffect(() => {
+    if (users.length > 0 && user?.uid) {
+      fetchCompatibility(users[currentIndex]?.uid);
+    }
+  }, [currentIndex, users, user?.uid]);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -39,6 +52,54 @@ const BrowseUsersScreen = () => {
       setError(err.message || 'Failed to load users');
     } finally {
       setLoading(false);
+    }
+  };
+  
+  const fetchCompatibility = async (otherUid) => {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'BrowseUsersScreen.js:fetchCompatibility',message:'fetchCompatibility called',data:{otherUid:otherUid,myUid:user?.uid},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H1'})}).catch(()=>{});
+    // #endregion
+    
+    if (!otherUid || !user?.uid) {
+      setCompatibility(null);
+      return;
+    }
+    
+    setCompatLoading(true);
+    setCompatError(null);
+    setCompatibility(null);
+    
+    try {
+      const result = await getUserCompatibility(user.uid, otherUid);
+      
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'BrowseUsersScreen.js:fetchCompatibility:result',message:'Compatibility API result',data:{success:result?.success,hasCompatibility:!!result?.compatibility,error:result?.error},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H1'})}).catch(()=>{});
+      // #endregion
+      
+      if (result.success && result.compatibility) {
+        setCompatibility(result.compatibility);
+      } else {
+        setCompatError(result.error || 'Cannot calculate compatibility');
+      }
+    } catch (err) {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'BrowseUsersScreen.js:fetchCompatibility:error',message:'Compatibility fetch error',data:{errorMessage:err.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H1'})}).catch(()=>{});
+      // #endregion
+      
+      setCompatError(err.message || 'Failed to load compatibility');
+    } finally {
+      setCompatLoading(false);
+    }
+  };
+  
+  const handleChatWithAI = () => {
+    const currentUser = users[currentIndex];
+    if (currentUser) {
+      navigation.navigate('ChatWithUser', {
+        targetUser: currentUser,
+        targetUid: currentUser.uid,
+        targetName: currentUser.profile?.name || currentUser.email?.split('@')[0] || 'User',
+      });
     }
   };
 
@@ -115,15 +176,15 @@ const BrowseUsersScreen = () => {
 
   const formatLocation = (profileData) => {
     const city = profileData?.city;
-    const country = profileData?.country;
-    if (city && country) return `${city}, ${country}`;
-    return city || country || profileData?.location || 'Not specified';
+    const state = profileData?.state;
+    if (city && state) return `${city}, ${state}`;
+    return city || state || profileData?.location || 'Not specified';
   };
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6200ee" />
+        <ActivityIndicator size="large" color="#E07A5F" />
         <Text style={styles.loadingText}>Loading users...</Text>
       </View>
     );
@@ -220,6 +281,78 @@ const BrowseUsersScreen = () => {
                   <ProfileRow label="Height" value={formatHeight(profileData)} icon="📏" />
                   <ProfileRow label="Age" value={profileData?.age ? `${profileData.age} years` : 'Not specified'} icon="🎂" />
                 </View>
+                
+                {/* Compatibility Section */}
+                <View style={styles.sectionDivider} />
+                <View style={styles.compatibilitySection}>
+                  <Text style={styles.sectionTitle}>Compatibility</Text>
+                  
+                  {compatLoading ? (
+                    <View style={styles.compatLoadingContainer}>
+                      <ActivityIndicator size="small" color="#E07A5F" />
+                      <Text style={styles.compatLoadingText}>Analyzing compatibility...</Text>
+                    </View>
+                  ) : compatError ? (
+                    <View style={styles.compatErrorContainer}>
+                      <Text style={styles.compatErrorIcon}>⚠️</Text>
+                      <Text style={styles.compatErrorText}>{compatError}</Text>
+                    </View>
+                  ) : compatibility ? (
+                    <View>
+                      {/* Overall Score */}
+                      <View style={styles.scoreContainer}>
+                        <Text style={styles.scoreValue}>{compatibility.overall_score}%</Text>
+                        <Text style={styles.scoreLabel}>Compatible</Text>
+                      </View>
+                      
+                      {/* Strengths */}
+                      {compatibility.strengths && compatibility.strengths.length > 0 && (
+                        <View style={styles.insightsContainer}>
+                          {compatibility.strengths.slice(0, 2).map((strength, index) => (
+                            <View key={`strength-${index}`} style={styles.insightRow}>
+                              <Text style={styles.insightIconGreen}>✓</Text>
+                              <Text style={styles.insightText}>{strength}</Text>
+                            </View>
+                          ))}
+                        </View>
+                      )}
+                      
+                      {/* Challenges */}
+                      {compatibility.challenges && compatibility.challenges.length > 0 && 
+                       compatibility.challenges[0] !== 'No major challenges identified' && (
+                        <View style={styles.insightsContainer}>
+                          {compatibility.challenges.slice(0, 1).map((challenge, index) => (
+                            <View key={`challenge-${index}`} style={styles.insightRow}>
+                              <Text style={styles.insightIconOrange}>⚡</Text>
+                              <Text style={styles.insightText}>{challenge}</Text>
+                            </View>
+                          ))}
+                        </View>
+                      )}
+                    </View>
+                  ) : (
+                    <Text style={styles.noCompatText}>Upload chat data to see compatibility</Text>
+                  )}
+                </View>
+                
+                {/* Chat with AI Button */}
+                <View style={styles.chatButtonContainer}>
+                  <Button
+                    mode="contained"
+                    onPress={handleChatWithAI}
+                    style={styles.chatButton}
+                    labelStyle={styles.chatButtonLabel}
+                    icon="chat"
+                    disabled={!currentUser?.vector_id}
+                  >
+                    Chat with AI
+                  </Button>
+                  {!currentUser?.vector_id && (
+                    <Text style={styles.chatDisabledText}>
+                      This user hasn't uploaded chat data yet
+                    </Text>
+                  )}
+                </View>
               </View>
             </View>
           </ScrollView>
@@ -301,7 +434,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   retryButton: {
-    backgroundColor: '#6200ee',
+    backgroundColor: '#E07A5F',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -352,9 +485,9 @@ const styles = StyleSheet.create({
   },
   arrowText: {
     fontSize: 56,
-    color: '#6200ee',
+    color: '#E07A5F',
     fontWeight: '300',
-    textShadowColor: 'rgba(98, 0, 238, 0.3)',
+    textShadowColor: 'rgba(224, 122, 95, 0.3)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
   },
@@ -386,7 +519,7 @@ const styles = StyleSheet.create({
     left: 8,
     right: 8,
     bottom: -12,
-    backgroundColor: 'rgba(98, 0, 238, 0.08)',
+    backgroundColor: 'rgba(224, 122, 95, 0.08)',
     borderRadius: 24,
   },
   cardShadowLayer2: {
@@ -395,7 +528,7 @@ const styles = StyleSheet.create({
     left: 5,
     right: 5,
     bottom: -8,
-    backgroundColor: 'rgba(98, 0, 238, 0.12)',
+    backgroundColor: 'rgba(224, 122, 95, 0.12)',
     borderRadius: 22,
   },
   cardShadowLayer1: {
@@ -404,7 +537,7 @@ const styles = StyleSheet.create({
     left: 2,
     right: 2,
     bottom: -4,
-    backgroundColor: 'rgba(98, 0, 238, 0.18)',
+    backgroundColor: 'rgba(224, 122, 95, 0.18)',
     borderRadius: 20,
   },
   profileCard: {
@@ -412,7 +545,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
     // iOS shadow
-    shadowColor: '#6200ee',
+    shadowColor: '#E07A5F',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
     shadowRadius: 16,
@@ -432,7 +565,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   avatar: {
-    backgroundColor: '#6200ee',
+    backgroundColor: '#E07A5F',
   },
   avatarLabel: {
     fontSize: 44,
@@ -451,7 +584,7 @@ const styles = StyleSheet.create({
   },
   instagram: {
     fontSize: 14,
-    color: '#6200ee',
+    color: '#E07A5F',
     fontWeight: '500',
   },
   sectionDivider: {
@@ -518,13 +651,115 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   dotActive: {
-    backgroundColor: '#6200ee',
+    backgroundColor: '#E07A5F',
     width: 24,
   },
   indexText: {
     fontSize: 15,
     color: '#666',
     fontWeight: '500',
+  },
+  // Compatibility Section
+  compatibilitySection: {
+    padding: 20,
+    paddingTop: 16,
+  },
+  compatLoadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+  },
+  compatLoadingText: {
+    marginLeft: 10,
+    color: '#666',
+    fontSize: 14,
+  },
+  compatErrorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#fff8e1',
+    borderRadius: 8,
+  },
+  compatErrorIcon: {
+    fontSize: 16,
+    marginRight: 8,
+  },
+  compatErrorText: {
+    color: '#666',
+    fontSize: 13,
+    flex: 1,
+  },
+  scoreContainer: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    marginBottom: 16,
+  },
+  scoreValue: {
+    fontSize: 36,
+    fontWeight: '700',
+    color: '#E07A5F',
+  },
+  scoreLabel: {
+    fontSize: 16,
+    color: '#666',
+    marginLeft: 8,
+  },
+  insightsContainer: {
+    marginBottom: 8,
+  },
+  insightRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    paddingVertical: 6,
+  },
+  insightIconGreen: {
+    fontSize: 16,
+    color: '#4caf50',
+    marginRight: 10,
+    marginTop: 1,
+  },
+  insightIconOrange: {
+    fontSize: 16,
+    color: '#ff9800',
+    marginRight: 10,
+    marginTop: 1,
+  },
+  insightText: {
+    fontSize: 14,
+    color: '#333',
+    flex: 1,
+    lineHeight: 20,
+  },
+  noCompatText: {
+    fontSize: 14,
+    color: '#999',
+    textAlign: 'center',
+    fontStyle: 'italic',
+    paddingVertical: 12,
+  },
+  // Chat Button
+  chatButtonContainer: {
+    padding: 20,
+    paddingTop: 0,
+  },
+  chatButton: {
+    backgroundColor: '#E07A5F',
+    borderRadius: 12,
+    paddingVertical: 4,
+  },
+  chatButtonLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  chatDisabledText: {
+    fontSize: 12,
+    color: '#999',
+    textAlign: 'center',
+    marginTop: 8,
+    fontStyle: 'italic',
   },
 });
 

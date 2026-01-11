@@ -16,6 +16,8 @@ const AnalysisScreen = require('../screens/AnalysisScreen').default;
 const VectorDetailScreen = require('../screens/VectorDetailScreen').default;
 const ProfileScreen = require('../screens/ProfileScreen').default;
 const BrowseUsersScreen = require('../screens/BrowseUsersScreen').default;
+const ChatWithUserScreen = require('../screens/ChatWithUserScreen').default;
+const ChatDataUploadScreen = require('../screens/ChatDataUploadScreen').default;
 
 // #region agent log - debug import validation
 console.log('[DEBUG-H1] AnalysisScreen type:', typeof AnalysisScreen);
@@ -34,7 +36,7 @@ const TabIcon = ({ name, color, size }) => (
 const MainTabs = () => (
   <Tab.Navigator
     screenOptions={{
-      tabBarActiveTintColor: '#6200ee',
+      tabBarActiveTintColor: '#E07A5F',
       tabBarInactiveTintColor: '#999',
       headerShown: false,
     }}
@@ -61,7 +63,7 @@ const MainTabs = () => (
 const MainAppNavigator = () => (
   <Stack.Navigator
     screenOptions={{
-      headerStyle: { backgroundColor: '#6200ee' },
+      headerStyle: { backgroundColor: '#E07A5F' },
       headerTintColor: '#fff',
       headerTitleStyle: { fontWeight: 'bold' },
     }}
@@ -70,6 +72,8 @@ const MainAppNavigator = () => (
     <Stack.Screen name="Analysis" component={AnalysisScreen} options={{ title: 'Analysis' }} />
     <Stack.Screen name="VectorDetail" component={VectorDetailScreen} options={{ title: 'Vector Details' }} />
     <Stack.Screen name="UserProfile" component={ProfileScreen} options={{ title: 'User Profile' }} />
+    <Stack.Screen name="ChatWithUser" component={ChatWithUserScreen} options={{ title: 'AI Chat' }} />
+    <Stack.Screen name="ChatDataUpload" component={ChatDataUploadScreen} options={{ title: 'Upload Chat Data' }} />
   </Stack.Navigator>
 );
 
@@ -81,7 +85,7 @@ const AppNavigator = () => {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6200ee" />
+        <ActivityIndicator size="large" color="#E07A5F" />
       </View>
     );
   }

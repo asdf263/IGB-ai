@@ -11,6 +11,7 @@ import json
 import logging
 from typing import Dict, Any, List, Optional, Tuple
 import numpy as np
+import httpx
 
 try:
     from google import genai
@@ -19,6 +20,10 @@ except ImportError:
     GEMINI_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
+
+# Ollama configuration for local LLM fallback
+OLLAMA_BASE_URL = os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434')
+OLLAMA_MODEL = os.getenv('OLLAMA_MODEL', 'llama3.2')
 
 
 class PersonalityService:
@@ -301,72 +306,90 @@ class PersonalityService:
         """
         Build a vector-based system prompt that instructs the LLM to use
         the personality vector as weighted stylistic constraints.
+        
+        Structure: Sample Messages FIRST (show don't tell), then brief traits.
         """
-        # Format the vector as JSON
-        vector_json = json.dumps(personality_vector, indent=2)
-        
-        # Build interpretation rules
-        interpretation_rules = self._build_interpretation_rules(personality_vector)
-        
-        prompt = f"""You are embodying {user_name}'s personality and texting style. You have been given a personality profile extracted from their real messages.
+        prompt = f"""You are {user_name}. You're having a casual conversation with someone. Be natural, engaged, and conversational.
 
-## Core Principle
-Bring {user_name} to life as a warm, engaged conversationalist. Even if some metrics are low, interpret them as personality quirks rather than negativity. This person WANTS to connect and communicate.
+## MOST IMPORTANT: Learn from these REAL messages
 
-## Personality Profile (0.0=low, 1.0=high)
+These are ACTUAL messages from {user_name}. Study them carefully - match the exact style, length, punctuation, capitalization, and tone:
+"""
+        # Add sample messages FIRST - up to 40 messages for style learning
+        if sample_messages and len(sample_messages) > 0:
+            num_samples = min(40, len(sample_messages))
+            for i, msg in enumerate(sample_messages[:num_samples], 1):
+                # Keep more of the message to preserve style
+                truncated = msg[:250] + "..." if len(msg) > 250 else msg
+                prompt += f'\n{i}. "{truncated}"'
+        else:
+            prompt += "\n(No sample messages available - use the style guidelines below)"
 
-{vector_json}
-
-## How to Apply These Traits
-
-{interpretation_rules}
-
-## Tone Guidelines
-- Default to FRIENDLY and ENGAGED - assume {user_name} enjoys this conversation
-- Low warmth = reserved/professional, NOT cold or dismissive
-- Low energy = calm/thoughtful, NOT bored or disinterested  
-- Low expressiveness = subtle/understated, NOT emotionless
-- Always show genuine interest in the conversation topic
-
-## Rules
-- Respond AS {user_name}, not about them
-- Never mention AI, vectors, or personality modeling
-- Match their style naturally throughout the conversation
-- When in doubt, lean toward warmth and engagement"""
-
-        # Add simplified text style patterns
+        # Add text style patterns
         if raw_text_style:
             prompt += f"""
 
-## CRITICAL: Text Style Patterns to Match EXACTLY
+## Text Style Summary
 
-{raw_text_style.get('length', 'Medium messages')}
-{raw_text_style.get('caps', 'Standard capitalization')}
-{raw_text_style.get('punctuation', 'Standard punctuation')}
-{raw_text_style.get('emojis', 'No emojis')}
-{raw_text_style.get('formality', 'Casual style')}
-{raw_text_style.get('structure', 'Complete sentences')}
+- Length: {raw_text_style.get('length', 'Medium messages')}
+- Caps: {raw_text_style.get('caps', 'Standard capitalization')}
+- Energy: {raw_text_style.get('punctuation', 'Standard punctuation')}
+- Emojis: {raw_text_style.get('emojis', 'Minimal')}
+- Formality: {raw_text_style.get('formality', 'Casual')}
+- Structure: {raw_text_style.get('structure', 'Complete sentences')}"""
 
-Match these patterns EXACTLY in your responses."""
-
-        # Add sample messages if available
-        if sample_messages and len(sample_messages) > 0:
-            prompt += f"""
-
-## Reference Messages from {user_name}
-
-Study these EXACT messages carefully and replicate the style, punctuation, capitalization, and emoji patterns:
-"""
-            for i, msg in enumerate(sample_messages[:10], 1):
-                # Keep more of the message to preserve style
-                truncated = msg[:300] + "..." if len(msg) > 300 else msg
-                prompt += f'\n{i}. "{truncated}"'
-
+        # Build brief trait summary - only 6 key dimensions
+        key_traits = self._build_key_traits_summary(personality_vector)
+        
         prompt += f"""
 
-Remember: You ARE {user_name} for this conversation. Match their EXACT texting style - same punctuation patterns, same capitalization habits, same emoji usage, same message length tendencies."""
+## Personality Traits (brief guide)
+
+{key_traits}
+
+## CRITICAL: Engagement Rules
+
+1. ALWAYS respond substantively - never give one-word answers unless the sample messages show that pattern
+2. Be CONVERSATIONAL - ask follow-up questions, share thoughts, react to what they say
+3. Show genuine interest - {user_name} wants to have a good conversation
+4. Match the energy - if they're excited, be excited; if they're chill, be chill
+5. Stay in character but be WARM and ENGAGED
+
+## Rules
+
+- You ARE {user_name} - respond in first person
+- Never mention being an AI or having a personality profile
+- If unsure, default to friendly and engaged
+- Match message length to the sample messages above"""
 
         return prompt
+    
+    def _build_key_traits_summary(self, personality_vector: Dict[str, float]) -> str:
+        """Build a brief summary of only the 6 most impactful traits."""
+        # Only show 6 key dimensions: warmth, energy, formality, verbosity, expressiveness, directness
+        key_dimensions = ['warmth', 'energy', 'formality', 'verbosity', 'expressiveness', 'directness']
+        
+        summaries = []
+        for dim in key_dimensions:
+            value = personality_vector.get(dim, 0.5)
+            if dim not in self.vector_dimensions:
+                continue
+            
+            dim_config = self.vector_dimensions[dim]
+            
+            if value >= 0.6:
+                behavior = dim_config['high_behavior']
+            elif value <= 0.4:
+                behavior = dim_config['low_behavior']
+            else:
+                continue  # Skip neutral values to reduce prompt length
+            
+            summaries.append(f"- {dim.title()}: {behavior}")
+        
+        if not summaries:
+            return "- Balanced style across all dimensions"
+        
+        return '\n'.join(summaries)
     
     def _build_interpretation_rules(self, personality_vector: Dict[str, float]) -> str:
         """Build concise interpretation rules based on vector values."""
@@ -460,88 +483,294 @@ Remember: You ARE {user_name} for this conversation. Match their EXACT texting s
         
         return summary
     
+    async def _ollama_chat(self, prompt: str, max_tokens: int = 150) -> Optional[str]:
+        """
+        Call local Ollama as fallback when Gemini is unavailable.
+        
+        Args:
+            prompt: The full prompt to send to Ollama
+            max_tokens: Maximum tokens for response (default 150 for brief responses)
+            
+        Returns:
+            Response text from Ollama, or None if unavailable
+        """
+        # Add brevity instruction for Ollama (tends to be verbose)
+        brevity_prompt = prompt + "\n\n[Keep your response brief and natural - 1-3 sentences max, like a real text message]"
+        
+        try:
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                response = await client.post(
+                    f"{OLLAMA_BASE_URL}/api/generate",
+                    json={
+                        "model": OLLAMA_MODEL,
+                        "prompt": brevity_prompt,
+                        "stream": False,
+                        "options": {
+                            "num_predict": max_tokens,  # Limit response length
+                            "temperature": 0.8,  # Keep it natural
+                            "top_p": 0.9,
+                            "repeat_penalty": 1.1  # Reduce repetition
+                        }
+                    }
+                )
+                if response.status_code == 200:
+                    result = response.json()
+                    ollama_response = result.get("response", "").strip()
+                    if ollama_response:
+                        # Clean up response - remove any meta-commentary
+                        ollama_response = self._clean_ollama_response(ollama_response)
+                        logger.info(f"Ollama fallback successful: {len(ollama_response)} chars")
+                        return ollama_response
+                else:
+                    logger.warning(f"Ollama returned status {response.status_code}")
+        except httpx.ConnectError:
+            logger.warning("Ollama not available (connection refused) - is Ollama running?")
+        except httpx.TimeoutException:
+            logger.warning("Ollama request timed out")
+        except Exception as e:
+            logger.warning(f"Ollama fallback failed: {type(e).__name__}: {e}")
+        return None
+    
+    def _clean_ollama_response(self, response: str) -> str:
+        """Clean up Ollama response - remove meta-commentary and truncate if too long."""
+        # Remove common LLM meta-patterns
+        patterns_to_remove = [
+            r'\[.*?\]',  # Remove bracketed instructions
+            r'\(.*?responds.*?\)',  # Remove response meta-text
+            r'Here\'s my response:',
+            r'I\'ll respond as',
+            r'Let me respond',
+        ]
+        
+        import re
+        cleaned = response
+        for pattern in patterns_to_remove:
+            cleaned = re.sub(pattern, '', cleaned, flags=re.IGNORECASE)
+        
+        # Clean up extra whitespace
+        cleaned = ' '.join(cleaned.split()).strip()
+        
+        # If still too long, truncate at last complete sentence within limit
+        if len(cleaned) > 500:
+            # Find last sentence ending before 500 chars
+            last_period = cleaned[:500].rfind('.')
+            last_question = cleaned[:500].rfind('?')
+            last_exclaim = cleaned[:500].rfind('!')
+            cutoff = max(last_period, last_question, last_exclaim)
+            if cutoff > 100:  # Only truncate if we have enough content
+                cleaned = cleaned[:cutoff + 1]
+        
+        return cleaned
+    
     async def chat_as_persona(
         self,
         personality: Dict[str, Any],
         user_message: str,
-        conversation_history: Optional[List[Dict[str, str]]] = None
+        conversation_history: Optional[List[Dict[str, str]]] = None,
+        sample_messages: Optional[List[str]] = None
     ) -> str:
         """
         Chat as the synthesized persona.
+        
+        Uses a fallback chain: Gemini API -> Ollama (local) -> Smart templates
         
         Args:
             personality: Synthesized personality profile
             user_message: The user's message
             conversation_history: Previous messages in the conversation
+            sample_messages: Sample messages for style reference (few-shot examples)
         
         Returns:
             Response from the AI persona
         """
-        if not self.gemini_client or not self.gemini_model:
-            logger.warning("Gemini model not initialized - using fallback response. Check GEMINI_API_KEY environment variable.")
-            return self._fallback_response(personality, user_message)
+        # Build conversation context (used by both Gemini and Ollama)
+        messages = []
         
-        try:
-            # Build conversation context
-            messages = []
-            
-            # Add system prompt
-            system_prompt = personality.get('system_prompt', '')
-            if not system_prompt:
-                logger.warning("No system prompt found in personality profile")
-            
-            # Add conversation history
-            if conversation_history:
-                for msg in conversation_history[-10:]:  # Last 10 messages
-                    role = msg.get('role', 'user')
-                    content = msg.get('content', '')
-                    messages.append(f"{role}: {content}")
-            
-            # Build the full prompt
-            full_prompt = f"{system_prompt}\n\n"
-            if messages:
-                full_prompt += "Previous conversation:\n" + "\n".join(messages) + "\n\n"
-            full_prompt += f"User: {user_message}\n\n{personality['user_name']}:"
-            
-            logger.info(f"Generating response for {personality['user_name']} (prompt length: {len(full_prompt)} chars)")
-            
-            # Generate response using the new google-genai API
-            response = self.gemini_client.models.generate_content(model=self.gemini_model, contents=full_prompt)
-            
-            if not response or not response.text:
-                logger.error("Gemini returned empty response")
-                return self._fallback_response(personality, user_message)
-            
-            logger.info(f"Successfully generated response: {len(response.text)} chars")
-            return response.text.strip()
-            
-        except Exception as e:
-            logger.error(f"Chat error: {type(e).__name__}: {str(e)}", exc_info=True)
-            return self._fallback_response(personality, user_message)
+        # Add system prompt
+        system_prompt = personality.get('system_prompt', '')
+        if not system_prompt:
+            logger.warning("No system prompt found in personality profile")
+        
+        # Add conversation history
+        if conversation_history:
+            for msg in conversation_history[-10:]:  # Last 10 messages
+                role = msg.get('role', 'user')
+                content = msg.get('content', '')
+                messages.append(f"{role}: {content}")
+        
+        # Build the full prompt
+        full_prompt = f"{system_prompt}\n\n"
+        
+        # Add a few sample messages as immediate style reminders if available
+        if sample_messages and len(sample_messages) > 0:
+            full_prompt += "Quick style reminder - here are some example responses:\n"
+            for msg in sample_messages[:5]:  # Just 5 for the chat context
+                truncated = msg[:150] + "..." if len(msg) > 150 else msg
+                full_prompt += f'- "{truncated}"\n'
+            full_prompt += "\n"
+        
+        if messages:
+            full_prompt += "Previous conversation:\n" + "\n".join(messages) + "\n\n"
+        
+        user_name = personality.get('user_name', 'Assistant')
+        full_prompt += f"User: {user_message}\n\nRespond as {user_name} (be conversational and engaged):\n{user_name}:"
+        
+        # === STEP 1: Try Gemini API ===
+        if self.gemini_client and self.gemini_model:
+            try:
+                logger.info(f"Generating response for {user_name} via Gemini (prompt length: {len(full_prompt)} chars)")
+                
+                response = self.gemini_client.models.generate_content(model=self.gemini_model, contents=full_prompt)
+                
+                if response and response.text:
+                    logger.info(f"Gemini response successful: {len(response.text)} chars")
+                    return response.text.strip()
+                else:
+                    logger.warning("Gemini returned empty response")
+                    
+            except Exception as e:
+                logger.warning(f"Gemini failed: {type(e).__name__}: {str(e)}")
+        else:
+            logger.warning("Gemini not available - trying Ollama fallback")
+        
+        # === STEP 2: Fallback to Ollama (local LLM) ===
+        logger.info(f"Falling back to Ollama ({OLLAMA_MODEL})...")
+        ollama_response = await self._ollama_chat(full_prompt)
+        if ollama_response:
+            return ollama_response
+        
+        # === STEP 3: Last resort - smart templates ===
+        logger.warning("All LLMs unavailable - using template fallback")
+        return self._fallback_response(personality, user_message)
     
     def _fallback_response(self, personality: Dict[str, Any], user_message: str) -> str:
-        """Generate a fallback response when Gemini is unavailable."""
-        user_name = personality.get('user_name', 'Unknown')
+        """
+        Generate a smart fallback response when all LLMs are unavailable.
+        
+        Parses user intent and applies personality vector to select and modify responses.
+        """
+        import random
+        
         vector = personality.get('personality_vector', {})
+        msg_lower = user_message.lower().strip()
         
-        # Generate a simple response based on personality vector
-        # Check sentiment baseline
-        sentiment = vector.get('sentiment_baseline', 0.5)
+        # Extract personality traits
+        warmth = vector.get('warmth', 0.5)
+        energy = vector.get('energy', 0.5)
         formality = vector.get('formality', 0.5)
-        enthusiasm = vector.get('response_enthusiasm', 0.5)
-        msg_length = vector.get('average_message_length', 0.5)
+        curiosity = vector.get('curiosity', 0.5)
+        expressiveness = vector.get('expressiveness', 0.5)
+        supportiveness = vector.get('supportiveness', 0.5)
         
-        # Build response based on vector values
-        if sentiment > 0.6 and enthusiasm > 0.6:
-            return "That's really interesting! I'd love to hear more about that."
-        elif msg_length < 0.4:
-            return "Interesting. Tell me more?"
-        elif formality > 0.7:
-            return "I understand. Could you elaborate on that point?"
-        elif sentiment < 0.4:
-            return "I see. What's your take on it?"
+        # === INTENT DETECTION ===
+        is_question = '?' in user_message or msg_lower.startswith(('what', 'how', 'why', 'when', 'where', 'who', 'can', 'do', 'is', 'are'))
+        is_greeting = any(g in msg_lower for g in ['hi', 'hello', 'hey', 'sup', 'yo', 'hiya', 'good morning', 'good evening'])
+        is_emotional_negative = any(w in msg_lower for w in ['sad', 'stressed', 'upset', 'angry', 'frustrated', 'worried', 'anxious', 'tired', 'exhausted', 'bad day', 'rough'])
+        is_emotional_positive = any(w in msg_lower for w in ['happy', 'excited', 'great', 'awesome', 'amazing', 'love', 'wonderful', 'fantastic'])
+        is_sharing = any(w in msg_lower for w in ['i think', 'i feel', 'i was', 'i went', 'i did', 'i had', 'i am', "i'm"])
+        
+        # === RESPONSE TEMPLATES BY INTENT ===
+        
+        if is_greeting:
+            greetings = [
+                "hey! what's up?",
+                "hi there!",
+                "hey hey!",
+                "oh hey! how's it going?",
+                "hi! good to hear from you",
+            ]
+            response = random.choice(greetings)
+            
+        elif is_emotional_negative:
+            # Supportive responses for negative emotions
+            supportive = [
+                "that sounds rough :( what's going on?",
+                "aw man, I'm sorry to hear that. want to talk about it?",
+                "that sucks :/ what happened?",
+                "oh no, hope you're okay. what's up?",
+                "I hear you. that's a lot to deal with",
+            ]
+            response = random.choice(supportive)
+            if supportiveness > 0.6:
+                response = response.replace(":/", ":(").replace("sucks", "sounds hard")
+                
+        elif is_emotional_positive:
+            # Excited responses for positive emotions
+            excited = [
+                "that's awesome!! tell me more!",
+                "oh nice! what happened?",
+                "yay! that's great to hear!",
+                "love that for you! what's the story?",
+                "ahh that's so cool!",
+            ]
+            response = random.choice(excited)
+            
+        elif is_question:
+            # Responses to questions
+            question_responses = [
+                "hmm good question... honestly not totally sure",
+                "ooh let me think about that",
+                "that's a good one - what do you think?",
+                "honestly? I'd have to think about it more",
+                "mm that's interesting to think about",
+            ]
+            response = random.choice(question_responses)
+            if curiosity > 0.6:
+                response += " what made you ask?"
+                
+        elif is_sharing:
+            # Responses to sharing/statements
+            sharing_responses = [
+                "oh that's interesting, tell me more!",
+                "wait really? how was that?",
+                "oh nice! and then what happened?",
+                "ooh I wanna hear more about this",
+                "that's cool! how'd it go?",
+            ]
+            response = random.choice(sharing_responses)
+            
         else:
-            return "That makes sense. What else is on your mind?"
+            # Default engaged responses
+            default_responses = [
+                "oh interesting! what do you mean?",
+                "hmm tell me more about that",
+                "wait I wanna hear more",
+                "oh? go on",
+                "that's cool, what made you think of that?",
+            ]
+            response = random.choice(default_responses)
+        
+        # === APPLY PERSONALITY MODIFIERS ===
+        
+        # High energy: add exclamation marks
+        if energy > 0.6 and '!' not in response:
+            response = response.rstrip('?.,') + '!'
+        
+        # Low energy: remove some exclamation marks
+        if energy < 0.4:
+            response = response.replace('!!', '').replace('!', '.')
+        
+        # High expressiveness: maybe add emoji
+        if expressiveness > 0.7 and random.random() > 0.5:
+            emojis = ['😊', '✨', '💭', '🙂', '👀']
+            response = response + ' ' + random.choice(emojis)
+        
+        # High formality: clean up casual language
+        if formality > 0.65:
+            response = response.replace("wanna", "want to")
+            response = response.replace("gonna", "going to")
+            response = response.replace("ooh", "oh")
+            response = response.replace("hmm", "hm")
+            response = response.replace(":)", "")
+            response = response.replace(":(", "")
+            response = response.replace(":/", "")
+        
+        # Low formality: keep it casual (already is by default)
+        if formality < 0.35:
+            response = response.replace("That is", "that's")
+            response = response.replace("I am", "I'm")
+        
+        return response
     
     def enhance_with_synthetic(
         self,

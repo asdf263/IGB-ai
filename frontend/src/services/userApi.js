@@ -88,6 +88,10 @@ const detectFileType = (file) => {
  * @returns {Promise} Upload result with vector_id
  */
 export const uploadChatData = async (uid, file) => {
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'userApi.js:90',message:'uploadChatData entry',data:{uid:uid,fileName:file?.name,fileUri:file?.uri,fileMimeType:file?.mimeType,fileSize:file?.size},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H2'})}).catch(()=>{});
+  // #endregion
+  
   try {
     const { isZip, mimeType, defaultName } = detectFileType(file);
     
@@ -102,6 +106,10 @@ export const uploadChatData = async (uid, file) => {
     });
 
     console.log(`[userApi] Uploading ${isZip ? 'Instagram ZIP' : 'JSON'} file: ${file.name}`);
+    
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'userApi.js:108',message:'Before API call',data:{endpoint:`/api/users/${uid}/upload-chat`,mimeType:mimeType,isZip:isZip},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H2'})}).catch(()=>{});
+    // #endregion
 
     const response = await api.post(`/api/users/${uid}/upload-chat`, formData, {
       headers: {
@@ -109,8 +117,17 @@ export const uploadChatData = async (uid, file) => {
       },
       timeout,
     });
+    
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'userApi.js:120',message:'API call success',data:{responseData:response.data,hasVectorId:!!response.data?.vector_id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H2'})}).catch(()=>{});
+    // #endregion
+    
     return response.data;
   } catch (error) {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/c7d0c08b-891b-46e2-8e1f-d3fa2db26cbd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'userApi.js:128',message:'API call error',data:{errorMessage:error.message,responseStatus:error.response?.status,responseData:error.response?.data},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H2'})}).catch(()=>{});
+    // #endregion
+    
     throw new Error(error.response?.data?.detail || error.response?.data?.error || error.message || 'Failed to upload chat data');
   }
 };
@@ -126,6 +143,62 @@ export const completeOnboarding = async (uid) => {
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.error || error.message || 'Failed to complete onboarding');
+  }
+};
+
+/**
+ * Get compatibility between two users
+ * @param {string} uid1 - First user's UID (typically the current user)
+ * @param {string} uid2 - Second user's UID (the user being viewed)
+ * @returns {Promise} Compatibility data including score, strengths, challenges
+ */
+export const getUserCompatibility = async (uid1, uid2) => {
+  try {
+    const response = await api.get(`/api/users/${uid1}/compatibility/${uid2}`);
+    return response.data;
+  } catch (error) {
+    // Return null for specific errors that indicate missing vectors
+    if (error.response?.status === 400 || error.response?.status === 404) {
+      return {
+        success: false,
+        error: error.response?.data?.detail || 'Cannot calculate compatibility',
+        compatibility: null
+      };
+    }
+    throw new Error(error.response?.data?.detail || error.message || 'Failed to get compatibility');
+  }
+};
+
+/**
+ * Chat with an AI persona simulating a user
+ * @param {string} uid - UID of the user to chat with (their AI persona)
+ * @param {string} message - The message to send
+ * @param {Array} conversationHistory - Previous messages [{role: 'user'|'assistant', content: '...'}]
+ * @returns {Promise} Chat response
+ */
+export const chatWithUser = async (uid, message, conversationHistory = null) => {
+  try {
+    const response = await api.post(`/api/users/${uid}/chat`, {
+      message,
+      conversation_history: conversationHistory,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.detail || error.message || 'Failed to chat');
+  }
+};
+
+/**
+ * Create or get a persona for a user
+ * @param {string} uid - User UID
+ * @returns {Promise} Persona data
+ */
+export const createUserPersona = async (uid) => {
+  try {
+    const response = await api.post(`/api/users/${uid}/persona`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.detail || error.message || 'Failed to create persona');
   }
 };
 
