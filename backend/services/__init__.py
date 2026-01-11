@@ -6,6 +6,8 @@ from .visualization_service import VisualizationService
 from .vector_store import VectorStore
 from .vector_store_chroma import ChromaVectorStore
 from .cache_service import CacheService
+from .mongodb_service import MongoDBService
+from .user_data_service import UserDataService
 
 __all__ = [
     'FeatureExtractor',
@@ -14,5 +16,7 @@ __all__ = [
     'VisualizationService',
     'VectorStore',
     'ChromaVectorStore',
-    'CacheService'
+    'CacheService',
+    'MongoDBService',
+    'UserDataService'
 ]

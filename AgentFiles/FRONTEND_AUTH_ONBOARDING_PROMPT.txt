@@ -1,0 +1,321 @@
+FRONTEND AUTHENTICATION & ONBOARDING FLOW - Implementation Prompt
+==================================================================
+
+OBJECTIVE
+---------
+Create a complete frontend authentication and onboarding experience that simulates user authentication (without real security), allowing users to sign up, log in, complete their profile, and upload chat data for vectorization.
+
+REQUIREMENTS
+------------
+
+1. AUTHENTICATION FLOW (Simulated)
+   - Login screen
+   - Signup screen
+   - Password field (stored in MongoDB, no real encryption needed)
+   - Session simulation (store user UID in AsyncStorage/Context)
+   - Logout functionality
+   - Protected routes (redirect to login if not authenticated)
+
+2. ONBOARDING PROCESS
+   Multi-step flow:
+   Step 1: Account Creation
+   - Email/Username
+   - Password
+   - Confirm Password
+   - Validation and error messages
+   
+   Step 2: Basic Profile Information
+   - Full Name
+   - Instagram Handle (with validation)
+   - Profile Picture (image picker/upload)
+   - Current Living Location (city, state, country or location picker)
+   - Height (input with unit selector: cm/inches)
+   - Ethnicity (dropdown or text input)
+   - Progress indicator
+   - Save & Continue button
+   
+   Step 3: Chat Data Upload
+   - File upload interface
+   - Support JSON/TXT chat logs
+   - File validation
+   - Upload progress indicator
+   - Preview uploaded file
+   - Process and vectorize button
+   - Show vectorization progress
+   - Success confirmation
+   
+   Step 4: Completion
+   - Welcome message
+   - Profile summary
+   - "Go to Dashboard" button
+
+3. USER DATA INTEGRATION
+   - Create user in MongoDB via API
+   - Upload profile picture (store URL or handle file)
+   - Save all profile fields
+   - Upload chat data and trigger vectorization
+   - Link vector to user via UID
+   - Store password in MongoDB (plain text is fine for simulation)
+
+4. NAVIGATION STRUCTURE
+   - AuthNavigator (Login/Signup screens)
+   - OnboardingNavigator (multi-step flow)
+   - MainAppNavigator (protected routes)
+   - Conditional rendering based on auth state
+
+IMPLEMENTATION TASKS
+--------------------
+
+1. Authentication Screens
+   
+   LoginScreen:
+   - Email/Username input
+   - Password input
+   - "Login" button
+   - "Don't have an account? Sign up" link
+   - Error message display
+   - API: POST /api/users/login
+     Body: {email/username, password}
+     Response: {success, uid, user_profile}
+   
+   SignupScreen:
+   - Email/Username input
+   - Password input
+   - Confirm Password input
+   - "Sign Up" button
+   - "Already have an account? Login" link
+   - Validation (password match, required fields)
+   - API: POST /api/users/signup
+     Body: {email/username, password}
+     Response: {success, uid, message}
+
+2. Onboarding Flow
+   
+   OnboardingStep1_Account:
+   - Form with email/username, password, confirm password
+   - Validation in real-time
+   - "Next" button (disabled until valid)
+   - Store credentials in state/context
+   
+   OnboardingStep2_Profile:
+   - Form with all profile fields:
+     * Name (TextInput)
+     * Instagram Handle (TextInput with @ validation)
+     * Profile Picture (ImagePicker or file upload)
+     * Location (TextInput or location picker)
+     * Height (TextInput with unit toggle)
+     * Ethnicity (Picker/Dropdown or TextInput)
+   - Image preview for profile picture
+   - "Back" and "Continue" buttons
+   - Progress indicator (Step 2 of 4)
+   - API: POST /api/users/:uid/profile
+     Body: {name, instagram_handle, profile_picture, location, height, ethnicity}
+   
+   OnboardingStep3_ChatUpload:
+   - File picker (DocumentPicker)
+   - File type validation (JSON, TXT)
+   - File size validation
+   - Upload progress bar
+   - File preview (show filename, size)
+   - "Upload & Vectorize" button
+   - Loading state during vectorization
+   - Success/error messages
+   - API: POST /api/users/:uid/upload-chat
+     Body: FormData with file
+     Response: {success, vector_id, message}
+   - API: POST /api/features/extract (if needed separately)
+   
+   OnboardingStep4_Complete:
+   - Success animation/icon
+   - Welcome message with user name
+   - Profile summary card
+   - "Go to Dashboard" button
+   - Navigate to main app
+
+3. State Management
+   
+   AuthContext:
+   - user: {uid, profile, isAuthenticated}
+   - login(credentials) -> set user state
+   - logout() -> clear user state
+   - signup(credentials) -> create user, set state
+   - updateProfile(updates) -> update user profile
+   - Persist auth state in AsyncStorage
+   
+   OnboardingContext (optional):
+   - currentStep: number
+   - formData: accumulated form data
+   - uploadedFile: file reference
+   - vectorizationStatus: loading/success/error
+
+4. API Integration
+   
+   Create API service methods:
+   - signup(email, password) -> POST /api/users/signup
+   - login(email, password) -> POST /api/users/login
+   - createUserProfile(uid, profileData) -> POST /api/users/:uid/profile
+   - uploadChatData(uid, file) -> POST /api/users/:uid/upload-chat
+   - getCurrentUser(uid) -> GET /api/users/:uid
+   - updateProfile(uid, updates) -> PUT /api/users/:uid/profile
+
+5. Backend API Endpoints Needed
+   
+   POST /api/users/signup
+   - Create new user with email/username and password
+   - Generate UID
+   - Return: {success, uid, message}
+   
+   POST /api/users/login
+   - Verify email/username and password
+   - Return: {success, uid, user_profile}
+   - Return error if credentials invalid
+   
+   POST /api/users/:uid/profile
+   - Create/update user profile
+   - Handle profile picture upload
+   - Save to MongoDB
+   - Return: {success, profile}
+   
+   POST /api/users/:uid/upload-chat
+   - Accept file upload (JSON/TXT)
+   - Process chat log
+   - Extract features and create vector
+   - Link vector to user via UID
+   - Save vector to ChromaDB
+   - Return: {success, vector_id, message}
+   
+   GET /api/users/:uid
+   - Get complete user data (profile + vector)
+   - Return: {profile, vector, metadata}
+
+6. UI/UX Requirements
+   
+   Design:
+   - Clean, modern onboarding flow
+   - Progress indicator (steps 1/4, 2/4, etc.)
+   - Smooth transitions between steps
+   - Loading states for API calls
+   - Error handling with user-friendly messages
+   - Success animations
+   - Form validation feedback
+   
+   Components Needed:
+   - Custom TextInput with validation
+   - ImagePicker component
+   - FileUpload component with progress
+   - ProgressBar/Stepper component
+   - LocationPicker (optional, can be text input)
+   - HeightInput with unit selector
+   - EthnicityPicker/Dropdown
+
+7. Navigation Flow
+   
+   App Startup:
+   - Check AsyncStorage for auth state
+   - If authenticated -> MainAppNavigator
+   - If not authenticated -> AuthNavigator
+   
+   After Signup:
+   - Create account -> OnboardingNavigator Step 1
+   - Complete Step 1 -> Step 2
+   - Complete Step 2 -> Step 3
+   - Complete Step 3 -> Step 4
+   - Complete Step 4 -> MainAppNavigator
+   
+   After Login:
+   - Verify credentials
+   - Load user profile
+   - If profile incomplete -> OnboardingNavigator (resume at appropriate step)
+   - If profile complete -> MainAppNavigator
+
+8. Error Handling
+   - Network errors
+   - Invalid credentials
+   - Duplicate email/username
+   - File upload failures
+   - Vectorization errors
+   - Display user-friendly error messages
+   - Retry mechanisms where appropriate
+
+9. Data Persistence
+   - Store auth state in AsyncStorage
+   - Persist user UID
+   - Cache user profile data
+   - Handle offline scenarios (show cached data)
+
+10. Security Considerations (Simulated)
+    - Store password in MongoDB (plain text for simulation)
+    - No real encryption needed
+    - No JWT tokens needed
+    - Simple UID-based session
+    - Clear indication this is a demo/simulation
+
+IMPLEMENTATION PRIORITY
+-----------------------
+1. AuthContext and state management
+2. Login/Signup screens
+3. Basic navigation structure
+4. Onboarding Step 1 (Account creation)
+5. Onboarding Step 2 (Profile form)
+6. Profile picture upload
+7. Onboarding Step 3 (Chat upload)
+8. Onboarding Step 4 (Completion)
+9. Protected routes
+10. Error handling and validation
+11. Polish and animations
+
+TECHNICAL SPECIFICATIONS
+-------------------------
+
+React Native Components:
+- React Navigation (Stack + Tab navigators)
+- React Native Paper (UI components)
+- React Native Document Picker (file upload)
+- React Native Image Picker (profile picture)
+- AsyncStorage (persistence)
+- Axios (API calls)
+
+State Management:
+- React Context API for auth state
+- Local state for form data
+- AsyncStorage for persistence
+
+File Structure:
+frontend/src/
+  screens/
+    auth/
+      LoginScreen.js
+      SignupScreen.js
+    onboarding/
+      OnboardingStep1_Account.js
+      OnboardingStep2_Profile.js
+      OnboardingStep3_ChatUpload.js
+      OnboardingStep4_Complete.js
+    main/
+      DashboardScreen.js
+      ProfileScreen.js
+      ...
+  navigation/
+    AuthNavigator.js
+    OnboardingNavigator.js
+    MainAppNavigator.js
+  context/
+    AuthContext.js
+    OnboardingContext.js (optional)
+  services/
+    authApi.js
+    userApi.js
+    vectorApi.js
+
+TESTING REQUIREMENTS
+--------------------
+- Test login flow
+- Test signup flow
+- Test form validation
+- Test file upload
+- Test navigation between steps
+- Test protected routes
+- Test error scenarios
+- Test data persistence
+
+

@@ -1,0 +1,181 @@
+USER DATA STORAGE SYSTEM - Implementation Prompt
+==================================================
+
+OBJECTIVE
+---------
+Implement a comprehensive user data storage system that stores user profile information in MongoDB Atlas and links behavior vectors in ChromaDB via unique user IDs (UIDs).
+
+REQUIREMENTS
+------------
+
+1. USER PROFILE DATA (MongoDB Atlas)
+   Store the following user information:
+   - uid: Unique identifier (primary key)
+   - name: Full name
+   - instagram_handle: Instagram username
+   - profile_picture: URL or file path to profile image
+   - current_living_location: City/State/Country or coordinates
+   - height: Height in cm or inches
+   - ethnicity: Ethnicity/race
+   - created_at: Account creation timestamp
+   - updated_at: Last update timestamp
+   - vector_id: Reference to ChromaDB vector (optional, for linking)
+
+2. BEHAVIOR VECTORS (ChromaDB)
+   Store behavior vectors with:
+   - uid: User ID (used as vector ID or in metadata)
+   - vector: ~200 dimensional feature vector
+   - metadata: Additional vector metadata
+   - created_at: Vector creation timestamp
+   - updated_at: Last vector update timestamp
+
+3. DATA RELATIONSHIP
+   - MongoDB stores user profile data
+   - ChromaDB stores behavior vectors
+   - Linked via UID (unique identifier)
+   - Must support bidirectional lookup (user -> vector, vector -> user)
+
+IMPLEMENTATION TASKS
+--------------------
+
+1. MongoDB Setup
+   - Create MongoDB Atlas connection service
+   - Define user collection schema
+   - Implement CRUD operations for user profiles
+   - Add indexes on uid, instagram_handle for fast lookups
+   - Handle profile picture storage (URL or file upload)
+
+2. ChromaDB Integration
+   - Modify existing ChromaVectorStore to use UID as vector ID
+   - Store UID in vector metadata
+   - Ensure vectors are linked to user profiles
+   - Support vector updates per user
+
+3. Unified Data Service
+   - Create UserDataService that coordinates MongoDB + ChromaDB
+   - Methods needed:
+     * create_user(profile_data, vector_data) -> uid
+     * get_user(uid) -> {profile, vector}
+     * update_user_profile(uid, profile_updates)
+     * update_user_vector(uid, new_vector)
+     * delete_user(uid) -> delete from both stores
+     * search_users_by_vector(query_vector, top_k) -> users with similar vectors
+     * get_user_by_instagram(handle) -> user profile
+
+4. API Endpoints
+   POST /api/users/create
+   - Create new user with profile + initial vector
+   - Returns: uid, user profile, vector_id
+   
+   GET /api/users/:uid
+   - Get complete user data (profile + vector)
+   - Returns: {profile: {...}, vector: [...], metadata: {...}}
+   
+   PUT /api/users/:uid/profile
+   - Update user profile information
+   - Returns: updated profile
+   
+   PUT /api/users/:uid/vector
+   - Update user's behavior vector
+   - Returns: updated vector_id
+   
+   DELETE /api/users/:uid
+   - Delete user from both MongoDB and ChromaDB
+   - Returns: success confirmation
+   
+   GET /api/users/search/by-instagram/:handle
+   - Find user by Instagram handle
+   - Returns: user profile + vector
+   
+   POST /api/users/search/by-vector
+   - Find users with similar behavior vectors
+   - Input: query_vector, top_k
+   - Returns: list of users with similarity scores
+
+5. Data Validation
+   - Validate all required fields on user creation
+   - Validate vector dimensions match expected (~200)
+   - Validate UID format and uniqueness
+   - Validate Instagram handle format
+   - Validate location data format
+
+6. Error Handling
+   - Handle MongoDB connection failures
+   - Handle ChromaDB connection failures
+   - Handle missing users (404)
+   - Handle duplicate UIDs (409)
+   - Handle invalid vector dimensions (400)
+   - Ensure atomicity: if MongoDB insert fails, don't create ChromaDB entry
+
+7. Environment Configuration
+   - MongoDB Atlas connection string
+   - Database name
+   - Collection name
+   - ChromaDB persistence directory
+   - Profile picture storage configuration (local vs cloud)
+
+TECHNICAL SPECIFICATIONS
+-------------------------
+
+MongoDB Schema:
+{
+  "_id": ObjectId (auto-generated),
+  "uid": String (unique, indexed),
+  "name": String,
+  "instagram_handle": String (indexed),
+  "profile_picture": String (URL),
+  "current_living_location": {
+    "city": String,
+    "state": String,
+    "country": String,
+    "coordinates": [Number, Number] // [longitude, latitude]
+  },
+  "height": Number, // in cm
+  "ethnicity": String,
+  "vector_id": String, // ChromaDB vector reference
+  "created_at": ISODate,
+  "updated_at": ISODate
+}
+
+ChromaDB Metadata:
+{
+  "uid": String,
+  "message_count": Number,
+  "extracted_at": String (ISO timestamp),
+  "created_at": String (ISO timestamp),
+  "updated_at": String (ISO timestamp)
+}
+
+UID Format:
+- Generate unique UIDs (UUID v4 or custom format)
+- Format: "user_<hash>" or UUID
+- Must be globally unique
+
+IMPLEMENTATION PRIORITY
+-----------------------
+1. MongoDB connection and basic CRUD
+2. ChromaDB UID integration
+3. Unified UserDataService
+4. API endpoints
+5. Search functionality
+6. Error handling and validation
+7. Profile picture handling
+
+TESTING REQUIREMENTS
+--------------------
+- Unit tests for MongoDB operations
+- Unit tests for ChromaDB operations
+- Integration tests for UserDataService
+- API endpoint tests
+- Test data cleanup after tests
+- Test with missing users, invalid data, connection failures
+
+SECURITY CONSIDERATIONS
+-----------------------
+- Validate all user inputs
+- Sanitize Instagram handles
+- Secure MongoDB connection (use connection string with credentials)
+- Consider rate limiting on user creation
+- Validate profile picture URLs (if using URLs)
+- Consider PII encryption for sensitive fields
+

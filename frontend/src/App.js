@@ -2,6 +2,7 @@ import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 import { AppProvider } from './context/AppContext';
+import { AuthProvider } from './context/AuthContext';
 import AppNavigator from './navigation/AppNavigator';
 
 const theme = {
@@ -19,10 +20,12 @@ const theme = {
 export default function App() {
   return (
     <PaperProvider theme={theme}>
-      <AppProvider>
-        <StatusBar style="light" />
-        <AppNavigator />
-      </AppProvider>
+      <AuthProvider>
+        <AppProvider>
+          <StatusBar style="light" />
+          <AppNavigator />
+        </AppProvider>
+      </AuthProvider>
     </PaperProvider>
   );
 }
